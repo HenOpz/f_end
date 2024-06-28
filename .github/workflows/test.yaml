@@ -39,18 +39,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: Wait 10 sec
-        run:
-          sleep 10
+      # - name: Wait 10 sec
+      #   run:
+      #     sleep 10
 
       - name: npm install
         if: steps.cache.outputs.cache-hit != 'true'
         run:
           npm install -g npm@latest
 
-      - name: Check Container
-        run:
-          docker ps
+      # - name: Check Container
+      #   run:
+      #     docker ps
 
       # - name: Test the App
       #   run:

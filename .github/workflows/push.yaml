@@ -37,7 +37,6 @@ jobs:
         with:
           image-ref: mydockerimage:latest
           format: "table"
-          output: "trivy_report.txt"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
 
@@ -60,8 +59,8 @@ jobs:
 
       - name: Tag Docker image
         run: |
-          docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+          docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/CPOC_f_end:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/CPOC_f_end:latest
 
       # - name: Push Docker image to Docker Hub
       #   uses: docker/build-push-action@v2
