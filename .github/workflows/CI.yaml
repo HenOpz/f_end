@@ -11,21 +11,21 @@ concurrency:
 jobs:
   build:
     name: Build
-    uses: HenOpz/f_end/.github/workflows/build.yaml
+    uses: HenOpz/f_end/.github/workflows/build.yaml@main
     with:
         version: "20"
 
   test:
     name: Test
     needs: [build]
-    uses: HenOpz/f_end/.github/workflows/test.yaml
+    uses: HenOpz/f_end/.github/workflows/test.yaml@main
     with:
         version: "20"
 
   sec:
     name: Sec Check
     needs: [test]
-    uses: HenOpz/f_end/.github/workflows/security.yaml
+    uses: HenOpz/f_end/.github/workflows/security.yaml@main
     secrets:
       GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -33,7 +33,7 @@ jobs:
   push:
     name: Push
     needs: [test]
-    uses: HenOpz/f_end/.github/workflows/push.yaml
+    uses: HenOpz/f_end/.github/workflows/push.yaml@main
     secrets:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
