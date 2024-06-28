@@ -38,7 +38,6 @@ jobs:
           image-ref: mydockerimage:latest
           format: 'table'
           output: 'trivy_report.txt'
-          # github-pat: githubtoken # or PAT if you're using a PAT
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
 
