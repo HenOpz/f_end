@@ -33,15 +33,15 @@ jobs:
 
       - name: Scan Docker image with Trivy
         id: trivy_scan
-        uses: aquasecurity/trivy-action@0.20.0
+        uses: aquasecurity/trivy-action@0.23.0
         with:
           input: image.tar
           #format: "table"
           severity: "MEDIUM,HIGH,CRITICAL"
           # scanners: "vuln"
-          format: 'template'
-          template: '@contrib/html.tpl'
-          output: 'report.html'
+          format: 'table'
+          template: '@/contrib/gitlab.tpl'
+          output: 'report.txt'
       
       # - name: Save Trivy scan report to file
       #   run: echo "${{ steps.trivy_scan.outputs.result }}" > ${{ github.workspace }}/trivy_report.txt
@@ -50,7 +50,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: trivy-scan-report
-          path: report.html
+          path: report.txt
           retention-days: 1
 
       - name: Log in to Docker Hub
