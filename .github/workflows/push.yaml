@@ -59,9 +59,9 @@ jobs:
         run: docker load < image.tar
 
       - name: Tag Docker image
-        run:
-        docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
-        docker push ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+        run: |
+          docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
 
       # - name: Push Docker image to Docker Hub
       #   uses: docker/build-push-action@v2
