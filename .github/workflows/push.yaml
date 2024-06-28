@@ -60,8 +60,11 @@ jobs:
         run: docker load < image.tar
 
       - name: Tag Docker image
-        run: |
+        run:
         docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+
+      - name: Push Image
+        run:
         docker push ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
 
       # - name: Push Docker image to Docker Hub
