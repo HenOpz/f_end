@@ -29,7 +29,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build -t mydockerimage:latest .
-          docker save mydockerimage:latest > image.tar
+          docker save mydockerimage:latest > ${{ github.workspace }}/image.tar
 
       - name: Scan Docker image with Trivy
         id: trivy_scan
@@ -58,7 +58,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Load Docker image from tarball
-        run: docker load < image.tar
+        run: docker load < ${{ github.workspace }}/image.tar
 
       - name: Tag Docker image
         run: |
