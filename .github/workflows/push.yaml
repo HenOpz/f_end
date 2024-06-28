@@ -35,7 +35,7 @@ jobs:
         id: trivy_scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: image.tar
+          input: ${{ github.workspace }}/image.tar
           format: "table"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
