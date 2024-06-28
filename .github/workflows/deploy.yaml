@@ -1,68 +1,35 @@
 name: Kubernetes Deployment
-
 on:
   workflow_call:
     secrets:
-      KUBE_CONFIG_DATA:
+      SSH_PRIVATE_KEY:
         required: true
-
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest  # Use the latest Ubuntu image
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Pull Docker image from Docker Hub
-        run: docker pull nginx:latest
+    - name: Set up SSH for GitHub Actions
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H 18.143.141.193 >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
 
-      - name: Run Docker container
-        run: |
-          docker run -d -p 80:80 --name web-svr nginx:latest
-  
-      - name: Verify Nginx is running
-        run: curl http://localhost:80
-  
-      - name: Holding the Container
-        run: |
-          sleep 10
+    - name: Deploy application
+      run: |
+        ssh -o StrictHostKeyChecking=no ubuntu@18.143.141.193 << 'EOF'
+          sudo apt update
+          sudo apt install -y nginx  # Example package installation
 
-      # - name: Set up kubectl
-      #   uses: azure/k8s-set-context@v1
-      #   with:
-      #     kubeconfig: ${{ secrets.KUBE_CONFIG_DATA }}
+          # Copy application files
+          sudo rm -rf /var/www/html/application  # Clean existing files (optional)
+          sudo mkdir -p /var/www/html/application
+          sudo cp -r $GITHUB_WORKSPACE/* /var/www/html/application
 
-      # - name: Set up kubectl
-      #   run: |
-      #     mkdir -p ~/.kube
-      #     cp path/to/your/local/kubeconfig ~/.kube/config
-      #     kubectl version  # Check kubectl version and configuration
-
-      # - name: Deploy NGINX to Kubernetes
-      #   run: |
-      #     kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
-      #     kubectl wait --namespace ingress-nginx \
-      #       --for=condition=ready pod \
-      #       --selector=app.kubernetes.io/component=controller \
-      #       --timeout=120s
-
-      # - name: Expose NGINX Service
-      #   run: |
-      #     kubectl expose deployment nginx-ingress-controller \
-      #       --type=LoadBalancer \
-      #       --name=nginx-ingress
-
-      # - name: Wait for LoadBalancer IP
-      #   run: |
-      #     sleep 30  # Allow time for the LoadBalancer IP to be assigned
-      #     kubectl get services nginx-ingress -o wide
-
-      # - name: Run Health Check
-      #   run: |
-      #     curl http://$(kubectl get services nginx-ingress -o jsonpath='{.status.loadBalancer.ingress[0].ip}')/healthz
-
-      # - name: Clean Up
-      #   run: |
-      #     kubectl delete deployment nginx-ingress-controller
-      #     kubectl delete svc nginx-ingress
+          # Restart nginx (example service restart)
+          sudo systemctl restart nginx
+        EOF
