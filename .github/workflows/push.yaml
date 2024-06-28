@@ -40,7 +40,7 @@ jobs:
           severity: "MEDIUM,HIGH,CRITICAL"
           # scanners: "vuln"
           format: 'template'
-          template: '@html.tpl'
+          template: '@contrib/html.tpl'
           output: 'report.html'
       
       # - name: Save Trivy scan report to file
