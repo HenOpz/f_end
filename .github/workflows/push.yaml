@@ -35,10 +35,13 @@ jobs:
         id: trivy_scan
         uses: aquasecurity/trivy-action@0.20.0
         with:
-          image-ref: mydockerimage:latest
+          image-ref: image.tar
           format: "table"
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
+      
+      - name: Save Trivy scan report to file
+        run: echo "${{ steps.trivy_scan.outputs.result }}" > ${{ github.workspace }}/trivy_report.txt
 
       - name: Upload Trivy report as a GitHub artifact
         uses: actions/upload-artifact@v2
@@ -59,8 +62,8 @@ jobs:
 
       - name: Tag Docker image
         run: |
-          docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/CPOC_f_end:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/CPOC_f_end:latest
+          docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/fend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/fend:latest
 
       # - name: Push Docker image to Docker Hub
       #   uses: docker/build-push-action@v2
