@@ -36,17 +36,17 @@ jobs:
         uses: aquasecurity/trivy-action@0.20.0
         with:
           image-ref: mydockerimage:latest
-          format: 'github'
-          output: 'dependency-results.sbom.json'
-          github-pat: ${{ secrets.GITHUB_TOKEN }} # or PAT if you're using a PAT
+          format: 'table'
+          output: 'trivy_report.txt'
+          # github-pat: githubtoken # or PAT if you're using a PAT
           severity: "MEDIUM,HIGH,CRITICAL"
           scanners: "vuln"
 
-      - name: Upload trivy report as a Github artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload Trivy report as a GitHub artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: trivy-sbom-report
-          path: '${{ github.workspace }}/dependency-results.sbom.json'
+          name: trivy-scan-report
+          path: ${{ github.workspace }}/trivy_report.txt 
           retention-days: 1
 
       - name: Log in to Docker Hub
@@ -60,11 +60,13 @@ jobs:
         run: docker load < image.tar
 
       - name: Tag Docker image
-        run: docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+        run: |
+        docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+        docker push ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
 
-      - name: Push Docker image to Docker Hub
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
+      # - name: Push Docker image to Docker Hub
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     push: true
+      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest
