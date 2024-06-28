@@ -1,0 +1,21 @@
+name: "Build Reusable Workflow For Node app"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+jobs:
+  build:
+    name: Build App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - uses: HenOpz/app/.github/prepare-action@dev
+
+      - name: build
+        run:  |
+          npm run build

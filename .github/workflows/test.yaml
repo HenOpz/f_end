@@ -1,0 +1,57 @@
+name: "Reusable Workflow for Test"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Testing Workflow
+    runs-on: ubuntu-latest
+    # services:
+    #   backend:
+    #     image: cpoc_backend:latest
+    #     ports:
+    #       - 7329:80
+    #     options: --name backend
+
+    steps:
+      - name: Checkout App
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4.0.2
+        with:  
+          node-version: ${{ inputs.version }}
+
+      # - name: Setup Env
+      #   run:  |
+      #     cp .env .env
+
+      - name: Cache app dependencies
+        uses: actions/cache@v2
+        with:
+          path: ./node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Wait 10 sec
+        run:
+          sleep 10
+
+      - name: npm install
+        if: steps.cache.outputs.cache-hit != 'true'
+        run:
+          npm install -g npm@latest
+
+      - name: Check Container
+        run:
+          docker ps
+
+      # - name: Test the App
+      #   run:
+      #     npm run test

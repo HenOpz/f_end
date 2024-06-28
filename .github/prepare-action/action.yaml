@@ -1,0 +1,22 @@
+name: Composite Action
+description: A composite action to build Laravel applications
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v4.0.2
+      with:  
+        node-version: ${{ inputs.version }}
+
+    - name: Install dependencies
+      shell: bash  # or 'pwsh' if you're using PowerShell
+      run: |
+        npm install
+
+    - name: Cache app dependencies
+      uses: actions/cache@v2
+      with:
+        path: ./node_modules
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
