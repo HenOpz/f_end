@@ -16,20 +16,13 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H 18.143.141.193 >> ~/.ssh/known_hosts
+        ssh-keyscan -H 54.251.159.214 >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
     - name: Deploy application
       run: |
         ssh -o StrictHostKeyChecking=no ubuntu@18.143.141.193 << 'EOF'
           sudo apt update
-          sudo apt install -y nginx  # Example package installation
-
-          # Copy application files
-          sudo rm -rf /var/www/html/application  # Clean existing files (optional)
-          sudo mkdir -p /var/www/html/application
-          sudo cp -r $GITHUB_WORKSPACE/* /var/www/html/application
-
-          # Restart nginx (example service restart)
-          sudo systemctl restart nginx
+          sudo 
+          
         EOF

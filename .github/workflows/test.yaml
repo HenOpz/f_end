@@ -1,12 +1,10 @@
 name: "Reusable Workflow for Test"
-
 on:
   workflow_call:
     inputs:
       version:
         required: true
         type: string
-
 jobs:
   build:
     name: Testing Workflow
@@ -17,7 +15,6 @@ jobs:
     #     ports:
     #       - 7329:80
     #     options: --name backend
-
     steps:
       - name: Checkout App
         uses: actions/checkout@v4
@@ -26,7 +23,6 @@ jobs:
         uses: actions/setup-node@v4.0.2
         with:  
           node-version: ${{ inputs.version }}
-
       # - name: Setup Env
       #   run:  |
       #     cp .env .env

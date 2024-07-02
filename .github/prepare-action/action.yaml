@@ -1,5 +1,5 @@
 name: Composite Action
-description: A composite action to build Laravel applications
+description: A composite action to build applications
 runs:
   using: 'composite'
   steps:

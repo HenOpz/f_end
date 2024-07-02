@@ -42,9 +42,6 @@ jobs:
           format: 'table'
           template: '@/contrib/gitlab.tpl'
           output: 'report.txt'
-      
-      # - name: Save Trivy scan report to file
-      #   run: echo "${{ steps.trivy_scan.outputs.result }}" > ${{ github.workspace }}/trivy_report.txt
 
       - name: Upload Trivy report as a GitHub artifact
         uses: actions/upload-artifact@v2
