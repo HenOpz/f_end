@@ -19,10 +19,15 @@ jobs:
         ssh-keyscan -H 54.251.159.214 >> ~/.ssh/known_hosts
         chmod 644 ~/.ssh/known_hosts
 
-    - name: Deploy application
-      run: |
-        ssh -o StrictHostKeyChecking=no ubuntu@18.143.141.193 << 'EOF'
-          sudo apt update
-          sudo 
+    # - name: Deploy application
+    #   run: |
+    #     ssh -o StrictHostKeyChecking=no ubuntu@18.143.141.193 << 'EOF'
+    #       sudo apt update
+    #       sudo 
           
-        EOF
+    #     EOF
+
+    - name: Run Docker container
+      run: |
+        docker run -d -p 80:80 --name web-svr nginx:latest
+      
