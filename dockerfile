@@ -21,7 +21,6 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/dist ./dist
 # Install node packages, install serve, build the app, and remove dependencies at the end
 
-
 EXPOSE 8081
 
 # Start the app using serve command
