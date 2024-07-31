@@ -31,4 +31,4 @@ jobs:
         with:
           name: vue-build-artifacts
           path: |
-            node_modules/
+            node_modules
