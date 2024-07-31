@@ -4,6 +4,7 @@ inputs:
   node-version:
     required: true
     type: string
+    
 runs:
   using: 'composite'
   steps:
