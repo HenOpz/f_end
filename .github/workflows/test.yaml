@@ -19,7 +19,7 @@ jobs:
       - name: Checkout App
         uses: actions/checkout@v4
 
-        - uses: HenOpz/f_end/.github/prepare-action@main
+      - uses: HenOpz/f_end/.github/prepare-action@main
         with:
           node-version: ${{ inputs.node-version }}
 
