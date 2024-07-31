@@ -17,7 +17,7 @@ jobs:
 
   codeql:
     name: Scan Code QL
-    needs: [Build]
+    #needs: [Build]
     uses: HenOpz/f_end/.github/workflows/codeql.yaml@main
 
   # test:
