@@ -2,7 +2,7 @@ name: "Reusable Workflow for Test"
 on:
   workflow_call:
     inputs:
-      version:
+      node-version:
         required: true
         type: string
 jobs:
