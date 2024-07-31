@@ -3,6 +3,7 @@ services:
     image: cpoc-aims-ii-backend-dev-backend:latest
     ports:
       - 7129:80
+      
     networks:
       - my_network
     restart: always

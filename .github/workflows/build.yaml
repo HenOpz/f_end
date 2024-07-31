@@ -3,15 +3,15 @@ name: "Build Reusable Workflow For Node app"
 on:
   workflow_call:
     inputs:
-      version:
+      node-version:
         required: true
         type: string
 jobs:
   build:
-    name: Build App
+    name: Build Next App
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - uses: HenOpz/f_end/.github/prepare-action@main
@@ -19,3 +19,9 @@ jobs:
       - name: build
         run:  |
           npm run build
+
+      - name: Cache the app dependencies
+        uses: actions/cache@v4.0.2
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-app

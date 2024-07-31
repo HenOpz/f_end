@@ -1,22 +1,21 @@
 name: Composite Action
-description: A composite action to build applications
+description: A composite action to build node applications
+inputs:
+  node-version:
+    required: true
+    type: string
 runs:
   using: 'composite'
   steps:
-    - name: Setup Node.js environment
-      uses: actions/setup-node@v4.0.2
-      with:  
-        node-version: ${{ inputs.version }}
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }} # or the version you are using
 
     - name: Install dependencies
-      shell: bash  # or 'pwsh' if you're using PowerShell
-      run: |
-        npm install
+      run: npm install
+      shell: bash
 
-    - name: Cache app dependencies
-      uses: actions/cache@v2
-      with:
-        path: ./node_modules
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
