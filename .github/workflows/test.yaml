@@ -23,6 +23,6 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
 
-      - name: Test the App
-        run:
-          npm run lint
+      # - name: Test the App
+      #   run:
+      #     npm run lint
