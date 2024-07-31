@@ -29,6 +29,7 @@ jobs:
       - name: list the files
         run: |
           ls -al
+          ulimit -n 10000
           
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
