@@ -4,9 +4,9 @@ inputs:
   node-version:
     required: true
     type: string
-    
+
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -19,4 +19,3 @@ runs:
     - name: Install dependencies
       run: npm install
       shell: bash
-
