@@ -22,6 +22,12 @@ jobs:
     with:
       node-version: '20'
 
+  release:
+    name: Release
+    uses: HenOpz/f_end/.github/workflows/release.yaml@main
+    with:
+      node-version: '20'
+
   sec:
     name: Sec Check
     needs: [test]

@@ -3,14 +3,14 @@ name: "QA Workflow"
 on: workflow_dispatch
 
 jobs:
-  build-with-version-19:
-    name: Build app with version 20
-    uses: ./.github/workflows/build.yaml
+  build-with-version-13:
+    name: Build app with version 23
+    uses: HenOpz/f_end/.github/workflows/build.yaml@main
     with:
-      version: "19"
+      node-version: '23'
 
   build-with-version-20:
     name: Build App with version 20
-    uses: ./.github/workflows/build.yaml
+    uses: HenOpz/f_end/.github/workflows/build.yaml@main
     with:
-      version: "20"
+      node-version: '20'
