@@ -18,7 +18,7 @@ jobs:
   test:
     name: Test
     needs: [build]
-    uses: ./.github/workflows/test.yaml@main
+    uses: HenOpz/f_end/.github/workflows/test.yaml@main
     with:
         node-version: '20'
 
