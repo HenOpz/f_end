@@ -1,48 +1,48 @@
-name: SonarQube Security Scan
+# name: SonarQube Security Scan
 
-on:
-  workflow_call:
-    secrets:
-      GIT_TOKEN:
-        required: true
-      COVERITY_USER:
-        required: true
-      COVERITY_PASSPHRASE:
-        required: true
+# on:
+#   workflow_call:
+#     secrets:
+#       GIT_TOKEN:
+#         required: true
+#       COVERITY_USER:
+#         required: true
+#       COVERITY_PASSPHRASE:
+#         required: true
 
-jobs:
-  coverity:
-    name: Coverity
-    runs-on: ubuntu-latest
-    steps:
-        - name: Coverity Full Scan
-          if: ${{ github.event_name != 'pull_request' }}
-          uses: synopsys-sig/synopsys-action@v1.11.0
-          with:
-            coverity_url: ${{ vars.COVERITY_URL }}
-            coverity_user: ${{ secrets.COVERITY_USER }}
-            coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
-            coverity_project_name: ${{ github.event.repository.name }}
-            coverity_stream_name: ${{ github.event.repository.name }}-${{ github.ref_name }}
-            coverity_policy_view: 'Outstanding Issues'
+# jobs:
+#   coverity:
+#     name: Coverity
+#     runs-on: ubuntu-latest
+#     steps:
+#         - name: Coverity Full Scan
+#           if: ${{ github.event_name != 'pull_request' }}
+#           uses: synopsys-sig/synopsys-action@v1.11.0
+#           with:
+#             coverity_url: ${{ vars.COVERITY_URL }}
+#             coverity_user: ${{ secrets.COVERITY_USER }}
+#             coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
+#             coverity_project_name: ${{ github.event.repository.name }}
+#             coverity_stream_name: ${{ github.event.repository.name }}-${{ github.ref_name }}
+#             coverity_policy_view: 'Outstanding Issues'
             
-            ### Arbitrary product-related CL arguments
-            # coverity_build_command: mvn clean install
-            # coverity_clean_command: mvn clean
-            # coverity_config_path: /Users/Config/coverity.yml
-            # coverity_args: -c /Users/Config/coverity.yml -o capture.build.clean-command="mvn clean" -- mvn clean install
+#             ### Arbitrary product-related CL arguments
+#             # coverity_build_command: mvn clean install
+#             # coverity_clean_command: mvn clean
+#             # coverity_config_path: /Users/Config/coverity.yml
+#             # coverity_args: -c /Users/Config/coverity.yml -o capture.build.clean-command="mvn clean" -- mvn clean install
             
-            # project_directory: ${{ vars.PROJECT_DIRECTORY }}
+#             # project_directory: ${{ vars.PROJECT_DIRECTORY }}
   
-            ### Uncomment below configuration if Synopsys Bridge diagnostic files needs to be uploaded
-            # include_diagnostics: true  
+#             ### Uncomment below configuration if Synopsys Bridge diagnostic files needs to be uploaded
+#             # include_diagnostics: true  
         
-        - name: Coverity PR Scan
-          if: ${{ github.event_name == 'pull_request' }}
-          uses: synopsys-sig/synopsys-action@v1.11.0
-          with:
-            coverity_url: ${{ vars.COVERITY_URL }}
-            coverity_user: ${{ secrets.COVERITY_USER }}
-            coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
-            coverity_project_name: ${{ github.event.repository.name }}
-            coverity_stream_name: ${{ github.event.repository.name }}-${{ github.base_ref }}
+#         - name: Coverity PR Scan
+#           if: ${{ github.event_name == 'pull_request' }}
+#           uses: synopsys-sig/synopsys-action@v1.11.0
+#           with:
+#             coverity_url: ${{ vars.COVERITY_URL }}
+#             coverity_user: ${{ secrets.COVERITY_USER }}
+#             coverity_passphrase: ${{ secrets.COVERITY_PASSPHRASE }}
+#             coverity_project_name: ${{ github.event.repository.name }}
+#             coverity_stream_name: ${{ github.event.repository.name }}-${{ github.base_ref }}
