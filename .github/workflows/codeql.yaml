@@ -1,0 +1,19 @@
+name: SonarQube Security Scan
+
+on:
+  workflow_call:
+jobs:
+  security:
+    name: Github quality Check
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: javascript
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
