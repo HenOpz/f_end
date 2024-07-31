@@ -21,6 +21,7 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
+        output: results.sarif
         category: 'security'  # Optional: you can categorize the results for better reporting
 
     - name: Upload CodeQL Results
