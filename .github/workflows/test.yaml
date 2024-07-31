@@ -23,14 +23,6 @@ jobs:
         with:
           node-version: ${{ inputs.node-version }}
 
-      # - name: Wait 10 sec
-      #   run:
-      #     sleep 10
-
-      # - name: Check Container
-      #   run:
-      #     docker ps
-
-      # - name: Test the App
-      #   run:
-      #     npm run test
+      - name: Test the App
+        run:
+          npm run lint
