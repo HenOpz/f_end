@@ -24,6 +24,7 @@ jobs:
 
   release:
     name: Release
+    needs: [test]
     uses: HenOpz/f_end/.github/workflows/release.yaml@main
     with:
       node-version: '20'
