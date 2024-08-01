@@ -1,8 +1,8 @@
 <template>
     <div>
-        <ViewFR v-if="current_view == 0" @currentView="(view, row, moc_no) => SET_EDIT(view, row, moc_no)" />
+        <ViewFR v-if="current_view == 0" @currentView="(view, row, moc_no) => SET_EDIT(view, row)" />
         <AddFR v-if="current_view == 1" @currentView="(view) => current_view = view" />
-        <EditFR :id_record="edit_row" :moc_no="moc_no" v-if="current_view == 2" @currentView="(view) => current_view = view" />
+        <EditFR :info="edit_row" v-if="current_view == 2" @currentView="(view) => current_view = view" />
     </div>
 </template>
 
@@ -22,7 +22,7 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "MANAGEMENT OF CHANGE",
+            subpageName: "ER PROBE",
             subpageInnerName: null,
         });
     },
@@ -30,16 +30,13 @@ export default {
         return {
             current_view: 0,
             edit_row: 0,
-            moc_no: null,
         };
     },
     computed: {},
     methods: {
-        SET_EDIT(view, row, moc_no) {
-            console.log('moc', moc_no);
+        SET_EDIT(view, row) {
             this.current_view = view;
             this.edit_row = row;
-            this.moc_no = moc_no;
         }
     }
 };

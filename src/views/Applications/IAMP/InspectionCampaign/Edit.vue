@@ -267,7 +267,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -348,122 +348,33 @@ export default {
   },
   methods: {
     FETCH_INSPECTION_RECORD() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url:
-          "/InspectionCampaign/" + this.id_record,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.inspectionCampaignList = res.data;
-            this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-              subpageName: "IC NUMBER: " + this.inspectionCampaignList.ic_number,
-              subpageInnerName: null,
-            });
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
+      GET_DATA(this, `/InspectionCampaign/${this.id_record}`, (res) => {
+        this.inspectionCampaignList = res;
+        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
+          subpageName: "IC NUMBER: " + this.inspectionCampaignList.ic_number,
+          subpageInnerName: null,
         });
+      });
     },
     UPDATE_RECORD() {
       if (this.inspectionCampaignList.start_date !== null)
         this.inspectionCampaignList.start_date = moment(this.inspectionCampaignList.start_date).format("L");
       if (this.inspectionCampaignList.end_date !== null)
         this.inspectionCampaignList.end_date = moment(this.inspectionCampaignList.end_date).format("L");
-      axios({
-        method: "put",
-        url: "/InspectionCampaign/" + this.inspectionCampaignList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.inspectionCampaignList
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/InspectionCampaign/${this.inspectionCampaignList.id}`, this.inspectionCampaignList, () => { this.SET_CURRENT_VIEW(0); });
     },
     DELETE_RECORD() {
       this.$ons.notification.confirm("Confirm Delete Inspection Campaign?").then((res) => {
         if (res == 1) {
-          axios({
-            method: "delete",
-            url: "/InspectionCampaign/delete-insp-campaign?id=" + this.inspectionCampaignList.id,
-            headers: {
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            }
-          })
-            .then(res => {
-              if (res.status == 204) {
-                this.SET_CURRENT_VIEW(0);
-              }
-            })
-            .catch(error => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {});
+          DELETE_DATA(`/InspectionCampaign/delete-insp-campaign?id=${this.inspectionCampaignList}`, () => { this.SET_CURRENT_VIEW(0); });
         }
       });
     },
     FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-insp-campaign-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-insp-campaign-status-list', 'formSelect.status');
     },
     FETCH_LIBRARY() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url: "/InspectionCampaignFile/get-insp-campaign-file-by-id-task?id=" + this.id_record,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200) {
-            this.library = res.data;
-            this.isLoading = false;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, `/InspectionCampaignFile/get-insp-campaign-file-by-id-task?id=${this.id_record}`, 'library');
     },
     ADD_NEW_FILE(e) {
       var formData = new FormData();
@@ -476,36 +387,7 @@ export default {
                   this.FETCH_LIBRARY();
               }
           });
-      axios({
-          method: "post",
-          url: "/InspectionCampaignFile",
-          headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          },
-          data: formData
-      })
-          .then(res => {
-              console.log(res);
-              if (res.status == 201) {
-                  this.FETCH_LIBRARY();
-              }
-          })
-          .catch(error => {
-              this.isLoading = false;
-              this.$ons.notification
-                  .alert(error.message, {
-                      title: "Add New File failed"
-                  })
-                  .then(res => {
-                      if (res == 0) {
-                          this.FETCH_LIBRARY();
-                      }
-                  });
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      POST_DATA('/InspectionCampaignFile', formData, true, () => { this.FETCH_LIBRARY(); });
     },
     UPDATE_DOC(e) {
       console.log("e.data", e.data);
@@ -514,37 +396,7 @@ export default {
       formData.append("id_insp_campaign", e.data.id_insp_campaign);
       formData.append("file", this.file ?? "");
       formData.append("note", e.data.note);
-      axios({
-          method: "put",
-          url: "/InspectionCampaignFile/" + e.data.id,
-          headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          },
-          data: formData
-      })
-          .then(res => {
-              console.log(res);
-              if (res.status == 204) {
-                  this.FETCH_LIBRARY();
-              }
-          })
-          .catch(error => {
-              console.log(error);
-              this.isLoading = false;
-              this.$ons.notification
-                  .alert(error.message, {
-                      title: "Update File failed"
-                  })
-                  .then(res => {
-                      if (res == 0) {
-                          this.FETCH_LIBRARY();
-                      }
-                  });
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      PUT_DATA(`/InspectionCampaignFile/${e.data.id}`, formData, true, () => { this.FETCH_LIBRARY(); });
     },
     VALUE_CHANGE(e) {
       //console.log("fileReader e data:");
@@ -577,34 +429,7 @@ export default {
     },
     DELETE_DOC(e) {
       const id = e.data.id;
-      axios({
-        method: "delete",
-        url: "/InspectionCampaignFile/" + id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.FETCH_LIBRARY();
-          }
-        })
-        .catch(error => {
-          console.log(error);
-          this.isLoading = false;
-          this.$ons.notification
-            .alert(error.message, {
-              title: "Delete failed"
-            })
-            .then(res => {
-              if (res == 0) {
-                this.FETCH_LIBRARY();
-              }
-            });
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      DELETE_DATA(`/InspectionCampaignFile/${id}`, () => { this.FETCH_LIBRARY(); });
     },
     ADD_ROW() {
       var grid = this.$refs[this.gridRefName].instance;

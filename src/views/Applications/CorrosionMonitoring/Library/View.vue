@@ -110,7 +110,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
@@ -258,50 +258,11 @@ export default {
             e.cancel = true;
         },
         FETCH_MOC_RECORD() {
-            this.isLoading = true;
             this.isShow = 0;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/ManagementOfChange', 'mocList');
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        console.log("delete success");
-                        this.FETCH_MOC_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/ManagementOfChange/delete-management-of-change?id=${e.key}`, () => { this.FETCH_MOC_RECORD(); });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "id_moc_status") {

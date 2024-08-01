@@ -98,7 +98,7 @@ import {
 } from "devextreme-vue/data-grid";
 
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 
 //Pages & Structures
 import toolbar from "@/components/app-structures/app-navbar-toolbar.vue";
@@ -177,50 +177,16 @@ export default {
             }
         },
         FETCH_LIST() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/User/get-active-user-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-                },
-            })
-                .then((res) => {
-                    if (res.data) {
-                        this.accountList = res.data;
-                    }
-                })
-                .catch((error) => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/User/get-active-user-list', 'accountList');
         },
         DELETE_ACCOUNT(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             this.$ons.notification.confirm("Confirm Delete Account?").then((res) => {
                 if (res == 1) {
-                    axios({
-                        method: "delete",
-                        url: "/User/inactive-user?id=" + e.data.id_account + "&updated_by=" + user.id,
-                        headers: {
-                            Authorization:
-                                "Bearer " + JSON.parse(localStorage.getItem("token")),
-                        },
-                    })
-                        .then((res) => {
-                            if (res.status == 200) {
-                                this.$ons.notification.alert("Account delete successful");
-                                this.FETCH_LIST();
-                            }
-                        })
-                        .catch((error) => {
-                            this.$ons.notification.alert(
-                                error.code + " " + error.response.status
-                            );
-                        })
-                        .finally(() => { });
+                    DELETE_DATA(`/User/inactive-user?id=${e.data.id_account}&updated_by=${user.id}`, () => {
+                        this.$ons.notification.alert("Account delete successful");
+                        this.FETCH_LIST();
+                    });
                 }
             });
         },
@@ -229,28 +195,14 @@ export default {
             // console.log("Reset account id: " + row_data.data.id_account);
             this.$ons.notification.confirm("Confirm password reset?").then((res) => {
                 if (res == 1) {
-                    axios({
-                        method: "put",
-                        url: "/UserAccount/edit-user-password",
-                        headers: {
-                            Authorization:
-                                "Bearer " + JSON.parse(localStorage.getItem("token")),
-                        },
-                        data: {
-                            id_account: row_data.data.id_account,
-                            password: sha256("dex0n7845"),
-                        },
-                    })
-                        .then((res) => {
-                            if (res.status == 200) {
-                                this.$ons.notification.alert("Password reset successful");
-                            }
-                            this.FETCH_LIST();
-                        })
-                        .catch((error) => {
-                            console.log(error);
-                        })
-                        .finally(() => { });
+                    let data = {
+                        id_account: row_data.data.id_account,
+                        password: sha256("dex0n7845"),
+                    };
+                    PUT_DATA('/UserAccount/edit-user-password', data, () => { 
+                        this.$ons.notification.alert("Password reset successful");
+                        this.FETCH_LIST();
+                    });
                 }
             });
         },

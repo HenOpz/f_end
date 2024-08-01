@@ -39,7 +39,7 @@
 
 <script>
 //API
-import {axios} from "/axios.js";
+import {GET_DATA} from "/axios.js";
 import moment from "moment";
 
 export default {
@@ -56,7 +56,7 @@ export default {
   created() {
     if (this.$store.state.status.server == true) {
       // this.FETCH_INSP_RECORD();
-      this.FETCH_DATA(`/ExInspectionRecord/get-ex-insp-record-by-id-info?id=${this.$route.params.id_tag}`, null,
+      GET_DATA(this, `/ExInspectionRecord/get-ex-insp-record-by-id-info?id=${this.$route.params.id_tag}`, null,
         (data) => {
           this.inspectionList = data.map(record => {
             return {
@@ -83,35 +83,14 @@ export default {
       //console.log("==> FETCH: Inspection Record");
       this.isLoading = true;
       const id_tag = this.$route.params.id_tag;
-      axios({
-        method: "get",
-        url:
-          "/ExInspectionRecord/get-ex-insp-record-by-id-info?id=" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          //console.log("==> RES: Inspection Record");
-          //console.log(res);
-          if (res.status == 200 && res.data) {
-            console.log("==> SUCCESS: Inspection Record");
-            this.inspectionList = res.data.map(record => {
+      GET_DATA(this, `/ExInspectionRecord/get-ex-insp-record-by-id-info?id=${id_tag}`, null, (data) => {
+        this.inspectionList = data.map(record => {
               return {
                 ...record,
                 id_inspection_record: record.id
               };
             });
-            console.log(this.inspectionList);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      });
     },
     DATE_FORMAT(d) {
       return moment(d).format("DD MMM yyyy");
@@ -135,31 +114,6 @@ export default {
         .classList.add("active");
       this.current_view.id_inspection_record = item.id_inspection_record;
       // this.current_view.id_item = item.id_item;
-    },
-    FETCH_DATA(url, targetVariable, callback) {
-      this.isLoading = true;
-      axios({
-          method: "get",
-          url: url,
-          headers: {
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          }
-      })
-          .then(res => {
-              if (res.status == 200 && res.data) {
-                  if (callback && typeof callback === 'function') {
-                      callback(res.data);
-                  } else {
-                      this.$set(this, targetVariable, res.data);
-                  }
-              }
-          })
-          .catch(error => {
-              console.log(error);
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
     },
   }
 };

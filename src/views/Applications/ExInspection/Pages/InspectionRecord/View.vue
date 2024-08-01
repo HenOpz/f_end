@@ -65,7 +65,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -155,93 +155,21 @@ export default {
     },
     FETCH_INSP_RECORD() {
       const id_tag = this.$route.params.id_tag;
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url:
-          "/ExInspectionRecord/get-ex-insp-record-by-id-info?id=" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.inspRecordList = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, `/ExInspectionRecord/get-ex-insp-record-by-id-info?id=${id_tag}`, 'inspRecordList');
     },
     CREATE_RECORD(e) {
       e.data.id_info = this.$route.params.id_tag;
       e.data.id = 0;
       e.data.is_active = true;
       if (e.data.inspection_date) e.data.inspection_date = moment(e.data.inspection_date).format("L");
-      axios({
-        method: "post",
-        url: "/ExInspectionRecord",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 201) {
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/ExInspectionRecord', e.data, () => { this.FETCH_INSP_RECORD(); });
     },
     UPDATE_RECORD(e) {
       if (e.data.inspection_date) e.data.inspection_date = moment(e.data.inspection_date).format("L");
-      axios({
-        method: "put",
-        url: "/ExInspectionRecord/" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/ExInspectionRecord/${e.key}`, e.data, () => { this.FETCH_INSP_RECORD(); });
     },
     DELETE_RECORD(e) {
-      axios({
-        method: "delete",
-        url: "/ExInspectionRecord/delete-ex-insp-record?id=" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/ExInspectionRecord/delete-ex-insp-record?id=${e.key}`, () => { this.FETCH_INSP_RECORD(); });
     },
     ON_INIT_NEW_ROW(e) {
       e.data.is_d_type = false;

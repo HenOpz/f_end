@@ -152,6 +152,19 @@
                     </div>
                 </div>
 
+                <div class="input-wrapper">
+                        <span>Status</span>
+                        <div class="select">
+                            <DxSelectBox 
+                                :items="statusList" 
+                                value-expr="id" 
+                                display-expr="code"
+                                v-model="gpiRecordList.id_status" 
+                                placeholder="Select Status" 
+                            />
+                        </div>
+                    </div>
+
                 <div fill class="input-wrapper">
                     <span>Damage Mechanism / Findings</span>
                     <div class="input">
@@ -186,7 +199,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -209,15 +222,16 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/Md/get-md-asset-type-list', 'assetTypeList');
-            this.FETCH_DATA('/Md/get-md-gpi-main-component-list', 'mainComponentList');
-            this.FETCH_DATA('/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
-            this.FETCH_DATA('/Md/get-md-gpi-severity-list', 'severityList');
-            this.FETCH_DATA('/Md/get-md-gpi-discipline-list', 'disciplineList');
-            this.FETCH_DATA('/Md/get-md-gpi-repair-type-list', 'repairTypeList');
-            this.FETCH_DATA('/Md/get-md-sap-main-work-ctr-list', 'mainWorkCtrList');
-            this.FETCH_DATA('/Md/get-md-gpi-location-deck-list', 'deckList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'assetTypeList');
+            GET_DATA(this, '/Md/get-md-gpi-main-component-list', 'mainComponentList');
+            GET_DATA(this, '/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
+            GET_DATA(this, '/Md/get-md-gpi-severity-list', 'severityList');
+            GET_DATA(this, '/Md/get-md-gpi-discipline-list', 'disciplineList');
+            GET_DATA(this, '/Md/get-md-gpi-repair-type-list', 'repairTypeList');
+            GET_DATA(this, '/Md/get-md-sap-main-work-ctr-list', 'mainWorkCtrList');
+            GET_DATA(this, '/Md/get-md-gpi-location-deck-list', 'deckList');
+            GET_DATA(this, '/Md/get-md-gpi-record-status-list', 'statusList');
         }
     },
     data() {
@@ -231,6 +245,7 @@ export default {
             mainWorkCtrList: [],
             deckList: [],
             disciplineList: [],
+            statusList: [],
             gpiRecordList: {
                 id: 0,
                 is_active: true,
@@ -244,63 +259,26 @@ export default {
                 expected_finish_date: null,
                 dmg_mech_findings: null,
                 recommendation: null,
+                id_status: 1,
             },
         };
     },
     computed: {},
     methods: {
         CREATE_RECORD() {
+            const user = JSON.parse(localStorage.getItem("user"));
+            this.gpiRecordList.created_by = user.id;
+            this.gpiRecordList.updated_by = user.id;
             this.gpiRecordList.gpi_date = this.gpiRecordList.gpi_date ? moment(this.gpiRecordList.gpi_date).format("L") : '';
             this.gpiRecordList.expected_finish_date = this.gpiRecordList.expected_finish_date ? moment(this.gpiRecordList.expected_finish_date).format("L") : '';
-            axios({
-                method: "post",
-                url: "/GpiRecord",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.gpiRecordList
-            })
-                .then(res => {
-                    if (res.status == 201) {
-                        this.SET_CURRENT_VIEW(2, res.data);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            POST_DATA('/GpiRecord', this.gpiRecordList, (data) => { 
+                this.$router.push("gpi-record-edit/" + data.id);
+            });
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);
             if (data !== null) this.$emit('currentView', view, data);
             else this.$emit('currentView', view);
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         INSERT_ITEM_SELECT_BOX(data, array) {
           if (!data.text) {

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import moment from "moment";
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -38,20 +38,22 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "GPI NUMBER: ",
+            subpageName: "GPI NUMBER: " + this.data_row.gpi_number,
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/Md/get-md-asset-type-list', 'assetTypeList');
-            this.FETCH_DATA('/Md/get-md-gpi-main-component-list', 'mainComponentList');
-            this.FETCH_DATA('/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
-            this.FETCH_DATA('/Md/get-md-gpi-severity-list', 'severityList');
-            this.FETCH_DATA('/Md/get-md-gpi-repair-list', 'typeOfRepairList');
-            this.FETCH_DATA(`/GpiRecord/${this.id_record}`, null, 
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'assetTypeList');
+            GET_DATA(this, '/Md/get-md-gpi-main-component-list', 'mainComponentList');
+            GET_DATA(this, '/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
+            GET_DATA(this, '/Md/get-md-gpi-severity-list', 'severityList');
+            GET_DATA(this, '/Md/get-md-gpi-repair-list', 'typeOfRepairList');
+            GET_DATA(this, '/Md/get-md-gpi-discipline-list', 'discList');
+            GET_DATA(this, '/User/get-active-user-list', 'userList');
+            GET_DATA(this, `/GpiRecord/${this.id_record}`, null, 
                 (data) => {
                     this.gpiRecordList = data;
-                    this.FETCH_DATA(`/GpiFile/get-gpi-file-by-id?id=${this.data_row.id}`, 'pictureLogList');
+                    GET_DATA(this, `/GpiFile/get-gpi-file-by-id?id=${this.data_row.id}`, 'pictureLogList');
                     this.$nextTick(function () {
                         window.setTimeout(() => {
                             this.generatePDF();
@@ -71,6 +73,7 @@ export default {
                 cur: 0,
                 max: 0,
             },
+            userList: [],
             library: [],
             platformList: [],
             assetTypeList: [],
@@ -78,6 +81,7 @@ export default {
             damageMechanismList: [],
             severityList: [],
             typeOfRepairList: [],
+            discList: [],
             id_record: this.data_row.id,
             base64ImageUrl: '',
             isShow: 0
@@ -92,31 +96,6 @@ export default {
         }
     },
     methods: {
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         DATE_FORMAT(d) {
             return moment(d).format("DD MMM yyyy");
         },
@@ -158,13 +137,13 @@ export default {
         },
         headerTable() {
             return {
-                widths: [85.5, '*', 37.5, 48],
+                widths: [137.5, '*', 37.5, 100],
                 body: [
                     [
                         { rowSpan: 4, image: 'logo', width: 60, height: 50, alignment: 'center', margin: [0, 0, 0, 0] },
                         { rowSpan: 4, text: 'GPI REPORT', style: 'headerTitle', alignment: 'center' , margin: [0, 20, 0, 0] },
                         { text: 'No:', style: 'cellLeft' },
-                        { text: this.data_row ? this.data_row.id : '-', style: 'headerCellRight' }
+                        { text: this.gpiRecordList.gpi_number ? this.gpiRecordList.gpi_number : '-', style: 'headerCellRight' }
                     ],
                     [
                         '',
@@ -176,13 +155,13 @@ export default {
                         '',
                         '',
                         { text: 'Discipline:', style: 'cellLeft' }, 
-                        { text: '-', style: 'headerCellRight' } 
+                        { text: this.gpiRecordList.id_discipline ? this.GET_DISC(this.gpiRecordList.id_discipline) : '-', style: 'headerCellRight' } 
                     ],
                     [
                         '',
                         '',
                         { text: 'Originator:', style: 'cellLeft' }, 
-                        { text: '-', style: 'headerCellRight' } 
+                        { text: this.gpiRecordList.created_by ? this.GET_USER(this.gpiRecordList.created_by) : '-', style: 'headerCellRight' } 
                     ],
 
                 ]
@@ -214,13 +193,13 @@ export default {
                     ],
                     [
                         { text: 'Mitigation:', border: [true, false, true, true], style: 'cellLeft' },
-                        { text: this.mitigation_free_text ? this.mitigation_free_text : '-', border: [true, false, true, true] },
+                        { text: this.data_row.mitigation_free_text ? this.data_row.mitigation_free_text : '-', border: [true, false, true, true] },
                         { text: 'Repair Description:', border: [true, false, true, true], style: 'cellLeft' },
                         { text: this.data_row.repair_type_free_text ? this.data_row.repair_type_free_text : "-", border: [true, false, true, true] },
                     ],
                     [
                         { text: 'Expected Finish Date:', border: [true, false, true, true], style: 'cellLeft' },
-                        { text: this.data_row.expected_finish_date ? this.data_row.expected_finish_date : '-', border: [true, false, true, true] },
+                        { text: this.data_row.expected_finish_date ? this.DATE_FORMAT(this.data_row.expected_finish_date) : '-', border: [true, false, true, true] },
                         { text: '', border: [true, false, true, true], style: 'cellLeft' },
                         { text: '', border: [true, false, true, true] },
                     ],
@@ -277,7 +256,7 @@ export default {
 
             const docDefinition = {
                 info: {
-                    title: 'test'
+                    title: this.gpiRecordList.gpi_number ? this.gpiRecordList.gpi_number : '-'
                 },
                 content: [
                     {
@@ -457,6 +436,14 @@ export default {
             const filterValue = this.typeOfRepairList.filter(val => val.id == id);
             if (filterValue.length === 0) return '-';
             return filterValue[0].code;
+        },
+        GET_DISC(id) {
+            const disc = this.discList.filter(d => d.id == id);
+            return disc[0]?.code ? disc[0].code : '-';
+        },
+        GET_USER(id) {
+            const user = this.userList.filter(d => d.id == id);
+            return user[0]?.name ? user[0].name : '-';
         },
     }
 };

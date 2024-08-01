@@ -137,7 +137,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import AddPage from "./Add.vue"
 import EditPage from "./Edit.vue"
 import DetailPage from "./Detail.vue"
@@ -191,11 +191,11 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "PIGGING OPERATION",
+            subpageName: "SPLASH PIG",
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DROPDOWN_PLATFORM();
+            GET_DATA(this, '/Md/get-md-platform-list', 'formSelect.platform');
             this.tagRegistrationList = [
                 {
                     id: 1,
@@ -253,51 +253,9 @@ export default {
         },
     },
     methods: {
-        FETCH_DROPDOWN_PLATFORM() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-platform-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.platform = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         FETCH_PIGGING() {
-            this.isLoading = true;
             this.isShow = 0;
-            axios({
-                method: "get",
-                url:
-                    "/PiggingOperation",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.tagRegistrationList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/PiggingOperation', 'tagRegistrationList');
         },
         ADD_ROW() {
             this.isShow = 1

@@ -76,7 +76,7 @@ import {
   DxMasterDetail,
 } from "devextreme-vue/data-grid";
 
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import toolbar from "@/components/app-structures/app-navbar-toolbar.vue";
 import contentLoading from "@/components/app-structures/app-content-loading.vue";
 import MenuList from "@/views/Applications/Accessibility/MenuList.vue";
@@ -132,26 +132,7 @@ export default {
       e.cancel = true;
     },
     FETCH_LIST() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url: "/User/get-active-user-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          // console.log(res);
-          if (res.data) {
-            this.accountList = res.data;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/User/get-active-user-list', 'accountList');
     },
   },
 };

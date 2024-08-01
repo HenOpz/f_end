@@ -22,7 +22,7 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "MANAGEMENT OF CHANGE",
+            subpageName: "MICROBIOLOGICAL BACTERIA",
             subpageInnerName: null,
         });
     },

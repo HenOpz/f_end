@@ -6,30 +6,29 @@
                     <label>{{ route.name }}</label>
                 </div>
                 <router-link :to="route.url" v-if="route.url && !route.menu" :key="'route_' + index">
-                    <v-ons-toolbar-button class="item">
+                    <v-ons-toolbar-button class="item"
+                        :class="{ 'active': path.split('/')[2] === route.url.split('/')[2] }">
                         <img class="svg" :src="route.icon" :style="{ width: route.icon.size, height: route.icon.size }" />
                         <span>{{ route.name }}</span>
                     </v-ons-toolbar-button>
                 </router-link>
                 <router-link :to="route.url" :disabled="true" tag="button" class="popup-button-caller"
                     v-if="route.url && route.menu" :key="'route_button_' + index">
-                    <v-ons-toolbar-button @click="SHOW_POPOVER($event, 'right', true, route.name)" class="item">
+                    <v-ons-toolbar-button @click="SHOW_POPOVER($event, 'right', true, route.name)" class="item" :class="{ 'active': path.split('/')[2] === route.url.split('/')[2] }">
                         <img class="svg" :src="route.icon" />
                         <span>{{ route.name }}</span>
                         <i class="las la-angle-right right-arrow"></i>
                     </v-ons-toolbar-button>
                 </router-link>
-                <template>
-                    <v-ons-popover cancelable :visible="FETCH_POPUP_VISIBILITY(route.name)"
-                        @update:visible="value => SET_POPUP_VISIBILITY(route.name, value)" :target="popoverTarget"
-                        :direction="popoverDirection" :cover-target="coverTarget" :key="'route_menu_' + index">
-                        <v-ons-toolbar-button id="popover-button" class="popover-button"
-                            v-for="(item, index) in route.menu" :key="index" v-on:click="GO_TO(item.url)">
-                            <span>{{ item.name }}</span>
-                            <i class="las la-angle-right"></i>
-                        </v-ons-toolbar-button>
-                    </v-ons-popover>
-                </template>
+                <v-ons-popover cancelable :visible="FETCH_POPUP_VISIBILITY(route.name)"
+                    @update:visible="value => SET_POPUP_VISIBILITY(route.name, value)" :target="popoverTarget"
+                    :direction="popoverDirection" :cover-target="coverTarget" :key="'route_menu_' + index">
+                    <v-ons-toolbar-button id="popover-button" class="popover-button"
+                        v-for="(item, index) in route.menu" :key="index" v-on:click="GO_TO(item.url)">
+                        <span>{{ item.name }}</span>
+                        <i class="las la-angle-right"></i>
+                    </v-ons-toolbar-button>
+                </v-ons-popover>
                 <div class="line" v-if="route.line" :key="'line_' + index">
                     <hr />
                 </div>
@@ -55,6 +54,7 @@ export default {
             this.routes.forEach(route => {
                 route.menu && this.popup.push({ [route.name]: false });
             });
+            this.path = this.$route.path;
         }
     },
     props: {
@@ -69,6 +69,7 @@ export default {
             popoverTarget: null,
             popoverDirection: "right",
             coverTarget: false,
+            path: null
         };
     },
     computed: {},
@@ -83,11 +84,13 @@ export default {
             this.popup.forEach(popup => {
                 if (Object.prototype.hasOwnProperty.call(popup, routeName)) {
                     visibility = popup[routeName];
+                    console.log('visibility', popup[routeName]);
                 }
             });
             return visibility;
         },
         SET_POPUP_VISIBILITY(routeName, value) {
+            console.log('path', this.path.split('/')[2], this.routes[2].url.split('/')[2]);
             this.popup.forEach(popup => {
                 if (Object.prototype.hasOwnProperty.call(popup, routeName)) {
                     popup[routeName] = value;
@@ -138,6 +141,10 @@ export default {
         width: 100%;
         padding-top: 20px;
         transition: all 0.3s;
+
+        .active {
+            background: $dexon-primary-green;
+        }
 
         .section-label {
             margin-left: 20px;
@@ -214,6 +221,7 @@ export default {
         }
 
         .item:hover,
+        .active
         // .router-link-active > .item,
         .router-link-exact-active>.item {
             background: $dexon-primary-green;

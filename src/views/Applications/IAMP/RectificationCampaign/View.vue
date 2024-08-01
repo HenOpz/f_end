@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
@@ -204,53 +204,12 @@ export default {
             e.cancel = true;
         },
         FETCH_RECTICATION_CAMPAIGN() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/RectificationCampaign",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        console.log("success");
-                        this.rectificationCampaignList = res.data;
-                        console.log("this.rectificationCampaign ", this.rectificationCampaignList)
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/RectificationCampaign', 'rectificationCampaignList');
         },
         DELETE_RECORD(e) {
             this.$ons.notification.confirm("Confirm Delete Rectification Campaign?").then((res) => {
                 if (res == 1) {
-                    axios({
-                        method: "delete",
-                        url: "RectificationCampaign/delete-rectification-campaign?id=" + e.key,
-                        headers: {
-                            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                        }
-                    })
-                        .then(res => {
-                            if (res.status == 204) {
-                                console.log("delete success");
-                                this.FETCH_RECTICATION_CAMPAIGN();
-                            }
-                        })
-                        .catch(error => {
-                            this.$ons.notification.alert(
-                                error.code + " " + error.response.status + " " + error.message
-                            );
-                        })
-                        .finally(() => { });
+                    DELETE_DATA(`RectificationCampaign/delete-rectification-campaign?id=${e.key}`, () => { this.FETCH_RECTICATION_CAMPAIGN(); });
                 }
             });
         },
@@ -266,25 +225,7 @@ export default {
             }
         },
         FETCH_DROPDOWN_STATUS() {
-        axios({
-            method: "get",
-            url: "/Md/get-md-rectification-status-list",
-            headers: {
-            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            },
-            data: {}
-        })
-            .then(res => {
-            if (res.status == 200 && res.data) {
-                this.status = res.data;
-            }
-            })
-            .catch(error => {
-            console.log(error);
-            })
-            .finally(() => {
-            this.isLoading = false;
-            });
+            GET_DATA(this, '/Md/get-md-rectification-status-list', 'status');
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);

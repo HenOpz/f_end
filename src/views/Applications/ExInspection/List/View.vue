@@ -257,7 +257,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -326,20 +326,20 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/ExInspectionRegisterInfo', 'exList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-area-std-list', 'areaStandardList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-area-class-list', 'areaClassList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-area-temp-class-list', 'areaTempClassList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-area-gas-group-list', 'areaGasGroupList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-std-list', 'equipStandardList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-protec-type-list', 'equipProtectTypeList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-type-list', 'equipTypeList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-gas-group-list', 'equipGasGroupList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-temp-class-list', 'equipTempClassList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-class-list', 'equipClassList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-protec-lv-cat-list', 'equipProtectLvlList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-ip-rating-list', 'equipIPRatingList');
-            this.FETCH_DATA('/Md/get-md-ex-insp-equip-enclosure-type-list', 'equipEnclosureTypeList');
+            GET_DATA(this, '/ExInspectionRegisterInfo', 'exList');
+            GET_DATA(this, '/Md/get-md-ex-insp-area-std-list', 'areaStandardList');
+            GET_DATA(this, '/Md/get-md-ex-insp-area-class-list', 'areaClassList');
+            GET_DATA(this, '/Md/get-md-ex-insp-area-temp-class-list', 'areaTempClassList');
+            GET_DATA(this, '/Md/get-md-ex-insp-area-gas-group-list', 'areaGasGroupList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-std-list', 'equipStandardList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-protec-type-list', 'equipProtectTypeList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-type-list', 'equipTypeList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-gas-group-list', 'equipGasGroupList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-temp-class-list', 'equipTempClassList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-class-list', 'equipClassList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-protec-lv-cat-list', 'equipProtectLvlList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-ip-rating-list', 'equipIPRatingList');
+            GET_DATA(this, '/Md/get-md-ex-insp-equip-enclosure-type-list', 'equipEnclosureTypeList');
             this.operatingDuringESDList = [
                 { id: 1, code: 'Yes' },
                 { id: 2, code: 'No' },
@@ -395,54 +395,12 @@ export default {
             e.cancel = true;
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/ExInspectionRegisterInfo/delete-ex-inspection-register-info?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_DATA('/ExInspectionRegisterInfo', 'exList');
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/ExInspectionRegisterInfo/delete-ex-inspection-register-info?id=${e.key}`, () => { GET_DATA(this, '/ExInspectionRegisterInfo', 'exList'); });
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);
             if (data !== null) this.$emit('currentView', view, data);
             else this.$emit('currentView', view);
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
     }
 };

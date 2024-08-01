@@ -156,7 +156,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -263,49 +263,10 @@ export default {
             e.cancel = true;
         },
         FETCH_MOC_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/ManagementOfChange', 'mocList');
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        console.log("delete success");
-                        this.FETCH_MOC_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/ManagementOfChange/delete-management-of-change?id=${e.key}`, () => {  });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "id_moc_status") {
@@ -322,75 +283,21 @@ export default {
             }
         },
         FETCH_DROPDOWN_NOC() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-noc-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+            GET_DATA(this, '/Md/get-md-moc-noc-list', 'noc');
         },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.noc = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+        FETCH_DROPDOWN_STATUS() {
+            GET_DATA(this, '/Md/get-md-moc-status-list', 'status');
         },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DROPDOWN_RRL() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-rrl-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+        FETCH_DROPDOWN_RRL() {
+            GET_DATA(this, '/Md/get-md-moc-rrl-list', 'rrl');
         },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.rrl = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    SET_CURRENT_VIEW(view, data = null, data2 = null) {
-        this.$store.commit("SET_SHOW_BACK_BUTTON", false);
-        if (data !== null && data2 === null) this.$emit('currentView', view, data);
-        else if (data !== null && data2 !== null) this.$emit('currentView', view, data, data2);
-        else this.$emit('currentView', view);
+        SET_CURRENT_VIEW(view, data = null, data2 = null) {
+            this.$store.commit("SET_SHOW_BACK_BUTTON", false);
+            if (data !== null && data2 === null) this.$emit('currentView', view, data);
+            else if (data !== null && data2 !== null) this.$emit('currentView', view, data, data2);
+            else this.$emit('currentView', view);
+        }
     }
-}
 };
 </script>
 

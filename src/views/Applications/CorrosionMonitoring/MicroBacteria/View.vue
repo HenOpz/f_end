@@ -4,7 +4,7 @@
             <div class="page-section">
                 <DxDataGrid
                 id="data-grid-list"
-                key-expr="id"
+                key-expr="id_tag"
                 :ref="gridRefName"
                 :data-source="microBacteriaList"
                 :hover-state-enabled="true"
@@ -52,76 +52,43 @@
                     :min-width="150"
                 >
                 </DxColumn>
-                <DxColumn caption="ATP">
-                    <DxColumn 
-                        data-field="atp_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="atp" 
-                        caption="ATP (pgATP/mL)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-                <DxColumn caption="GHB">
-                    <DxColumn 
-                        data-field="ghb_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="ghb" 
-                        caption="GHB (Cells/mL)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-                <DxColumn caption="APGHB">
-                    <DxColumn 
-                        data-field="apghb_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="apghb" 
-                        caption="APGHB (Cells/mL)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-                <DxColumn caption="Sulphide">
-                    <DxColumn 
-                        data-field="sulphide_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="sulphide" 
-                        caption="Sulphide (mg/L)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-                <DxColumn caption="SRB">
-                    <DxColumn 
-                        data-field="srb_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="srb" 
-                        caption="SRB (cfu)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
+                <DxColumn 
+                    data-field="srb_lastest_period" 
+                    caption="Latest Date" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="srb_value" 
+                    caption="SRB (cfu)" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="ghb_value" 
+                    caption="GHB (Cells/mL)" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="apghb_value" 
+                    caption="APGHB (Cells/mL)" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="atp_value" 
+                    caption="ATP (pgATP/mL)" 
+                    alignment="center"
+                    :width="110"
+                />
+                <DxColumn 
+                    data-field="sulphide_value" 
+                    caption="Sulphide (mg/L)" 
+                    alignment="center"
+                    :width="100"
+                />
+
                 <!-- <DxColumn 
                     data-field="next_due_date" 
                     caption="Next Due Date" 
@@ -176,12 +143,12 @@
         </div>
         <AddTagRegistration 
             v-if="isShow === 1" 
-            @popup="FETCH_DATA('/CMInfo', 'microBacteriaList');"
+            @popup="POPUP_CALL"
             :tagList="microBacteriaList" 
         />
         <EditTagRegistration
             v-if="isShow === 2" 
-            @popup="FETCH_DATA('/CMInfo', 'microBacteriaList');" 
+            @popup="POPUP_CALL"
             :dataInfo="selectedData" 
         />
     </div>
@@ -189,7 +156,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
 import "devextreme/dist/css/dx.light.css";
@@ -216,8 +183,6 @@ import {
     // DxFormItem,
     // DxForm
 } from "devextreme-vue/data-grid";
-
-//Structures
 
 export default {
     name: "micro-bacteria-list",
@@ -255,12 +220,14 @@ export default {
             this.isProducedWater = this.CHECK_SYSTEM('produced-water');
             this.isSeaWater = this.CHECK_SYSTEM('sea-water');
             this.isPipeline = this.CHECK_SYSTEM('pipeline');
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/CMInfo', 'microBacteriaList');
+            GET_DATA(this, '/Md/get-md-cm-micro-bact-status-list/', 'statusList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, this.listApiUrl, 'microBacteriaList');
         }
     },
     data() {
         return {
+            statusList: [],
             platformList: [],
             microBacteriaList: [],
             isShow: 0,
@@ -291,6 +258,13 @@ export default {
             else if(this.system == 'pipeline') return 4;
             else return 0;
         },
+        listApiUrl() {
+            if(this.system == 'cooling-medium') return '/CMInfo/get-tag-cooling-medium-view-in-micro-bact'; 
+            else if(this.system == 'produced-water') return '/CMInfo/get-tag-produced-water-view-in-micro-bact'; 
+            else if(this.system == 'sea-water') return '/CMInfo/get-tag-sea-water-view-in-micro-bact'; 
+            else if(this.system == 'pipeline') return '/CMInfo/get-tag-pipeline-view-in-micro-bact';
+            else return '';
+        },
     },
     methods: {
         EXPORT_DATA(e) {
@@ -309,102 +283,31 @@ export default {
             });
             e.cancel = true;
         },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                            if(url == '/CMInfo') {
-                                this.isShow = 0;
-                                this.microBacteriaList = this.microBacteriaList.filter(t => t.id_system == this.SYSTEM_ID && t.is_micro_bacteria);
-                            }
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         CHECK_SYSTEM(e) {
             if (this.system === e) return true;
             else return false;
         },
-        GET_STATUS_CELL_COLOR(value) {
-            if (value.rowType === "data" && value.column.dataField === "atp") {
-                if (value.data.atp) {
-                    let str = value.data.atp.split(" ");
-                    let num = Number(str[str.length - 1]);
-
-                    if (num <= 10) return this.cellColors.green;
-                    else if (num > 10 && num <= 100) return this.cellColors.yellow;
-                    else if (num > 100) return this.cellColors.red;
-                }
-            }
-            if (value.rowType === "data" && value.column.dataField === "ghb") {
-                if (value.data.ghb) {
-                    let str = value.data.ghb.split(" ");
-                    let num = Number(str[str.length - 1]);
-
-                    if (num <= 0.3) return this.cellColors.green;
-                    else if (0.3 < num && num  <= 100) return this.cellColors.yellow;
-                    else if (num > 100) return this.cellColors.red;
-                }
-            }
-            if (value.rowType === "data" && value.column.dataField === "apghb") {
-                if (value.data.apghb) {
-                    let str = value.data.apghb.split(" ");
-                    let num = Number(str[str.length - 1]);
-
-                    if (num <= 0.3) return this.cellColors.green;
-                    else if (0.3 < num && num  <= 100) return this.cellColors.yellow;
-                    else if (num > 100) return this.cellColors.red;
-                }
-            }
-            if (value.rowType === "data" && value.column.dataField === "srb") {
-                if (value.data.srb) {
-                    let str = value.data.srb.split(" ");
-                    let num = Number(str[str.length - 1]);
-
-                    if (num <= 100) return this.cellColors.green;
-                    else if (isNaN(num)) return this.cellColors.yellow;
-                    else if (num > 100) return this.cellColors.red;
-                }
-            }
-        },
         onCellPrepared(e) {
-            if(e.rowType === "data" && e.column.dataField === "atp") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
-                e.cellElement.style.textTransform = "uppercase";
+            if(e.rowType === "data" && e.column.dataField === "atp_value") {
+                e.cellElement.style.backgroundColor = e.data.atp_color_code;
             }
-            if(e.rowType === "data" && e.column.dataField === "ghb") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
-                e.cellElement.style.textTransform = "uppercase";
+            if(e.rowType === "data" && e.column.dataField === "ghb_value") {
+                e.cellElement.style.backgroundColor = e.data.ghb_color_code;
             }
-            if(e.rowType === "data" && e.column.dataField === "apghb") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
-                e.cellElement.style.textTransform = "uppercase";
+            if(e.rowType === "data" && e.column.dataField === "apghb_value") {
+                e.cellElement.style.backgroundColor = e.data.apghb_color_code;
             }
-            if(e.rowType === "data" && e.column.dataField === "srb") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
-                e.cellElement.style.textTransform = "uppercase";
+            if(e.rowType === "data" && e.column.dataField === "srb_value") {
+                e.cellElement.style.backgroundColor = e.data.srb_color_code;
             }
         },
         ADD_ROW() {
             this.isShow = 1
         },
+        POPUP_CALL() {
+            this.isShow = 0;
+            GET_DATA(this, this.listApiUrl, 'microBacteriaList');
+        }
     }
 };
 </script>

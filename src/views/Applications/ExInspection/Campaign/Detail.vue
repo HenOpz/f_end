@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { POST_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 // import { DxItem } from "devextreme-vue/form";
 // import DxButton from "devextreme-vue/button";
@@ -256,55 +256,12 @@ export default {
     },
     methods: {
         CREATE_RECORD() {
-            axios({
-                method: "post",
-                url: "/ExInspectionRegisterInfo",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.inspRecordList
-            })
-                .then(res => {
-                    if (res.status == 201) {
-                        this.$emit('popup');
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            POST_DATA('/ExInspectionRegisterInfo', this.inspRecordList);
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);
             if (data !== null) this.$emit('currentView', view, data);
             else this.$emit('currentView', view);
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "integrity_status") {

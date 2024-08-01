@@ -2,168 +2,179 @@
     <div>
         <div class="page-container">
             <div class="page-section">
-                <DxDataGrid
-                id="data-grid-list"
-                :ref="gridRefName"
-                :data-source="tagRegistrationList"
-                :hover-state-enabled="true"
-                :allow-column-reordering="true"
-                :show-borders="true"
-                :show-row-lines="true"
-                :row-alternation-enabled="false"
-                :column-hiding-enabled="false"
-                :word-wrap-enabled="true"
-                :column-auto-width="true"
-                >
-                <DxEditing
-                    :allow-updating="false"
-                    :allow-deleting="false"
-                    :allow-adding="false"
-                    :use-icons="true"
-                    mode="form"
-                >
-                    
-                </DxEditing>
-                <DxFilterRow :visible="true" />
-                <DxHeaderFilter :visible="true" />
-                <!-- <DxColumn data-field="gpi_no" caption="GPI No." alignment="center" :width="50"
-                    :editor-options="GPINoInputOptions">
-                    <DxRequiredRule />
-                </DxColumn> -->
-                <DxColumn data-field="id_platform" caption="Platform" alignment="center" :width="100"
-                    :editor-options="platformNoInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="tag_no" caption="Tag No." alignment="center">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="temp" caption="Temp"
-                    alignment="center" :width="100" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="description" caption="Description" alignment="center" :editor-options="tagNoInputOptions"   
-                    :min-width="150">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="ir" caption="Injection Rate ml/MMscf" alignment="center"
-                    :width="150" :editor-options="GPIDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="jan" caption="Jan"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="feb" caption="Feb"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="mar" caption="Mar"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="apr" caption="Apr"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="may" caption="May"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="jun" caption="Jun"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="jul" caption="Jul"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="aug" caption="Aug"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="sep" caption="Sep"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="oct" caption="Oct"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="nov" caption="Nov"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn data-field="dec" caption="Dec"
-                    alignment="center" :width="80" :editor-options="ExpDateInputOptions">
-                    <DxRequiredRule />
-                </DxColumn>
-                <DxColumn :width="50" alignment="center" cell-template="action-cell-template" />
-        
-                <template #action-cell-template="{ data }">
-                    <div class="action-wrapper">
-                        <div @click="() => [isShow = 2, selectedId = data.data.id]">
-                            <img src="/img/svg/magnifying-glass-svg.svg" class="penSvg" />
-                        </div>
+                <div fill class="table-tabs-buttons">
+                    <button 
+                        v-for="(tab, index) in tabs" 
+                        :key="index" 
+                        :class="active_tab === tab ? 'active' : ''"
+                        @click="active_tab = tab"
+                    >
+                        {{ tab }}
+                    </button>
+                </div>
+                <div v-if="active_tab === tabs[0]" style="font-size: 12px;">
+                    <div id="month-data" style="display: grid; grid-template-columns: 10% repeat(13, 1fr); background-color: #fff; font-weight: 600; gap: 5px; margin-bottom: 5px; margin-top: 25px;">
+                        <span style="display: flex; align-items: center; justify-content: center; ">
+                            Tag No.
+                        </span>
+                        <span style="display: flex; align-items: center; justify-content: center; text-align: center;">
+                            CI Injection Rate (ml/MMscf)
+                        </span>
+                        <span v-for="(month, index) in monthList" :key="'month-' + index" style="display: flex; align-items: center; justify-content: center;">
+                            {{ month.month_code }}
+                        </span>
                     </div>
-                </template>
-                <DxToolbar>
-                    <DxItem
-                        location="after"
-                        template="filterSelect"
-                    />
-                    <!-- <DxItem
-                        location="after"
-                        template="addButton"
-                    /> -->
-                    <DxItem
-                        location="after"
-                        name="searchPanel"
-                    />
-                </DxToolbar>
-                <template #addButton>
-                    <DxButton
-                    icon="las la-plus"
-                    @click="ADD_ROW"
-                    hint="Add"
-                    />
-                </template>
-                <template #filterSelect>
-                    <DxSelectBox
-                        :items="yearList"
-                        value-expr="id"
-                        display-expr="year"
-                        placeholder="Filter Year"
+                    <div v-for="(tag, index) in tagList" :key="'tag-' + index" style="display: grid; grid-template-columns: 10% repeat(13, 1fr); gap: 5px; margin-bottom: 5px; border-bottom: 2px solid #777; font-weight: 600; padding-bottom: 5px;">
+                        <span style="grid-row: span 1; display: flex; align-items: center; justify-content: flex-start; background-color: #ddd; padding-left: 5px; ">
+                            {{ tag.tag_no }}
+                        </span>
+                        <!-- <span style="display: flex; align-items: center; justify-content: center; background-color: #ccc; padding-top: 5px; padding-bottom: 5px;">
+                            Target
+                        </span>
+                        <span v-for="(val, valIndex) in 12" :key="'target-' + valIndex" style="display: flex; align-items: center; justify-content: center; background-color: #ccc;">
+                            95%
+                        </span> -->
+                        <span style="grid-column-start: 2; display: flex; align-items: center; justify-content: center; background-color: #eee; padding-top: 5px; padding-bottom: 5px;" >
+                            500
+                        </span>
+                        <span v-for="(val, valIndex) in tag.value" :key="'actual-' + valIndex" style="display: flex; align-items: center; justify-content: center; background-color: #eee;" 
+                        v-bind:style="val.Percentage >= 95 || !val.Percentage ? 'backgroundColor: #eee;' : 'backgroundColor: #ff0000a8;'">
+                            {{ TO_FIXED(val.Percentage, 2) }}
+                        </span>
+                    </div>
+                </div>
+                <DxDataGrid
+                    v-if="active_tab === tabs[1]"
+                    id="data-grid-list"
+                    :ref="gridRefName"
+                    :data-source="tagList"
+                    :hover-state-enabled="true"
+                    :allow-column-reordering="true"
+                    :show-borders="true"
+                    :show-row-lines="true"
+                    :row-alternation-enabled="false"
+                    :column-hiding-enabled="false"
+                    :word-wrap-enabled="true"
+                    :column-auto-width="true"
+                    >
+                    <DxEditing
+                        :allow-updating="false"
+                        :allow-deleting="false"
+                        :allow-adding="false"
+                        :use-icons="true"
+                        mode="form"
+                    >
                         
+                    </DxEditing>
+                    <DxFilterRow :visible="true" />
+                    <DxHeaderFilter :visible="true" />
+                    <!-- <DxColumn data-field="gpi_no" caption="GPI No." alignment="center" :width="50"
+                        :editor-options="GPINoInputOptions">
+                        <DxRequiredRule />
+                    </DxColumn> -->
+                    <DxColumn data-field="id_platform" caption="Platform" alignment="center" :width="100">
+                        <DxRequiredRule />
+                    </DxColumn>
+                    <DxColumn data-field="tag_no" caption="Tag No." alignment="center">
+                        <DxRequiredRule />
+                    </DxColumn>
+                    <DxColumn data-field="desc" caption="Desc."
+                        alignment="center" :width="100">
+                        <DxRequiredRule />
+                    </DxColumn>
+                    <DxColumn data-field="temp_c" caption="Temp." alignment="center"  
+                        :min-width="150">
+                        <DxRequiredRule />
+                    </DxColumn>
+                    <DxColumn caption="Latest">
+                        <DxColumn data-field="last_date" caption="Latest Date" 
+                            :width="120" alignment="center" />
+                        <DxColumn data-field="ci_injection_rate" caption="CI Injection Rate (ml/MMscf)"
+                            alignment="center" :width="120">
+                            <DxRequiredRule />
+                        </DxColumn>
+                        <DxColumn data-field="rci_val" caption="R-CI (ppm)"
+                            alignment="center" :width="100">
+                            <DxRequiredRule />
+                        </DxColumn>
+                        <DxColumn data-field="temp" caption="Status"
+                            alignment="center" :width="100">
+                            <DxRequiredRule />
+                        </DxColumn>
+                    </DxColumn>
+                    <DxColumn data-field="note" caption="Note"
+                        alignment="center" :width="100">
+                        <DxRequiredRule />
+                    </DxColumn>
+                    <DxColumn :width="50" alignment="center" cell-template="action-cell-template" />
+            
+                    <template #action-cell-template="{ data }">
+                        <div class="action-wrapper">
+                            <div @click="() => [isShow = 3, selectedId = data.data.id_tag]">
+                                <img src="/img/svg/magnifying-glass-svg.svg" class="penSvg" />
+                            </div>
+                        </div>
+                    </template>
+                    <DxToolbar>
+                        <!-- <DxItem
+                            location="after"
+                            template="filterSelect"
+                        /> -->
+                        <!-- <DxItem
+                            location="after"
+                            template="addButton"
+                        /> -->
+                        <DxItem
+                            location="after"
+                            name="searchPanel"
+                        />
+                    </DxToolbar>
+                    <template #addButton>
+                        <DxButton
+                        icon="las la-plus"
+                        @click="ADD_ROW"
+                        hint="Add"
+                        />
+                    </template>
+                    <!-- <template #filterSelect>
+                        <DxSelectBox
+                            :items="yearList"
+                            value-expr="id"
+                            display-expr="year"
+                            placeholder="Filter Year"
+                            
+                        />
+                    </template> -->
+                    
+                    
+                    <!-- <DxFilterRow :visible="true" /> -->
+                    <DxScrolling mode="standard" />
+                    <DxSearchPanel :visible="true" />
+                    <DxPaging :page-size="10" :page-index="0" />
+                    <DxPager 
+                        :show-page-size-selector="true" 
+                        :allowed-page-sizes="[5, 10, 20]" 
+                        :show-navigation-buttons="true"
+                        :show-info="true" 
+                        info-text="Page {0} of {1} ({2} items)" 
                     />
-                </template>
-                
-                
-                <!-- <DxFilterRow :visible="true" /> -->
-                <DxScrolling mode="standard" />
-                <DxSearchPanel :visible="true" />
-                <DxPaging :page-size="10" :page-index="0" />
-                <DxPager 
-                    :show-page-size-selector="true" 
-                    :allowed-page-sizes="[5, 10, 20]" 
-                    :show-navigation-buttons="true"
-                    :show-info="true" 
-                    info-text="Page {0} of {1} ({2} items)" 
-                />
-                <DxExport :enabled="false" />
+                    <DxExport :enabled="false" />
                 </DxDataGrid>
             </div>
         </div>
         <AddTagRegistration v-if="isShow === 1" @popup="FETCH_MOC_RECORD" />
         <EditTagRegistration v-if="isShow === 2" @popup="FETCH_MOC_RECORD" :id_record="selectedId" />
+        <InjectionRate v-if="isShow === 3" @popup="FETCH_MOC_RECORD" :id_record="selectedId" />
     </div>
 </template> 
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
+import InjectionRate from "./InjectionRate.vue"
 
 //Components
 //import VueTabsChrome from "vue-tabs-chrome";
@@ -179,7 +190,7 @@ import saveAs from "file-saver";
 import { exportDataGrid } from "devextreme/excel_exporter";
 import { DxItem } from "devextreme-vue/form";
 import DxButton from "devextreme-vue/button";
-import DxSelectBox from 'devextreme-vue/select-box';
+// import DxSelectBox from 'devextreme-vue/select-box';
 
 import {
   DxDataGrid,
@@ -225,9 +236,10 @@ export default {
         // DxFormItem,
         // penSvg,
         // trashSvg,
-        DxSelectBox,
+        // DxSelectBox,
         AddTagRegistration,
-        EditTagRegistration
+        EditTagRegistration,
+        InjectionRate
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -239,62 +251,32 @@ export default {
             // this.FETCH_DROPDOWN_RRL();
             // this.FETCH_DROPDOWN_STATUS();
             // this.FETCH_MOC_RECORD();
+            GET_DATA(this, '/Md/get-md-month-list', 'monthList');
+            GET_DATA(this, '/CMRCIRecord/get-latest-cm-rci-records', 'tagList');
+            // GET_DATA(this, '/CMInfo/get-tag-pipeline-view-in-chem-injection-percentage?year=2024', 'tagList', (data) => {
+            //     const resultArray = [];
+            //     for (const [key, value] of Object.entries(data)) {
+            //         resultArray.push({key: key, value: value});
+            //     }
+            //     this.tagList = resultArray;
+            // });
             const years = []
             for (let index = 0; index < 11; index++) {
                 years.push({ id: index, year: 2020 + index })
             }
             this.yearList = years;
-            this.tagRegistrationList = [
-                {
-                    id: 1,
-                    id_platform: 'MDC',
-                    tag_no: 'MDC-CC-04201',
-                    temp: 45,
-                    description: '-',
-                    ir: 500,
-                    jan: 77.85,
-                    feb: 77.85,
-                    mar: 77.85,
-                    apr: 77.85,
-                    may: 77.85,
-                    jun: 77.85,
-                    jul: 77.85,
-                    aug: 77.85,
-                    sep: 77.85,
-                    oct: 77.85,
-                    nov: 77.85,
-                    dec: 77.85,
-                },
-                {
-                    id: 2,
-                    id_platform: 'MDDC',
-                    tag_no: 'MDDC-CC-07301',
-                    temp: 65,
-                    description: '-',
-                    ir: 500,
-                    jan: 65,
-                    feb: 65,
-                    mar: 65,
-                    apr: 65,
-                    may: 65,
-                    jun: 65,
-                    jul: 65,
-                    aug: 65,
-                    sep: 65,
-                    oct: 65,
-                    nov: 65,
-                    dec: 65,
-                },
-            ];
         }
     },
     data() {
         return {
-            tagRegistrationList: [],
+            tagList: [],
             isShow: 0,
             selectedId: null,
             gridRefName: "grid",
-            yearList: []
+            yearList: [],
+            tabs: ['Dashboard', 'R-CI Data'],
+            active_tab: 'Dashboard',
+            monthList: [],
         };
     },
     computed: {
@@ -323,50 +305,11 @@ export default {
             e.cancel = true;
         },
         FETCH_MOC_RECORD() {
-            this.isLoading = true;
             this.isShow = 0;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/CMRCIRecord/get-latest-cm-rci-records', 'tagList');
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        console.log("delete success");
-                        this.FETCH_MOC_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/ManagementOfChange/delete-management-of-change?id=${e.key}`, () => { this.FETCH_MOC_RECORD(); });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "id_moc_status") {
@@ -391,6 +334,13 @@ export default {
         ADD_ROW() {
             this.isShow = 1
         },
+        TO_FIXED(value, digits) {
+            if(value) {
+                return value.toFixed(digits) + '%';
+            } else {
+                return "";
+            }
+        },
     }
 };
 </script>
@@ -403,6 +353,35 @@ export default {
     margin: 0 auto;
     width: 22px;
     height: 22px;
+}
+
+.table-tabs-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    margin-bottom: 10px;
+
+    button {
+        border-radius: 0;
+        padding: 10px;
+        width: 130px;
+    }
+    .active {
+        color: white;
+        background-color: $web-theme-color-secondary;
+        border: solid 1px $web-theme-color-secondary;
+    }
+}
+
+button {
+    padding: 10px 0;
+    background-color: white;
+    border: solid 1px gray;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: 1s;
+    cursor: pointer;
 }
 
 .column-template {

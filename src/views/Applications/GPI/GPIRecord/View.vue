@@ -12,8 +12,6 @@
                 :row-alternation-enabled="false" 
                 :column-hiding-enabled="false" 
                 :word-wrap-enabled="true"
-                :column-min-width="100" 
-                :column-auto-width="true"
                 @init-new-row="SET_CURRENT_VIEW(1)"
                 @cell-prepared="onCellPrepared"
             >
@@ -32,7 +30,7 @@
                     data-field="id_platform" 
                     caption="Platform" 
                     alignment="center" 
-                    :width="50"
+                    :width="90"
                 >
                     <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
                 </DxColumn>
@@ -40,19 +38,21 @@
                     data-field="asset_type" 
                     caption="Asset Type" 
                     alignment="center"
+                    :width="120"
                 >
-                    <!-- <DxLookup :data-source="assetTypeList" display-expr="asset_type" value-expr="id" /> -->
                 </DxColumn>
                 <DxColumn 
                     data-field="tag_no" 
                     caption="Tag Number" 
-                    alignment="center"
+                    alignment="left"
+                    :min-width="120"
                 >
                 </DxColumn>
                 <DxColumn 
                     data-field="location_deck" 
                     caption="Location | Deck" 
                     alignment="center"
+                    :width="120"
                 >
                 </DxColumn>
                 <DxColumn 
@@ -61,7 +61,7 @@
                     data-type="date" 
                     format="dd MMM yyyy"
                     alignment="center" 
-                    :width="150"
+                    :width="100"
                 >
                 </DxColumn>
                 <DxColumn 
@@ -70,13 +70,14 @@
                     data-type="date"
                     format="dd MMM yyyy" 
                     alignment="center" 
-                    :width="150"
+                    :width="100"
                 >
                 </DxColumn>
                 <DxColumn 
                     data-field="id_discipline" 
                     caption="Discipline" 
                     alignment="center"
+                    :width="120"
                 >
                     <DxLookup :data-source="disciplineList" display-expr="code" value-expr="id" />
                 </DxColumn>
@@ -84,11 +85,20 @@
                     data-field="id_severity" 
                     caption="Severity" 
                     alignment="center"
+                    :width="100"
                 >
                     <DxLookup :data-source="severityList" display-expr="status" value-expr="id" />
                 </DxColumn>
                 <DxColumn 
-                    :width="80" 
+                    data-field="id_status" 
+                    caption="Status" 
+                    alignment="center"
+                    :width="100"
+                >
+                    <DxLookup :data-source="statusList" display-expr="code" value-expr="id" />
+                </DxColumn>
+                <DxColumn 
+                    :width="100" 
                     alignment="center" 
                     cell-template="action-cell-template" 
                 />
@@ -98,10 +108,10 @@
                         <div @click="SET_CURRENT_VIEW(3, data.data)">
                             <img src="/img/svg/pdf-file-svg.svg" class="pdfSvg" />
                         </div>
-                        <div @click="SET_CURRENT_VIEW(2, data.data)">
+                        <div @click="GO_TO(data.data)">
                             <img src="/img/svg/pen-svg.svg" class="penSvg" />
                         </div>
-                        <div @click="DELETE_RECORD(data)">
+                        <div @click="DELETE_RECORD(data.data.id)">
                             <img src="/img/svg/trash-svg.svg" class="trashSvg" />
                         </div>
                     </div>
@@ -135,7 +145,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
@@ -178,28 +188,20 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/Md/get-md-asset-type-list', 'assetTypeList');
-            this.FETCH_DATA('/Md/get-md-gpi-main-component-list', 'mainComponentList');
-            this.FETCH_DATA('/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
-            this.FETCH_DATA('/Md/get-md-gpi-severity-list', 'severityList');
-            this.FETCH_DATA('/Md/get-md-gpi-repair-list', 'typeOfRepairList');
-            this.FETCH_DATA('/Md/get-md-gpi-repair-type-list', 'repairTypeList');
-            this.FETCH_DATA('/Md/get-md-sap-main-work-ctr-list', 'mainWorkCtrList');
-            this.FETCH_DATA('/Md/get-md-gpi-discipline-list', 'disciplineList');
-            this.FETCH_DATA('/GpiRecord', 'gpiRecordList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
+            GET_DATA(this, '/Md/get-md-gpi-severity-list', 'severityList');
+            GET_DATA(this, '/Md/get-md-gpi-discipline-list', 'disciplineList');
+            GET_DATA(this, '/Md/get-md-gpi-record-status-list', 'statusList');
+            GET_DATA(this, '/GpiRecord', 'gpiRecordList');
         }
     },
     data() {
         return {
             platformList: [],
-            assetTypeList: [],
-            mainComponentList: [],
             damageMechanismList: [],
             severityList: [],
-            typeOfRepairList: [],
-            repairTypeList: [],
-            mainWorkCtrList: [],
+            statusList: [],
             gpiRecordList: {},
             disciplineList: [],
             dataGridAttributes: {
@@ -226,32 +228,10 @@ export default {
             e.cancel = true;
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/GpiRecord/delete-gpi-record?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_GPI_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/GpiRecord/delete-gpi-record?id=${e}`, () => { GET_DATA(this, '/GpiRecord', 'gpiRecordList'); });
         },
         onCellPrepared(e) {
             // console.log(e);
-            if (e.rowType === "data" && e.column.dataField === "id_severity") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_COLOR(e.data.id_severity);
-                e.cellElement.style.color = "#fff";
-                e.cellElement.style.textTransform = "uppercase";
-            }
             if (e.rowType === "data" && e.column.dataField === "id_severity") {
                 e.cellElement.style.backgroundColor = this.GET_STATUS_COLOR(e.data.id_severity);
                 e.cellElement.style.color = "#fff";
@@ -278,46 +258,14 @@ export default {
                 return "-";
             }
         },
-        GET_REPAIR_TYPE(id) {
-            if (id) {
-                var data = this.typeOfRepairList.filter(function (s) {
-                    return s.id == id;
-                });
-                return data[0].code;
-            } else {
-                return "-";
-            }
-        },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);
             if (data !== null) this.$emit('currentView', view, data);
             else this.$emit('currentView', view);
         },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
+        GO_TO(e) {
+            this.$router.push("gpi-record-edit/" + e.id);
+        }
     }
 };
 </script>

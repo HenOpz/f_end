@@ -76,8 +76,85 @@
                         <span>{{ status }}</span>
                     </div>
                 </div>
+
+                <h4 style="margin: 25px 0 15px;">Safety Critical Equipment Inspection & Safety Critical Equipment Anomaly Status</h4>
+                <DxDataGrid 
+                    id="data-grid-list" 
+                    key-expr="fieldData.id" 
+                    :data-source="anomalyList"
+                    :selection="{ mode: 'single' }" 
+                    :hover-state-enabled="true" 
+                    :allow-column-reordering="true"
+                    :show-borders="true" 
+                    :show-row-lines="true" 
+                    :row-alternation-enabled="false"
+                    :word-wrap-enabled="true" 
+                    :column-auto-width="true"
+                    @row-updated="ON_UPDATE"
+                >
+                    <DxEditing 
+                        :allow-updating="true" 
+                        :allow-deleting="false" 
+                        :allow-adding="false" 
+                        :use-icons="true"
+                        mode="row"
+                    />
+                    <DxFilterRow :visible="false" />
+                    <DxHeaderFilter :visible="false" />
+                    <DxSelection mode="single" />
+                    <DxColumn 
+                        data-field="fieldData.module_name" 
+                        caption="Module" 
+                        :width="150" 
+                        alignment="left"
+                        :allow-editing="false"
+                        css-class="module-name"
+                    />
+                    <DxColumn 
+                        data-field="fieldData.inspection_plan_status" 
+                        cellTemplate="circle-cell-template"
+                        caption="Inspection Status"
+                        :width="150"
+                        alignment="center"
+                        :allow-editing="false"
+                    />
+                    <DxColumn 
+                        data-field="fieldData.anomaly_management_status" 
+                        cellTemplate="circle-cell-template"
+                        caption="Anomaly Repair" 
+                        :width="150" 
+                        alignment="center" 
+                        :allow-editing="false"
+                    />
+                    <DxColumn 
+                        data-field="fieldData.remark" 
+                        caption="Note" 
+                        :min-width="300" 
+                        alignment="left"
+                    />
+
+
+                    <template #circle-cell-template="{ data }">
+                        <div class="circle" :style="{ backgroundColor: GET_STATUS_CELL_COLOR(data) }"></div>
+                    </template>
+
+                    <DxScrolling mode="standard" />
+                    <DxSearchPanel :visible="false" />
+                    <DxPaging :page-size="10" :page-index="0" />
+                    <DxPager :show-page-size-selector="true" :allowed-page-sizes="[10, 20, 30]"
+                        :show-navigation-buttons="true" :show-info="false" info-text="Page {0} of {1} ({2} items)" />
+                    <DxExport :enabled="false" />
+                </DxDataGrid>
+                <div class="circle-wrapper">
+                    <div class="circle-row" v-for="(status, index) in statusList" :key="index">
+                        <div class="circle" :style="{ backgroundColor: GET_STATUS_COLOR(status) }" />
+                        <span>{{ status }}</span>
+                    </div>
+                </div>
+
+
             </div>
-            <div class="page-chart">
+            <!-- <div class="page-chart" style="display: none;">
                 <h4 style="margin: 5px 0;">Management of Very High Risk Equipment & Very High Risk Anomaly</h4>
                 <div class="grid-chart">
                     <div v-for="chart in chartOptions" :key="chart.id">
@@ -85,13 +162,13 @@
                     </div>
                 </div>
                 
-            </div>
+            </div> -->
         </div>
     </div>
 </template>
 
 <script>
-import Chart from '@/views/Applications/IAMP/Anomaly/Chart.vue'
+// import Chart from '@/views/Applications/IAMP/Anomaly/Chart.vue'
 
 import { axiosFileMaker } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
@@ -125,7 +202,7 @@ export default {
         DxSelection,
         DxEditing,
         DxFilterRow,
-        Chart
+        // Chart
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -445,5 +522,9 @@ export default {
 }
 .page-chart{
     margin-top: 1.5rem;
+}
+
+.table-wrapper {
+    margin-bottom: 200px;
 }
 </style>

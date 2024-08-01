@@ -107,7 +107,7 @@
     </div>
 </template>
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import DxButton from "devextreme-vue/button";
 import { DxPopup, DxToolbarItem } from 'devextreme-vue/popup';
@@ -154,9 +154,9 @@ export default {
             subpageName: null,
             subpageInnerName: null,
         });
-        this.FETCH_MODULE_LIST();
-        this.FETCH_MENU_IN_USER_LIST();
-        this.FETCH_MENU_LIST();
+        GET_DATA(this, '/Md/get-md-app-module-list', 'moduleList');
+        GET_DATA(this, `/UserInMenu/get-menu-list-by-id-user?id_user=${this.accountData.key}`, 'menuInUserList');
+        GET_DATA(this, '/Md/get-md-menu-list', 'menuList');
         this.closeButton = {
             text: 'CLOSE',
             onClick: () => {
@@ -166,7 +166,13 @@ export default {
         this.submitButton = {
             text: 'SUBMIT',
             onClick: () => {
-                this.MODIFY_USER_IN_MENU();
+                if(this.selectedMenus.length > 0) {
+                    const user = JSON.parse(localStorage.getItem("user"));
+                    this.MODIFY_USER_IN_MENU(); PUT_DATA(`/UserInMenu/modify-user-in-menu?id_user=${this.accountData.key}&created_by=${user.id}`, this.selectedMenus, () => {
+                        this.popupVisible = false;
+                        GET_DATA(this, `/UserInMenu/get-menu-list-by-id-user?id_user=${this.accountData.key}`, 'menuInUserList');
+                    });
+                }
             }
         }
     },
@@ -184,70 +190,6 @@ export default {
     },
     comments: {},
     methods: {
-        FETCH_MENU_IN_USER_LIST() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/UserInMenu/get-menu-list-by-id-user?id_user=" + this.accountData.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.menuInUserList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_MENU_LIST() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/Md/get-md-menu-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.menuList = res.data;
-                        console.log("get-md-menu-list ", this.menuList);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_MODULE_LIST() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/Md/get-md-app-module-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.moduleList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         GET_MENU_IN_USER() {
             this.selectedRowKeys = [];
             this.selectedMenus = [];
@@ -260,34 +202,6 @@ export default {
             this.selectedMenus = e.selectedRowKeys;
             console.log('selectedMenus', this.selectedMenus);
         },
-        MODIFY_USER_IN_MENU() {
-            console.log('id_user', this.accountData.key);
-            console.log('selectedMenus', this.selectedMenus);
-            const user = JSON.parse(localStorage.getItem("user"));
-            if(this.selectedMenus.length > 0) {
-                this.isLoading = true;
-                axios({
-                    method: "put",
-                    url: "/UserInMenu/modify-user-in-menu?id_user=" + this.accountData.key + "&created_by=" + user.id,
-                    headers: {
-                        Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                    },
-                    data: this.selectedMenus
-                })
-                    .then(res => {
-                        console.log(res);
-                        this.popupVisible = false;
-                        this.FETCH_MENU_IN_USER_LIST();
-
-                    })
-                    .catch(error => {
-                        console.log(error);
-                    })
-                    .finally(() => {
-                        this.isLoading = false;
-                    });
-            }
-        }
     }
 }
 </script>

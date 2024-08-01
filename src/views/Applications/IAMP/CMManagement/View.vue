@@ -102,7 +102,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
@@ -287,99 +287,28 @@ export default {
             e.cancel = true;
         },
         FETCH_CM_WO_MANAGEMENT_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/CMWOManagement",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.cmManagementList = res.data;
-                        console.log("cmManagementList", this.cmManagementList);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/CMWOManagement', 'cmManagementList');
         },
         CREATE_RECORD(e) {
             e.data.id = 0;
             e.data.record_month = moment(e.data.record_month).format("L");
-            axios({
-                method: "post",
-                url: "/CMWOManagement",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: e.data
-            })
-                .then(res => {
-                    if (res.status == 201) {
-                        console.log("create success");
-                        this.FETCH_CM_WO_MANAGEMENT_RECORD();
-                        this.FETCH_CM_WO_MANAGEMENT_CHART();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            POST_DATA('/CMWOManagement', e.data, () => {
+                this.FETCH_CM_WO_MANAGEMENT_RECORD();
+                this.FETCH_CM_WO_MANAGEMENT_CHART();
+            });
         },
         UPDATE_RECORD(e) {
             e.data.record_month = moment(e.data.record_month).format("L");
-            axios({
-                method: "put",
-                url: "/CMWOManagement/" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: e.data
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        console.log("update success");
-                        this.FETCH_CM_WO_MANAGEMENT_RECORD();
-                        this.FETCH_CM_WO_MANAGEMENT_CHART();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            PUT_DATA(`/CMWOManagement/${e.key}`, e.data, () => {
+                this.FETCH_CM_WO_MANAGEMENT_RECORD();
+                this.FETCH_CM_WO_MANAGEMENT_CHART();
+            });
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/CMWOManagement/delete-cm-wo-management?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log(res);
-                    if (res.status == 204) {
-                        console.log("delete success");
-                        this.FETCH_CM_WO_MANAGEMENT_RECORD();
-                        this.FETCH_CM_WO_MANAGEMENT_CHART();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/CMWOManagement/delete-cm-wo-management?id=${e.key}`, () => {
+                this.FETCH_CM_WO_MANAGEMENT_RECORD();
+                this.FETCH_CM_WO_MANAGEMENT_CHART();
+            });
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);
@@ -388,36 +317,20 @@ export default {
         },
         FETCH_CM_WO_MANAGEMENT_CHART(){
             this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/CMWOManagement/get-cm-wo-management-for-chart",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+            GET_DATA(this, '/CMWOManagement/get-cm-wo-management-for-chart', (data) => {
+                this.cmwoChart = data;
+                for (var i = 0; i < this.cmwoChart.length; i++) {
+                    this.chartData.xAxis.push(moment(this.cmwoChart[i].record_month).format("MMM yyyy"));
+                    this.chartData.total.push(this.cmwoChart[i].cm_total);
+                    this.chartData.opened.push(this.cmwoChart[i].cm_opened);
+                    this.chartData.closed.push(this.cmwoChart[i].cm_closed);
+                    this.chartData.linear.push([i, this.cmwoChart[i].cm_total]);
                 }
-            })
-            .then(res => {
-                if (res.status == 200 && res.data) {
-                    this.cmwoChart = res.data;
-                    for (var i = 0; i < this.cmwoChart.length; i++) {
-                        this.chartData.xAxis.push(moment(this.cmwoChart[i].record_month).format("MMM yyyy"));
-                        this.chartData.total.push(this.cmwoChart[i].cm_total);
-                        this.chartData.opened.push(this.cmwoChart[i].cm_opened);
-                        this.chartData.closed.push(this.cmwoChart[i].cm_closed);
-                        this.chartData.linear.push([i, this.cmwoChart[i].cm_total]);
-                    }
-                    console.warn(this.chartData);
-                    this.chartOptions.xAxis.categories = this.chartData.xAxis;
-                    this.chartOptions.series[0].data = this.chartData.total;
-                    this.chartOptions.series[1].data = this.chartData.closed;
-                    this.chartOptions.series[2].data = this.GET_TREND_LINE(this.chartData.linear);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                this.isLoading = false;
+                console.warn(this.chartData);
+                this.chartOptions.xAxis.categories = this.chartData.xAxis;
+                this.chartOptions.series[0].data = this.chartData.total;
+                this.chartOptions.series[1].data = this.chartData.closed;
+                this.chartOptions.series[2].data = this.GET_TREND_LINE(this.chartData.linear);
             });
         },
         GET_TREND_LINE(data) {

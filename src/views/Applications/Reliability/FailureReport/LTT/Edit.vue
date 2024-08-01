@@ -2,346 +2,346 @@
   <div class="page-container">
     <div class="page-section">
       <div class="table-wrapper">
-        <h4 style="grid-column: span 4">Edit Long Term Tracking</h4>
-        <div class="input-wrapper" fill>
-          <span>Action Details</span>
-          <div class="input">
-            <DxTextBox
-              placeholder="Enter Action Details"
-              v-model="failureActionRecordList.action_details"
-            />
+        <h4 style="">Edit Long Term Tracking</h4>
+        <div class="scroll">
+          <div class="input-wrapper" fill>
+            <span>Action Details</span>
+            <div class="input">
+              <DxTextBox
+                placeholder="Enter Action Details"
+                v-model="failureActionRecordList.action_details"
+              />
+            </div>
           </div>
-        </div>
-        <div class="input-wrapper">
-          <span>Discipline</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.discipline"
-              value-expr="id"
-              display-expr="discipline"
-              placeholder="Select Discipline"
-              v-model="failureActionRecordList.id_discipline"
-              :search-enabled="true"
-            />
+          <div class="input-wrapper">
+            <span>Discipline</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.mainWorkCtr"
+                value-expr="id"
+                display-expr="code"
+                placeholder="Select Discipline"
+                v-model="failureActionRecordList.id_discipline"
+                :search-enabled="true"
+              />
+            </div>
           </div>
-        </div>
-        <div class="input-wrapper">
-          <span>Action Date</span>
-          <div class="select">
-            <DxDateBox
-              type="date"
-              placeholder="Select Action Date"
-              v-model="failureActionRecordList.action_date"
-              display-format="dd MMM yyyy"
-            />
+          <div class="input-wrapper">
+            <span>Action Date</span>
+            <div class="select">
+              <DxDateBox
+                type="date"
+                placeholder="Select Action Date"
+                v-model="failureActionRecordList.action_date"
+                display-format="dd MMM yyyy"
+              />
+            </div>
           </div>
-        </div>
-        <div class="input-wrapper">
-          <span>Failure Action Status</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.failureactionStatus"
-              value-expr="id"
-              display-expr="status"
-              placeholder="Select Failure Action Status"
-              v-model="failureActionRecordList.id_failure_action_status"
-              :search-enabled="true"
-            />
+          <div class="input-wrapper">
+            <span>Failure Action Status</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.failureactionStatus"
+                value-expr="id"
+                display-expr="status"
+                placeholder="Select Failure Action Status"
+                v-model="failureActionRecordList.id_failure_action_status"
+                :search-enabled="true"
+              />
+            </div>
           </div>
-        </div>
-        <h4 style="grid-column: span 4">SAP Notification Header</h4>
-        <div class="input-wrapper">
-          <span>WO Order No.</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Generate by SAP"
-              v-model="sapHeader.wo_order_no"
-              :disabled="true"
-            />
+          <h4 style="grid-column: span 4">SAP Notification Header</h4>
+          <div class="input-wrapper">
+            <span>WO Order No.</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Generate by SAP"
+                v-model="sapHeader.wo_order_no"
+                :disabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>WO Type</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Enter WO Type"
+                v-model="sapHeader.wo_type"
+                :disabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Description</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Description"
+                v-model="sapHeader.description"
+                :disabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Functional Location</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.functionalLocation"
+                value-expr="functional_location"
+                display-expr="functional_location"
+                placeholder="Select Functional Location"
+                v-model="sapHeader.functional_location"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <!-- <div class="input-wrapper">
+            <span>Equipment No.</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Enter Equipment No."
+                v-model="sapHeader.equipment_no"
+              />
+            </div>
+          </div> -->
+
+          <div class="input-wrapper">
+            <span>Planner Grp</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.plannerGrp"
+                value-expr="code"
+                display-expr="code"
+                placeholder="Select Planner Grp"
+                v-model="sapHeader.planner_grp"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Planner Grp Planning Plant</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.plannerGrpPlanning"
+                value-expr="code"
+                display-expr="code"
+                placeholder="Select Planner Grp Planning Plant"
+                v-model="sapHeader.planner_grp_planning_plant"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Main WorkCtr</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.mainWorkCtr"
+                value-expr="code"
+                display-expr="code"
+                placeholder="Select Main WorkCtr"
+                v-model="sapHeader.main_workctr"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Code Grp Object Part</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.codegrpObjectpart"
+                value-expr="object_part_code"
+                display-expr="object_part_code"
+                placeholder="Select Code Grp Object Part"
+                v-model="sapHeader.code_grp_object_part"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Object Part Code</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.objectpartCode"
+                value-expr="object_part_code"
+                display-expr="ddl"
+                placeholder="Select Object Part Code"
+                v-model="sapHeader.object_part_code"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+          <div class="input-wrapper">
+            <span>Code Grp Damage</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.codegrpDamage"
+                value-expr="code"
+                display-expr="code"
+                placeholder="Select Code Grp Damage"
+                v-model="sapHeader.code_grp_damage"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Damage Code</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.damageCode"
+                value-expr="damage_code"
+                display-expr="ddl"
+                placeholder="Select Damage Code"
+                v-model="sapHeader.damage_code"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Damage Free Text</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Enter Damage Free text"
+                v-model="sapHeader.damage_free_text"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Code Grp Cause</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.codegrpCause"
+                value-expr="cause_code"
+                display-expr="cause_code"
+                placeholder="Select Code Grp Cause"
+                v-model="sapHeader.code_grp_cause"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Cause Code</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.causeCode"
+                value-expr="cause_code"
+                display-expr="ddl"
+                placeholder="Select Cause Code"
+                v-model="sapHeader.cause_code"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Cause Grp Free Text</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Enter Cause Grp Free Text"
+                v-model="sapHeader.cause_grp_free_text"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Required Start Date</span>
+            <div class="select">
+              <DxDateBox
+                type="date"
+                placeholder="Select Required Start Date"
+                v-model="sapHeader.required_start_date"
+                display-format="dd MMM yyyy"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Required Start Time</span>
+            <div class="select">
+              <DxDateBox
+                type="time"
+                placeholder="Select Required Start Time"
+                v-model="sapHeader.required_start_time"
+                display-format="HH:mm"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Required End Date</span>
+            <div class="select">
+              <DxDateBox
+                type="date"
+                placeholder="Select Required End date"
+                v-model="sapHeader.required_end_date"
+                display-format="dd MMM yyyy"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Required End Time</span>
+            <div class="select">
+              <DxDateBox
+                type="time"
+                placeholder="Select Required End Time"
+                v-model="sapHeader.required_end_time"
+                display-format="HH:mm"
+              />
+            </div>
+          </div>
+          
+          <div class="input-wrapper">
+            <span>Addtional Data</span>
+            <div class="select">
+              <DxTextBox
+                placeholder="Enter Addtional Data"
+                v-model="sapHeader.additional_data"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Accessibility</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.accessibility"
+                value-expr="code"
+                display-expr="description"
+                placeholder="Select Accessibility"
+                v-model="sapHeader.accessibility"
+                :search-enabled="true"
+              />
+            </div>
+          </div>
+
+          <div class="input-wrapper">
+            <span>Scaffolding Requirement</span>
+            <div class="select">
+              <DxSelectBox
+                :items="formSelect.scaffoldingReq"
+                value-expr="code"
+                display-expr="code"
+                placeholder="Select Scaffolding Requirement"
+                v-model="sapHeader.scaffolding_requirement"
+                :search-enabled="true"
+              />
+            </div>
           </div>
         </div>
 
-        <div class="input-wrapper">
-          <span>WO Type</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Enter WO Type"
-              v-model="sapHeader.wo_type"
-              :disabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Description</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Description"
-              v-model="sapHeader.description"
-              :disabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Functional Location</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.functionalLocation"
-              value-expr="functional_location"
-              display-expr="functional_location"
-              placeholder="Select Functional Location"
-              v-model="sapHeader.functional_location"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <!-- <div class="input-wrapper">
-          <span>Equipment No.</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Enter Equipment No."
-              v-model="sapHeader.equipment_no"
-            />
-          </div>
-        </div> -->
-
-        <div class="input-wrapper">
-          <span>Planner Grp</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.plannerGrp"
-              value-expr="code"
-              display-expr="code"
-              placeholder="Select Planner Grp"
-              v-model="sapHeader.planner_grp"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Planner Grp Planning Plant</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.plannerGrpPlanning"
-              value-expr="code"
-              display-expr="code"
-              placeholder="Select Planner Grp Planning Plant"
-              v-model="sapHeader.planner_grp_planning_plant"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Main WorkCtr</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.mainWorkCtr"
-              value-expr="code"
-              display-expr="code"
-              placeholder="Select Main WorkCtr"
-              v-model="sapHeader.main_workctr"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Code Grp Object Part</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.codegrpObjectpart"
-              value-expr="object_part_code"
-              display-expr="object_part_code"
-              placeholder="Select Code Grp Object Part"
-              v-model="sapHeader.code_grp_object_part"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Object Part Code</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.objectpartCode"
-              value-expr="object_part_code"
-              display-expr="ddl"
-              placeholder="Select Object Part Code"
-              v-model="sapHeader.object_part_code"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-        <div class="input-wrapper">
-          <span>Code Grp Damage</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.codegrpDamage"
-              value-expr="code"
-              display-expr="code"
-              placeholder="Select Code Grp Damage"
-              v-model="sapHeader.code_grp_damage"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Damage Code</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.damageCode"
-              value-expr="damage_code"
-              display-expr="ddl"
-              placeholder="Select Damage Code"
-              v-model="sapHeader.damage_code"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Damage Free Text</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Enter Damage Free text"
-              v-model="sapHeader.damage_free_text"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Code Grp Cause</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.codegrpCause"
-              value-expr="cause_code"
-              display-expr="cause_code"
-              placeholder="Select Code Grp Cause"
-              v-model="sapHeader.code_grp_cause"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Cause Code</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.causeCode"
-              value-expr="cause_code"
-              display-expr="ddl"
-              placeholder="Select Cause Code"
-              v-model="sapHeader.cause_code"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Cause Grp Free Text</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Enter Cause Grp Free Text"
-              v-model="sapHeader.cause_grp_free_text"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Required Start Date</span>
-          <div class="select">
-            <DxDateBox
-              type="date"
-              placeholder="Select Required Start Date"
-              v-model="sapHeader.required_start_date"
-              display-format="dd MMM yyyy"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Required Start Time</span>
-          <div class="select">
-            <DxDateBox
-              type="time"
-              placeholder="Select Required Start Time"
-              v-model="sapHeader.required_start_time"
-              display-format="HH:mm"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Required End Date</span>
-          <div class="select">
-            <DxDateBox
-              type="date"
-              placeholder="Select Required End date"
-              v-model="sapHeader.required_end_date"
-              display-format="dd MMM yyyy"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Required End Time</span>
-          <div class="select">
-            <DxDateBox
-              type="time"
-              placeholder="Select Required End Time"
-              v-model="sapHeader.required_end_time"
-              display-format="HH:mm"
-            />
-          </div>
-        </div>
-        
-        <div class="input-wrapper">
-          <span>Addtional Data</span>
-          <div class="select">
-            <DxTextBox
-              placeholder="Enter Addtional Data"
-              v-model="sapHeader.additional_data"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Accessibility</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.accessibility"
-              value-expr="code"
-              display-expr="description"
-              placeholder="Select Accessibility"
-              v-model="sapHeader.accessibility"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-
-        <div class="input-wrapper">
-          <span>Scaffolding Requirement</span>
-          <div class="select">
-            <DxSelectBox
-              :items="formSelect.scaffoldingReq"
-              value-expr="code"
-              display-expr="code"
-              placeholder="Select Scaffolding Requirement"
-              v-model="sapHeader.scaffolding_requirement"
-              :search-enabled="true"
-            />
-          </div>
-        </div>
-        <div></div>
-        <div></div>
-
-        <div class="action-container" style="grid-column: span 4">
-          <button class="submit" @click="UPDATE_RECORD">Submit</button>
+        <div class="action-container" style="">
+          <button class="create" @click="UPDATE_RECORD">Submit</button>
           <button @click="$emit('popup', 0)">Cancel</button>
         </div>
       
@@ -351,7 +351,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -423,388 +423,94 @@ export default {
   methods: {
     FETCH_FAILURE_ACTION_RECORD() {
       console.log(this.id_record);
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url: "/FailureActionRecord/" + this.id_record,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          console.log('FailureActionRecord', res);
-          if (res.status == 200 && res.data) {
-            this.failureActionRecordList = res.data;
-            axios({
-              method: "get",
-              url: "/SapHeader/get-sap-header-by-module-from-module?id_module=2&id_from_module=" + this.id_record,
-              headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-              }
-            })
-              .then(res => {
-                console.log('SapHeader', res);
-                this.sapHeader = res.data[0];
-                this.sapHeader.descriptionI = this.sapHeader.description;
-                if(this.sapHeader.required_end_date) {
-                  const y = this.sapHeader.required_end_date.substring(0, 4);
-                  const m = this.sapHeader.required_end_date.substring(4, 6) - 1;
-                  const d = this.sapHeader.required_end_date.substring(6, 8);
-                  this.sapHeader.required_end_date = new Date(y, m, d);
-                }
-                if(this.sapHeader.required_start_date) {
-                  const y = this.sapHeader.required_start_date.substring(0, 4);
-                  const m = this.sapHeader.required_start_date.substring(4, 6) - 1;
-                  const d = this.sapHeader.required_start_date.substring(6, 8);
-                  this.sapHeader.required_start_date = new Date(y, m, d);
-                }
-                if(this.sapHeader.required_start_time) {
-                  this.sapHeader.required_start_time = moment(this.sapHeader.required_start_time, ["HHmmss"]).format("lll");
-                  console.log(this.sapHeader.required_start_time);
-                }
-                if(this.sapHeader.required_end_time) {
-                  this.sapHeader.required_end_time = moment(this.sapHeader.required_end_time, ["HHmmss"]).format("lll");
-                  console.log(this.sapHeader.required_end_time);
-                }
-              })
-              .catch(error => {
-                console.log(error);
-              })
-              .finally(() => {
-                this.isLoading = false;
-              });
+      GET_DATA(this, `/FailureActionRecord/${this.id_record}`, (data1) => {
+        this.failureActionRecordList = data1;
+        GET_DATA(this, `/SapHeader/get-sap-header-by-module-from-module?id_module=2&id_from_module=${this.id_record}`, (data2) => {
+          console.log('SapHeader', data2);
+          this.sapHeader = data2[0];
+          this.sapHeader.descriptionI = this.sapHeader.description;
+          if(this.sapHeader.required_end_date) {
+            const y = this.sapHeader.required_end_date.substring(0, 4);
+            const m = this.sapHeader.required_end_date.substring(4, 6) - 1;
+            const d = this.sapHeader.required_end_date.substring(6, 8);
+            this.sapHeader.required_end_date = new Date(y, m, d);
+          }
+          if(this.sapHeader.required_start_date) {
+            const y = this.sapHeader.required_start_date.substring(0, 4);
+            const m = this.sapHeader.required_start_date.substring(4, 6) - 1;
+            const d = this.sapHeader.required_start_date.substring(6, 8);
+            this.sapHeader.required_start_date = new Date(y, m, d);
+          }
+          if(this.sapHeader.required_start_time) {
+            this.sapHeader.required_start_time = moment(this.sapHeader.required_start_time, ["HHmmss"]).format("lll");
+            console.log(this.sapHeader.required_start_time);
+          }
+          if(this.sapHeader.required_end_time) {
+            this.sapHeader.required_end_time = moment(this.sapHeader.required_end_time, ["HHmmss"]).format("lll");
+            console.log(this.sapHeader.required_end_time);
           }
         })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      })
     },
     FETCH_FAILURE_ACTION_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-action-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.failureactionStatus = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-action-status-list', 'formSelect.failureactionStatus');
     },
     FETCH_DISCIPLINE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-discipline-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.discipline = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-discipline-list', 'formSelect.discipline');
     },
     FETCH_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-action-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-action-status-list', 'formSelect.status');
     },
     FETCH_FUNC_LOCATION() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-functional-location-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.functionalLocation = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-functional-location-list', 'formSelect.functionalLocation');
     },
     FETCH_PLANNER_GRP() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-planner-grp-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.plannerGrp = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-planner-grp-list', 'formSelect.plannerGrp');
     },
     FETCH_PLANNER_GRP_PLANNING_PLANT() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-planner-grp-planning-plant-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.plannerGrpPlanning = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-planner-grp-planning-plant-list', 'formSelect.plannerGrpPlanning');
     },
     FETCH_MAIN_WORK_CTR() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-main-work-ctr-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.mainWorkCtr = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-main-work-ctr-list', 'formSelect.mainWorkCtr');
     },
     FETCH_OBJECT_PART_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-object-part-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.objectpartCode = res.data;
-            for(let i = 0; i < this.formSelect.objectpartCode.length; i++) {
-              this.formSelect.objectpartCode[i].ddl = this.formSelect.objectpartCode[i].object_part_code + "-" + this.formSelect.objectpartCode[i].object_part_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-object-part-code-list', (data) => {
+        this.formSelect.objectpartCode = data;
+        for(let i = 0; i < this.formSelect.objectpartCode.length; i++) {
+          this.formSelect.objectpartCode[i].ddl = this.formSelect.objectpartCode[i].object_part_code + "-" + this.formSelect.objectpartCode[i].object_part_text
+        }
+      });
     },
     FETCH_CODE_GROUP_OBJECT_PART() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-object-part-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpObjectpart = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-object-part-list', 'formSelect.codegrpObjectpart');
     },
     FETCH_CODE_GRP_DAMAGE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-damage-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpDamage = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-damage-list', 'formSelect.codegrpDamage');
     },
     FETCH_DAMAGE_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-damage-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.damageCode = res.data;
-            for(let i = 0; i < this.formSelect.damageCode.length; i++) {
-              this.formSelect.damageCode[i].ddl = this.formSelect.damageCode[i].damage_code + "-" + this.formSelect.damageCode[i].damage_code_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-damage-code-list', (data) => {
+        this.formSelect.damageCode = data;
+        for(let i = 0; i < this.formSelect.damageCode.length; i++) {
+          this.formSelect.damageCode[i].ddl = this.formSelect.damageCode[i].damage_code + "-" + this.formSelect.damageCode[i].damage_code_text
+        }
+      });
     },
     FETCH_CODE_GRP_CAUSE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-cause-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpCause = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-cause-list', 'formSelect.codegrpCause');
     },
     FETCH_CAUSE_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-cause-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.causeCode = res.data;
-            for(let i = 0; i < this.formSelect.causeCode.length; i++) {
-              this.formSelect.causeCode[i].ddl = this.formSelect.causeCode[i].cause_code + "-" + this.formSelect.causeCode[i].cause_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-cause-code-list', (data) => {
+        this.formSelect.causeCode = data;
+        for(let i = 0; i < this.formSelect.causeCode.length; i++) {
+          this.formSelect.causeCode[i].ddl = this.formSelect.causeCode[i].cause_code + "-" + this.formSelect.causeCode[i].cause_text
+        }
+      });
     },
     FETCH_ACCESSIBILITY() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-accessibility-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.accessibility = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-accessibility-list', 'formSelect.accessibility');
     },
     FETCH_SCAFFOLDING_REQ() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-scaffolding-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.scaffoldingReq = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-scaffolding-list', 'formSelect.scaffoldingReq');
     },
     UPDATE_RECORD() {
       const user = JSON.parse(localStorage.getItem("user"));
@@ -813,70 +519,19 @@ export default {
       // must to check required field.
       this.failureActionRecordList.action_date = this.failureActionRecordList.action_date ? moment(this.failureActionRecordList.action_date).format("L") : '';
       this.failureActionRecordList.updated_by = user.id;
-      axios({
-        method: "put",
-        url: "/FailureActionRecord/" + this.failureActionRecordList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.failureActionRecordList
-      })
-        .then(res => {
-          console.log('FailureActionRecordRes',res);
-          if (res.status == 204) {
-            this.sapHeader.reported_by = 'AIMS';
-            this.sapHeader.description = (this.sapHeader.id_reference + '-' + this.sapHeader.equipment_no + '-' + this.failureActionRecordList.action_details).substring(0,41);
-            this.sapHeader.required_start_date = this.sapHeader.required_start_date ? moment(this.sapHeader.required_start_date).format("YYYYMMDD") : '';
-            this.sapHeader.required_end_date = this.sapHeader.required_end_date ? moment(this.sapHeader.required_end_date).format("YYYYMMDD") : '';
-            this.sapHeader.required_start_time = this.sapHeader.required_start_time ? moment(this.sapHeader.required_start_time).format("HHmmss") : '';
-            this.sapHeader.required_end_time = this.sapHeader.required_end_time ? moment(this.sapHeader.required_end_time).format("HHmmss") : '';
-            this.sapHeader.updated_by = user.id;
-            axios({
-              method: "put",
-              url: "/SapHeader/" + this.sapHeader.id,
-              headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-              },
-              data: this.sapHeader
-            }) 
-            .then(res => {
-              console.log('SapHeaderRes', res);
-              this.$emit('popup');
-            })
-            .catch(error => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {});
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/FailureActionRecord/${this.failureActionRecordList.id}`, this.failureActionRecordList, () => {
+        this.sapHeader.reported_by = 'AIMS';
+        this.sapHeader.description = (this.sapHeader.id_reference + '-' + this.sapHeader.equipment_no + '-' + this.failureActionRecordList.action_details).substring(0,41);
+        this.sapHeader.required_start_date = this.sapHeader.required_start_date ? moment(this.sapHeader.required_start_date).format("YYYYMMDD") : '';
+        this.sapHeader.required_end_date = this.sapHeader.required_end_date ? moment(this.sapHeader.required_end_date).format("YYYYMMDD") : '';
+        this.sapHeader.required_start_time = this.sapHeader.required_start_time ? moment(this.sapHeader.required_start_time).format("HHmmss") : '';
+        this.sapHeader.required_end_time = this.sapHeader.required_end_time ? moment(this.sapHeader.required_end_time).format("HHmmss") : '';
+        this.sapHeader.updated_by = user.id;
+        PUT_DATA(`/SapHeader/${this.sapHeader.id}`, this.sapHeader, () => { this.$emit('popup'); });
+      });
     },
     DELETE_RECORD() {
-      axios({
-        method: "delete",
-        url: "/FailureActionRecord/delete-failure-action-record?id=" + this.failureActionRecordList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.SET_CURRENT_VIEW(2);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/FailureActionRecord/delete-failure-action-record?id=${this.failureActionRecordList.id}`, () => { this.SET_CURRENT_VIEW(2); });
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);
@@ -906,9 +561,7 @@ export default {
 
 .page-section {
   width: 900px;
-  padding: 20px;
-  overflow-y: auto;
-  height: auto;
+  height: 500px;
   grid-row: span 2;
   // width: 1;
   position: absolute !important;
@@ -922,13 +575,19 @@ export default {
 }
 
 .table-wrapper {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 15px;
-
+  
+  // *[fill] {
+  //   grid-column: span 3;
+  // }
   h4 {
-    padding: 0;
+    position: fixed; 
+    top: 0;
+    padding: 20px 0px 20px 20px;
     margin: 0;
+    background-color: white;
+    border-radius: 10px;
+    z-index: 999;
+    width: calc(100% - 20px);
   }
   .input-wrapper {
     display: flex;
@@ -950,17 +609,39 @@ export default {
     transition: 1s;
     cursor: pointer;
   }
-  .submit {
+  .create {
     color: white;
     background-color: $web-theme-color-secondary;
   }
   .action-container{
+    position: fixed;
+    bottom: 0;
     display: flex;
     justify-content: center;
     gap: 5px;
+    width: 100%;
+    background-color: white;
+    padding: 20px 0;
     
     button{
-      width: 50%;
+      width: 40%;
+    }
+  }
+  .scroll {
+    display: grid;
+    grid-template-columns: repeat(4 , 1fr) ;
+    gap: 15px;
+    overflow-y: auto;
+    height: 350px;
+    margin-top: 50px;
+    padding: 20px;
+
+    h4 {
+      position: relative;
+      width: auto;
+      padding: 0;
+      margin: 0;
+      z-index: 100;
     }
   }
 }

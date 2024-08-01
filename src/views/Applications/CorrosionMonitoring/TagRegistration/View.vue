@@ -144,19 +144,19 @@
         <AddTagRegistration 
             v-if="isShow === 1" 
             :system="system"
-            @popup="FETCH_DATA('/CMInfo', 'tagRegistrationList')" 
+            @popup="GET_CMINFO" 
         />
         <EditTagRegistration 
             v-if="isShow === 2" 
             :system="system"
             :infoData="selectedData" 
-            @popup="FETCH_DATA('/CMInfo', 'tagRegistrationList')" 
+            @popup="GET_CMINFO" 
         />
     </div>
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
 import "devextreme/dist/css/dx.light.css";
@@ -221,8 +221,10 @@ export default {
             this.isProducedWater = this.CHECK_SYSTEM('produced-water');
             this.isSeaWater = this.CHECK_SYSTEM('sea-water');
             this.isPipeline = this.CHECK_SYSTEM('pipeline');
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/CMInfo', 'tagRegistrationList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/CMInfo', 'tagRegistrationList', (data) => {
+                this.tagRegistrationList = data.filter(d => d.id_system == this.SYSTEM_ID);
+            });
         }
     },
     data() {
@@ -271,6 +273,10 @@ export default {
             });
             e.cancel = true;
         },
+        GET_CMINFO() {
+            this.isShow = 0;
+            GET_DATA(this, '/CMInfo', 'tagRegistrationList');
+        },
         CHECK_SYSTEM(e) {
             if (this.system === e) return true;
             else return false;
@@ -282,58 +288,9 @@ export default {
             console.log(e);
             this.$ons.notification.confirm("Confirm Delete This Tag Number?").then((res) => {
                 if (res == 1) {
-                    axios({
-                        method: "delete",
-                        url: "/CMInfo/" + e.key,
-                        headers: {
-                            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                        },
-                    })
-                        .then(res => {
-                            console.log('DELETE_TAG', res);
-                            if (res.status == 204) {
-                                this.FETCH_DATA('/CMInfo', 'tagRegistrationList');
-                            }
-                        })
-                        .catch(error => {
-                            this.$ons.notification.alert(
-                                error.code + " " + error.response.status + " " + error.message
-                            );
-                        })
-                        .finally(() => {
-                            this.isLoading = false;
-                        });
+                    DELETE_DATA(`/CMInfo/${e.key}`, () => { GET_DATA(this, '/CMInfo', 'tagRegistrationList'); });
                 }
             })
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                            if(url == '/CMInfo') {
-                                this.isShow = 0;
-                                this.tagRegistrationList = this.tagRegistrationList.filter(t => t.id_system == this.SYSTEM_ID);
-                            }
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
     }
 };
@@ -396,7 +353,7 @@ export default {
 
 .page-section {
     padding: 20px;
-    height: calc(100vh - 235px);
+    height: calc(100vh - 265px);
     overflow-y: auto;
     grid-row: span 2;
 }
@@ -405,7 +362,4 @@ export default {
     padding-bottom: 20px;
 }
 
-.table-wrapper {
-    margin-bottom: 200px;
-}
 </style>

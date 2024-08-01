@@ -5,7 +5,10 @@
                 <h3 fill style="margin-bottom: 0; margin-top: 0;">New Result</h3>
 
                 <div span-2 class="input-wrapper">
-                    <span>Tag Number</span>
+                    <div class="title-wrapper">
+                        <span>Tag Number</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="tagList" 
@@ -18,7 +21,10 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>Year</span>
+                    <div class="title-wrapper">
+                        <span>Year</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="yearList" 
@@ -29,7 +35,10 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>Period</span>
+                    <div class="title-wrapper">
+                        <span>Period</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="periodList" 
@@ -40,11 +49,11 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>ATP (pgATP/mL)</span>
+                    <span>SRB (cfu)</span>
                     <div class="input">
                         <DxNumberBox 
-                            placeholder="Enter ATP" 
-                            v-model="data.atp_val" 
+                            placeholder="Enter SRB" 
+                            v-model="data.srb_val" 
                         />
                     </div>
                 </div>
@@ -70,21 +79,21 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>Sulphide (mg/L)</span>
+                    <span>ATP (pgATP/mL)</span>
                     <div class="input">
                         <DxNumberBox 
-                            placeholder="Enter Sulphide" 
-                            v-model="data.sulphide_val" 
+                            placeholder="Enter ATP" 
+                            v-model="data.atp_val" 
                         />
                     </div>
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>SRB (cfu)</span>
+                    <span>Sulphide (mg/L)</span>
                     <div class="input">
                         <DxNumberBox 
-                            placeholder="Enter SRB" 
-                            v-model="data.srb_val" 
+                            placeholder="Enter Sulphide" 
+                            v-model="data.sulphide_val" 
                         />
                     </div>
                 </div>
@@ -99,7 +108,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { POST_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
 // import DxTextBox from 'devextreme-vue/text-box';
@@ -134,7 +143,7 @@ export default {
                 updated_by: null,
                 id_status: null,
             },
-            yearList: [2022,2023,2024],
+            yearList: [2022,2023,2024,2025,2026,2027],
             periodList: ['H1','H2'],
         };
     },
@@ -151,35 +160,13 @@ export default {
                 this.data.year && 
                 this.data.period
             ){
-                this.POST_DATA('/CMMicroBacteriaAPGHB');
-                this.POST_DATA('/CMMicroBacteriaATP');
-                this.POST_DATA('/CMMicroBacteriaGHB');
-                this.POST_DATA('/CMMicroBacteriaSRB');
-                this.POST_DATA('/CMMicroBacteriaSulphide');
+                POST_DATA('/CMMicroBacteriaAPGHB', this.data);
+                POST_DATA('/CMMicroBacteriaATP', this.data);
+                POST_DATA('/CMMicroBacteriaGHB', this.data);
+                POST_DATA('/CMMicroBacteriaSRB', this.data);
+                POST_DATA('/CMMicroBacteriaSulphide', this.data);
                 this.$emit('popup');
             }
-        },
-        POST_DATA(url) {
-            this.isLoading = true;
-            axios({
-                method: "post",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.data,
-            })
-                .then(res => {
-                    if (res.status == 201 && res.data) {
-                        console.log(url, res);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
     }
 };
@@ -248,6 +235,16 @@ export default {
         span {
             font-size: 12px;
             font-weight: 600;
+        }
+
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            span:last-child {
+                color: red;
+            }
         }
     }
 

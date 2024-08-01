@@ -16,7 +16,7 @@
                 <div fill v-if="active_tab === tabs[0]" class="table-chart">
                     <div>
                         <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
                             :element-attr="dataGridAttributesPh"
                             :data-source="pHList"
@@ -35,50 +35,135 @@
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="true" 
+                                :allow-adding="false" 
                                 :use-icons="true"
                                 mode="row" 
                             />
-                            <DxFilterRow :visible="true" />
+                            <DxFilterRow :visible="false" />
                             <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
                             <DxColumn 
                                 data-field="year" 
                                 caption="Year" 
-                                :width="100" 
+                                :width="dxColumnWidth[0]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn
                                 data-field="period" 
                                 caption="Period" 
-                                :width="100" 
+                                :width="dxColumnWidth[1]" 
                                 alignment="center" 
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn 
                                 data-field="ph_val" 
                                 caption="pH" 
-                                :width="100" 
+                                :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'pH' }"
+                                :format="formatDecimal2"
                             />
                         </DxDataGrid>
                     </div>
                     <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
+                        <highcharts :options="chartPhOptions" :key="'chart-ph-' + chartPhOptions.id"  />
                     </div>
                 </div>
 
                 <div fill v-if="active_tab === tabs[1]" class="table-chart">
                     <div>
                         <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
+                            key-expr="id" 
+                            :element-attr="dataGridAttributesCO2"
+                            :data-source="co2List"
+                            :selection="{ mode: 'single' }" 
+                            :hover-state-enabled="true" 
+                            :allow-column-reordering="true"
+                            :show-borders="true" 
+                            :show-row-lines="true" 
+                            :row-alternation-enabled="false"
+                            :word-wrap-enabled="true" 
+                            :column-auto-width="true"
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                            :onCellPrepared="onCellPrepared"
+                        >
+                            <DxEditing 
+                                :allow-updating="true" 
+                                :allow-deleting="true" 
+                                :allow-adding="false" 
+                                :use-icons="true"
+                                mode="row" 
+                            />
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
+                            <DxColumn 
+                                data-field="year" 
+                                caption="Year" 
+                                :width="dxColumnWidth[0]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn
+                                data-field="period" 
+                                caption="Period" 
+                                :width="dxColumnWidth[1]" 
+                                alignment="center" 
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="co2_val" 
+                                caption="CO2 (ppb)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'CO2' }"
+                                :format="formatDecimal2"
+                            />
+                        </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartCO2Options" :key="'chart-co2-' + chartCO2Options.id"  />
+                    </div>
+                </div>
+
+                <div fill v-if="active_tab === tabs[2]" class="table-chart">
+                    <div>
+                        <DxDataGrid 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
                             :element-attr="dataGridAttributesDissolved"
                             :data-source="dissolvedList"
@@ -98,50 +183,61 @@
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="true" 
+                                :allow-adding="false" 
                                 :use-icons="true"
                                 mode="row" 
                             />
-                            <DxFilterRow :visible="true" />
+                            <DxFilterRow :visible="false" />
                             <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
                             <DxColumn 
                                 data-field="year" 
                                 caption="Year" 
-                                :width="100" 
+                                :width="dxColumnWidth[0]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn
                                 data-field="period" 
                                 caption="Period" 
-                                :width="100" 
+                                :width="dxColumnWidth[1]" 
                                 alignment="center" 
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn 
                                 data-field="dissolved_o2_val" 
                                 caption="Dissolved O2 (ppb)" 
-                                :width="100" 
+                                :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Dissolved O2' }"
+                                :format="formatDecimal2"
                             />
                         </DxDataGrid>
                     </div>
                     <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
+                        <highcharts :options="chartDissolveO2Options" :key="'chart-dissolved-' + chartDissolveO2Options.id"  />
                     </div>
                 </div>
 
-                <div fill v-if="active_tab === tabs[2]" class="table-chart">
+                <div fill v-if="active_tab === tabs[3]" class="table-chart">
                     <div>
                         <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
                             :element-attr="dataGridAttributesIon"
                             :data-source="ionCountList"
@@ -160,52 +256,64 @@
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="true" 
+                                :allow-adding="false" 
                                 :use-icons="true"
                                 mode="row" 
                             />
-                            <DxFilterRow :visible="true" />
+                            <DxFilterRow :visible="false" />
                             <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
                             <DxColumn 
                                 data-field="year" 
                                 caption="Year" 
-                                :width="100" 
+                                :width="dxColumnWidth[0]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn
                                 data-field="period" 
                                 caption="Period" 
-                                :width="100" 
+                                :width="dxColumnWidth[1]" 
                                 alignment="center" 
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn 
                                 data-field="ion_count" 
                                 caption="Ion Count" 
-                                :width="100" 
+                                :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Ion Count' }"
+                                :format="formatDecimal2"
                             />
                         </DxDataGrid>
                     </div>
                     <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
+                        <highcharts :options="chartIonOptions" :key="'chart-ion-' + chartIonOptions.id"  />
                     </div>
                 </div>
 
-                <div fill v-if="active_tab === tabs[3]" class="table-chart">
-                    <div style="grid-column: span 2;">
+                <div fill v-if="active_tab === tabs[4]" class="table-chart">
+                    <div>
                         <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
-                            :data-source="libraryList"
+                            :element-attr="dataGridAttributesHydro"
+                            :data-source="hydroList"
                             :selection="{ mode: 'single' }" 
                             :hover-state-enabled="true" 
                             :allow-column-reordering="true"
@@ -214,39 +322,69 @@
                             :row-alternation-enabled="false"
                             :word-wrap-enabled="true" 
                             :column-auto-width="true"
-                            >
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                        >
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="true" 
+                                :allow-adding="false" 
                                 :use-icons="true"
                                 mode="row" 
                             />
-                            <DxColumn
-                                data-field="file_path" 
-                                caption="File" 
-                                :min-width="100" 
-                                alignment="left" 
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
                             />
-                            <DxColumn
-                                data-field="note" 
-                                caption="Note" 
-                                :min-width="100" 
-                                alignment="left" 
+                            <DxColumn 
+                                data-field="date" 
+                                caption="Date" 
+                                :width="dxColumnWidth[0]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="hydro_dynamic_cr_90_value" 
+                                caption="CR 90% (mm/yr)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'CR 90%' }"
+                                :format="formatDecimal2"
                             />
-                            <DxColumn
-                                data-field="file_type" 
-                                caption="Extension" 
-                                :width="100" 
-                                alignment="center" 
+                            <DxColumn 
+                                data-field="hydro_dynamic_cr_95_value" 
+                                caption="CR 95% (mm/yr)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :format="formatDecimal2"
                             />
-                            <DxColumn
-                                data-field="upload_date" 
-                                caption="Upload Date" 
-                                :width="100" 
-                                alignment="center" 
+                            <DxColumn 
+                                data-field="hydro_dynamic_cr_99_value" 
+                                caption="CR 99% (mm/yr)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :format="formatDecimal2"
+                            />
+                            <DxColumn 
+                                data-field="hydro_dynamic_not_injected_value" 
+                                caption="CR Not Injected (mm/yr)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :format="formatDecimal2"
                             />
                         </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartHydroOptions" :key="'chart-hydro-' + chartHydroOptions.id"  />
                     </div>
                 </div>
 
@@ -257,16 +395,8 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
-// import moment from "moment";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
-// import { Workbook } from "exceljs";
-// import saveAs from "file-saver";
-// import { exportDataGrid } from "devextreme/excel_exporter";
-// import DxTextArea from 'devextreme-vue/text-area';
-// import DxAddRowButton from "devextreme-vue/button";
-// import { DxItem } from "devextreme-vue/form";
-
 import exportingInit from "highcharts/modules/exporting";
 import offlineExporting from "highcharts/modules/offline-exporting";
 import { Chart } from "highcharts-vue";
@@ -276,25 +406,15 @@ offlineExporting(Highcharts);
 
 import {
     DxDataGrid,
-    // DxSearchPanel,
-    // DxPaging,
-    // DxPager,
-    // DxScrolling,
+    DxPaging,
+    DxPager,
     DxColumn,
-    // DxExport,
-    // DxToolbar,
     DxHeaderFilter,
-    // DxSelection,
     DxEditing,
     DxFilterRow,
-    // DxButton,
     DxLookup,
-    // DxRequiredRule,
-    // DxFormItem,
-    // DxForm
+    DxRequiredRule,
 } from "devextreme-vue/data-grid";
-
-//Structures
 
 export default {
     name: "edit-water-analysis-result",
@@ -303,30 +423,14 @@ export default {
     },
     components: {
         DxDataGrid,
-        // DxSearchPanel,
-        // DxPaging,
-        // DxPager,
-        // DxScrolling,
+        DxPaging,
+        DxPager,
         DxColumn,
-        // DxExport,
-        // DxToolbar,
         DxHeaderFilter,
-        // DxSelection,
-        // DxForm,
-        // DxItem,
         DxEditing,
         DxFilterRow,
-        // DxButton,
-        // DxAddRowButton,
         DxLookup,
-        // DxRequiredRule,
-        // DxFormItem,
-        // DxSelectBox,
-        // DxTextBox,
-        // DxDateBox,
-        // DxCheckBox,
-        // DxTextArea,
-        // trashSvg
+        DxRequiredRule,
         highcharts: Chart
     },
     created() {
@@ -336,41 +440,30 @@ export default {
         });
         if (this.$store.state.status.server == true) {
             console.log('dataInfo', this.dataInfo);
-            this.FETCH_DATA('/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList');
-            this.FETCH_DATA('/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList');
-            this.FETCH_DATA('/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList');
-            this.chartOptions = {
-                title: {
-                    text: 'Trending Results Chart',
-                    align: 'center'
-                },
-                xAxis: {
-                    categories: ['2020 H1', '2020 H2', '2021 H1', '2021 H2', '2022 H1', '2022 H2', '2023 H1', '2023 H2']
-                },
-                yAxis: {
-                    title: {
-                        text: this.active_tab
-                    }
-                },
-                credits: {
-                    enabled: false
-                },
-                series: [{
-                    name: 'Trend',
-                    data: [12.3, 9.5, 4, 18.4, 6, 3, 111, 9.5]
-                }]
-            }
+            GET_DATA(this, '/Md/get-md-cm-water-analysis-status-list/', 'dissolvedStatusList');
+            this.FETCH_PH();
+            this.FETCH_DISSOLVED_O2();
+            this.FETCH_ION();
+            this.FETCH_CO2();
+            this.FETCH_HYDRO();
         }
     },
     data() {
         return {
             pHList: [],
             dissolvedList: [],
+            dissolvedStatusList: [],
             ionCountList: [],
+            co2List: [],
+            hydroList: [],
             libraryList: [],
-            tabs: ['pH', 'Dissolved O2', 'Ion Count', 'Library'],
+            tabs: ['pH', 'CO2', 'Dissolved O2', 'Fe Count', 'Hydro Dynamic'],
             active_tab: 'pH',
-            chartOptions: {},
+            chartPhOptions: {},
+            chartDissolveO2Options: {},
+            chartIonOptions: {},
+            chartCO2Options: {},
+            chartHydroOptions: {},
             dataGridAttributesPh: {
                 class: "data-grid-list-ph"
             },
@@ -380,12 +473,204 @@ export default {
             dataGridAttributesIon: {
                 class: "data-grid-list-ion"
             },
+            dataGridAttributesCO2: {
+                class: "data-grid-list-co2"
+            },
+            dataGridAttributesHydro: {
+                class: "data-grid-list-hydro"
+            },
             yearList: [2022,2023,2024,2025,2026],
             periodList: ['H1','H2'],
+            dxColumnWidth: [110, 110, 120],
+            formatDecimal2: {
+                type: 'fixedPoint',
+                precision: 2,
+            },
         };
     },
     computed: {},
     methods: {
+        FETCH_PH() {
+            GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id_tag, 'pHList', () => {
+                let categories = [];
+                let value = [];
+
+                this.pHList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.ph_val,
+                    })
+                })
+
+                this.chartPhOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'pH Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'pH'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'pH',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+            });
+        },
+        FETCH_DISSOLVED_O2() {
+            GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id_tag, 'dissolvedList', () => {
+                let categories = [];
+                let value = [];
+
+                this.dissolvedList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.dissolved_o2_val,
+                        color: this.GET_COLOR_STATUS(item.id_status)
+                    })
+                })
+
+                this.chartDissolveO2Options = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'Dissolved O2 Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Dissolved O2 (ppb)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Dissolved O2 (ppb)',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#ccc'
+                    }]
+                }
+            });
+        },
+        FETCH_ION() {
+            GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id_tag, 'ionCountList', () => {
+                let categories = [];
+                let value = [];
+
+                this.ionCountList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.ion_count,
+                    })
+                })
+
+                this.chartIonOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'FE Count Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'FE Count'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'FE Count',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+            });
+        },
+        FETCH_CO2() {
+            let categories = [];
+            let value = [];
+
+            this.chartCO2Options = {
+                id: this.active_tab,
+                title: {
+                    text: 'CO2 Trending Results',
+                    align: 'center'
+                },
+                xAxis: {
+                    categories: categories,
+                },
+                yAxis: {
+                    title: {
+                        text: 'CO2'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'CO2',
+                    data: value,
+                    lineColor: '#ccc',
+                    color: '#777'
+                }]
+            }
+        },
+        FETCH_HYDRO() {
+            let categories = [];
+            let value = [];
+
+            this.chartHydroOptions = {
+                id: this.active_tab,
+                title: {
+                    text: 'Hydro Dynamic Trending Results',
+                    align: 'center'
+                },
+                xAxis: {
+                    categories: categories,
+                },
+                yAxis: {
+                    title: {
+                        text: 'Hydro Dynamic'
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Hydro Dynamic',
+                    data: value,
+                    lineColor: '#ccc',
+                    color: '#777'
+                }]
+            }
+        },
+        GET_COLOR_STATUS(id) {
+            if(id) {
+                console.log(id);
+                const color = this.dissolvedStatusList.filter(s => s.id == id);
+                return color[0].color_code;
+            }
+            return '#FFFFFF';
+        },
         CREATE_RECORD(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             e.data.id = 0;
@@ -393,143 +678,43 @@ export default {
             e.data.created_by = user.id;
             e.data.updated_by = user.id;
             if(e.component._customClass == 'data-grid-list-ph'){
-                this.POST_DATA('/CMWaterAnalysisPH', e.data, () => {this.FETCH_DATA('/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                POST_DATA('/CMWaterAnalysisPH', e.data, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                this.POST_DATA('/CMWaterAnalysisDissolvedO2', e.data, () => {this.FETCH_DATA('/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                POST_DATA('/CMWaterAnalysisDissolvedO2', e.data, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                this.POST_DATA('/CMWaterAnalysisIonCount', e.data, () => {this.FETCH_DATA('/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                POST_DATA('/CMWaterAnalysisIonCount', e.data, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
             }
         },
         UPDATE_RECORD(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             e.data.updated_by = user.id;
             if(e.component._customClass == 'data-grid-list-ph'){
-                this.PUT_DATA('/CMWaterAnalysisPH/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                PUT_DATA('/CMWaterAnalysisPH/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                this.PUT_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                PUT_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                this.PUT_DATA('/CMWaterAnalysisIonCount/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                PUT_DATA('/CMWaterAnalysisIonCount/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
             }
         },
         DELETE_RECORD(e) {
             if(e.component._customClass == 'data-grid-list-ph'){
-                this.DELETE_DATA('/CMWaterAnalysisPH/' + e.data.id, () => {this.FETCH_DATA('/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                DELETE_DATA('/CMWaterAnalysisPH/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                this.DELETE_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, () => {this.FETCH_DATA('/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                DELETE_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                this.DELETE_DATA('/CMWaterAnalysisIonCount/' + e.data.id, () => {this.FETCH_DATA('/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                DELETE_DATA('/CMWaterAnalysisIonCount/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
             }
         },
-        DELETE_DATA(url, callback) {
-            this.isLoading = true;
-            axios({
-                method: "delete",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        PUT_DATA(url, data, callback) {
-            this.isLoading = true;
-            axios({
-                method: "put",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: data,
-            })
-                .then(res => {
-                    if (res.status == 204 && res.data) {
-                        console.log(url, res);
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        POST_DATA(url, data, callback) {
-            this.isLoading = true;
-            axios({
-                method: "post",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: data,
-            })
-                .then(res => {
-                    if (res.status == 201 && res.data) {
-                        console.log(url, res);
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        onCellPrepared(e) {
-            console.log("test", e);
-            if (e.column.dataField === "dissolved_o2_val" && e.rowType === "data") {
-                console.log(e.data.id_status); 
-                if (e.data.id_status == 1) {
-                e.cellElement.style.backgroundColor = "#FF0000";
-                } else if (e.data.id_status == 2) {
-                e.cellElement.style.backgroundColor = "#FFFF00";
-                } else if(e.data.id_status == 3) {
-                e.cellElement.style.backgroundColor = "#66FF33";
-                }
-            }
+        onCellPrepared() {
+            // if (e.column.dataField === "dissolved_o2_val" && e.rowType === "data") {
+            //     if (e.data.id_status == 1) {
+            //     e.cellElement.style.backgroundColor = "#FF0000";
+            //     } else if (e.data.id_status == 2) {
+            //     e.cellElement.style.backgroundColor = "#FFFF00";
+            //     } else if(e.data.id_status == 3) {
+            //     e.cellElement.style.backgroundColor = "#66FF33";
+            //     }
+            // }
         }
     }
 };

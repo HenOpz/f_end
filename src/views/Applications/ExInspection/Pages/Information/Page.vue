@@ -92,7 +92,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -325,50 +325,35 @@ export default {
     },
     FETCH_INSP_RECORD() {
       var id_tag = this.$route.params.id_tag;
-      axios({
-        method: "get",
-        url:
-          "/ExInspectionRegisterInfo/" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.inspRecordList = res.data;
-            if (this.inspRecordList.id_area_standard)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-area-std-by-id?id=${this.inspRecordList.id_area_standard}`, 'areaStandard');
-            if (this.inspRecordList.id_area_class)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-area-class-by-id?id=${this.inspRecordList.id_area_class}`, 'areaClass');
-            if (this.inspRecordList.id_area_temp_class)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-area-temp-class-by-id?id=${this.inspRecordList.id_area_temp_class}`, 'areaTempClass');
-            if (this.inspRecordList.id_area_gas_group)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-area-gas-group-by-id?id=${this.inspRecordList.id_area_gas_group}`, 'areaGasGroup');
-            if (this.inspRecordList.id_equip_standard)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-std-by-id?id=${this.inspRecordList.id_equip_standard}`, 'equipStandard');
-            if (this.inspRecordList.id_equip_protection_type)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-protec-type-by-id?id=${this.inspRecordList.id_equip_protection_type}`, 'equipProtectType');
-            if (this.inspRecordList.id_equip_type)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-type-by-id?id=${this.inspRecordList.id_equip_type}`, 'equipType');
-            if (this.inspRecordList.id_equip_gas_group)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-gas-group-by-id?id=${this.inspRecordList.id_equip_gas_group}`, 'equipGasGroup');
-            if (this.inspRecordList.id_equip_temp_class)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-temp-class-by-id?id=${this.inspRecordList.id_equip_temp_class}`, 'equipTempClass');
-            if (this.inspRecordList.id_equip_class)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-class-by-id?id=${this.inspRecordList.id_equip_class}`, 'equipClass');
-            if (this.inspRecordList.id_equip_protection_level_category)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-protec-lv-cat-by-id?id=${this.inspRecordList.id_equip_protection_level_category}`, 'equipProtectLvl');
-            if (this.inspRecordList.id_equip_ip_rating)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-ip-rating-by-id?id=${this.inspRecordList.id_equip_ip_rating}`, 'equipIPRating');
-            if (this.inspRecordList.id_equip_enclosure_type)
-              this.FETCH_DATA(`/Md/get-md-ex-insp-equip-enclosure-type-by-id?id=${this.inspRecordList.id_equip_enclosure_type}`, 'equipEnclosureType');
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-        });
+      GET_DATA(this, `/ExInspectionRegisterInfo/${id_tag}`, (data) => {
+        this.inspRecordList = data;
+        if (this.inspRecordList.id_area_standard)
+          GET_DATA(this, `/Md/get-md-ex-insp-area-std-by-id?id=${this.inspRecordList.id_area_standard}`, 'areaStandard');
+        if (this.inspRecordList.id_area_class)
+          GET_DATA(this, `/Md/get-md-ex-insp-area-class-by-id?id=${this.inspRecordList.id_area_class}`, 'areaClass');
+        if (this.inspRecordList.id_area_temp_class)
+          GET_DATA(this, `/Md/get-md-ex-insp-area-temp-class-by-id?id=${this.inspRecordList.id_area_temp_class}`, 'areaTempClass');
+        if (this.inspRecordList.id_area_gas_group)
+          GET_DATA(this, `/Md/get-md-ex-insp-area-gas-group-by-id?id=${this.inspRecordList.id_area_gas_group}`, 'areaGasGroup');
+        if (this.inspRecordList.id_equip_standard)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-std-by-id?id=${this.inspRecordList.id_equip_standard}`, 'equipStandard');
+        if (this.inspRecordList.id_equip_protection_type)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-protec-type-by-id?id=${this.inspRecordList.id_equip_protection_type}`, 'equipProtectType');
+        if (this.inspRecordList.id_equip_type)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-type-by-id?id=${this.inspRecordList.id_equip_type}`, 'equipType');
+        if (this.inspRecordList.id_equip_gas_group)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-gas-group-by-id?id=${this.inspRecordList.id_equip_gas_group}`, 'equipGasGroup');
+        if (this.inspRecordList.id_equip_temp_class)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-temp-class-by-id?id=${this.inspRecordList.id_equip_temp_class}`, 'equipTempClass');
+        if (this.inspRecordList.id_equip_class)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-class-by-id?id=${this.inspRecordList.id_equip_class}`, 'equipClass');
+        if (this.inspRecordList.id_equip_protection_level_category)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-protec-lv-cat-by-id?id=${this.inspRecordList.id_equip_protection_level_category}`, 'equipProtectLvl');
+        if (this.inspRecordList.id_equip_ip_rating)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-ip-rating-by-id?id=${this.inspRecordList.id_equip_ip_rating}`, 'equipIPRating');
+        if (this.inspRecordList.id_equip_enclosure_type)
+          GET_DATA(this, `/Md/get-md-ex-insp-equip-enclosure-type-by-id?id=${this.inspRecordList.id_equip_enclosure_type}`, 'equipEnclosureType');
+      });
     },
     UPLOAD_PIC(pic_type) {
       const id_tag = this.$route.params.id_tag;
@@ -382,31 +367,7 @@ export default {
         this.file_pic_upload.type == "image/png"
       ) {
         if (this.file_pic_upload.size < 20000000) {
-          axios({
-            method: "post",
-            url: "/ExInspectionRegisterInfo/attach-pic?id_info=" + id_tag,
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization:
-                "Bearer " + JSON.parse(localStorage.getItem("token"))
-            },
-            data: {
-              file: this.file_pic_upload,
-            }
-          })
-            .then(res => {
-              if (res.status == 200) {
-                this.FETCH_INSP_RECORD();
-              }
-            })
-            .catch(error => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {
-              this.FETCH_INSP_RECORD();
-            });
+          POST_DATA(`/ExInspectionRegisterInfo/attach-pic?id_info=${id_tag}`, this.file_pic_upload, () => { this.FETCH_INSP_RECORD(); });
         } else {
           this.$ons.notification.alert("File size too large. (20 MB max)");
           const file = document.getElementById("pic-upload-btn");
@@ -424,29 +385,7 @@ export default {
       const id_tag = this.$route.params.id_tag;
       this.$ons.notification.confirm("Confirm delete?").then(res => {
         if (res == 1) {
-          axios({
-            method: "delete",
-            url: "/ExInspectionRegisterInfo/delete-pic?id_info=" + id_tag,
-            headers: {
-              Authorization:
-                "Bearer " + JSON.parse(localStorage.getItem("token"))
-            },
-          })
-            .then(res => {
-              console.log(res);
-
-              if (res.status == 204) {
-                this.FETCH_INSP_RECORD();
-              }
-            })
-            .catch(error => {
-              this.$ons.notification.alert(
-                error.code + " " + + error.message
-              );
-            })
-            .finally(() => {
-              this.FETCH_INSP_RECORD();
-            });
+          DELETE_DATA(`/ExInspectionRegisterInfo/delete-pic?id_info=${id_tag}`, () => { this.FETCH_INSP_RECORD(); });
         }
       });
     },
@@ -457,31 +396,6 @@ export default {
     },
     PREVIEW_PIC_CLOSE() {
       this.previewImg = "";
-    },
-    FETCH_DATA(url, targetVariable, callback) {
-        this.isLoading = true;
-        axios({
-            method: "get",
-            url: url,
-            headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            }
-        })
-            .then(res => {
-                if (res.status == 200 && res.data) {
-                    if (callback && typeof callback === 'function') {
-                        callback(res.data);
-                    } else {
-                        this.$set(this, targetVariable, res.data);
-                    }
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
     },
   }
 };

@@ -41,7 +41,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -103,7 +103,7 @@ export default {
       subpageInnerName: null,
     });
     if (this.$store.state.status.server == true) {
-      this.FETCH_DATA(`/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList');
+      GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList');
     }
     // if (this.$store.state.status.server == true) {
     //   this.FETCH_INSP_RECORD();
@@ -181,50 +181,12 @@ export default {
       e.data.is_active = true;
       e.data.inspection_date = moment(e.data.inspection_date).format("L");
       console.log(e.data);
-      axios({
-        method: "post",
-        url: "/PipingInspectionRecord",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 201) {
-            console.log("create success");
-            this.FETCH_DATA(`/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList');
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/PipingInspectionRecord', e.data, () => { GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList'); });
     },
     UPDATE_RECORD(e) {
       e.data.inspection_date = moment(e.data.inspection_date).format("L");
       console.log(e.data);
-      axios({
-        method: "put",
-        url: "/PipingInspectionRecord/" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 204) {
-            console.log("update success");
-            this.FETCH_DATA(`/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList');
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/PipingInspectionRecord/${e.key}`, e.data, () => { GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${this.$route.params.id_tag}`, 'inspRecordList'); });
     },
     // DELETE_RECORD(e) {
     //   axios({
@@ -259,7 +221,7 @@ export default {
       this.id_inspection_record = item.id_inspection_record;
       console.log("id_ins: ",item.id_inspection_record)
 
-      this.FETCH_DATA(`ExInspectionChecklist/get-ex-insp-chk-list-insp-id?id_insp_record=${item.id_inspection_record}`, null, 
+      GET_DATA(this, `ExInspectionChecklist/get-ex-insp-chk-list-insp-id?id_insp_record=${item.id_inspection_record}`, null, 
         (data) => {
           if (data[0].result != null) {
             this.checklistList_existance.general = true;
@@ -288,56 +250,10 @@ export default {
         "==> CREATE NEW CHECKLIST SHEET: id_insp: " + this.id_inspection_record
       );
       this.isLoading = true;
-      axios({
-        method: "post",
-        url:
-          "ExInspectionChecklist/add-all-ex-insp-chk-list?id_insp_record=" +
-          this.id_inspection_record,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {
-          id_insp_record: this.id_inspection_record
-        }
-      })
-        .then(res => {
-          if (res.status == 201) {
-            // this.CREATE_REMARK();
-            console.log(res.data);
-            console.log("NEW CHECKLIST SHEET CREATED");
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DATA(url, targetVariable, callback) {
-        this.isLoading = true;
-        axios({
-            method: "get",
-            url: url,
-            headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            }
-        })
-            .then(res => {
-                if (res.status == 200 && res.data) {
-                    if (callback && typeof callback === 'function') {
-                        callback(res.data);
-                    } else {
-                        this.$set(this, targetVariable, res.data);
-                    }
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
+      let data = {
+        id_insp_record: this.id_inspection_record
+      }
+      POST_DATA(`ExInspectionChecklist/add-all-ex-insp-chk-list?id_insp_record=${this.id_inspection_record}`, data);
     },
     // CREATE_REMARK() {
     //   this.isLoading = true;

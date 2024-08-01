@@ -12,16 +12,19 @@
         <div class="page-section">
             <div class="table-wrapper"> 
                 <div id="pdfPreview"></div>
+                <RiskMatrix pdf style="position: absolute; left: -9999px; top: -9999px;" />
             </div>
         </div>
     </div>
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { axios, GET_DATA } from "/axios.js";
 import moment from "moment";
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import html2canvas from 'html2canvas';
+import RiskMatrix from "./RiskMatrix.vue"
 
 export default {
     name: "failure-report",
@@ -29,6 +32,7 @@ export default {
         data_row: Object,
     },
     components: {
+        RiskMatrix
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -74,36 +78,18 @@ export default {
     },
     methods: {
         FETCH_FAILURE_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/FailureRecord/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.failureRecordList = res.data;
-                        this.FETCH_SHORT_TERM_RECORD();
-                        this.FETCH_LONG_TERM_RECORD();
-                        this.$nextTick(function () {
-                            window.setTimeout(() => {
-                                this.generatePDF();
-                            },500);
-                        })
-                    }
+            GET_DATA(this, `/FailureRecord/${this.id_record}`, (data) => {
+                this.failureRecordList = data;
+                this.FETCH_SHORT_TERM_RECORD();
+                this.FETCH_LONG_TERM_RECORD();
+                this.$nextTick(function () {
+                    window.setTimeout(() => {
+                        this.generatePDF();
+                    },1500);
                 })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            });
         },
         FETCH_SHORT_TERM_RECORD() {
-            this.isLoading = true;
             axios({
                 method: "get",
                 url:
@@ -157,91 +143,16 @@ export default {
                 });
         },
         FETCH_LIBRARY() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/FailureFile/get-failure-file-by-id?id=" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log('fetch library', res);
-                    if (res.status == 200) {
-                        this.library = res.data;
-                        this.isLoading = false;
-                        console.log("library", this.library);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, `/FailureFile/get-failure-file-by-id?id=${this.id_record}`, 'library');
         },
         FETCH_PLATFORM() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-platform-list",
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                if (res.status == 200 && res.data) {
-                    this.platform = res.data;
-                }
-                })
-                .catch(error => {
-                console.log(error);
-                })
-                .finally(() => {
-                this.isLoading = false;
-                });
+            GET_DATA(this, '/Md/get-md-platform-list', 'platform');
         },
         FETCH_DISC() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-failure-discipline-list",
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                if (res.status == 200 && res.data) {
-                    this.disc = res.data;
-                }
-                })
-                .catch(error => {
-                console.log(error);
-                })
-                .finally(() => {
-                this.isLoading = false;
-                });
+            GET_DATA(this, '/Md/get-md-failure-discipline-list', 'disc');
         },
         FETCH_IMPACT() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-failure-impact-list",
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                if (res.status == 200 && res.data) {
-                    this.impact = res.data;
-                }
-                })
-                .catch(error => {
-                console.log(error);
-                })
-                .finally(() => {
-                this.isLoading = false;
-                });
+            GET_DATA(this, '/Md/get-md-failure-impact-list', 'impact');
         },
         DATE_FORMAT(d) {
             return moment(d).format("DD MMM yyyy");
@@ -302,7 +213,7 @@ export default {
                         '',
                         '',
                         { text: 'Discipline:', style: 'cellLeft' }, 
-                        { text: this.failureRecordList ? this.GET_DISC(this.failureRecordList.id_discipline) : '-', style: 'headerCellRight' } 
+                        { text: this.failureRecordList ? this.GET_DISC(this.failureRecordList?.id_discipline) : '-', style: 'headerCellRight' } 
                     ],
                     [
                         '',
@@ -339,10 +250,10 @@ export default {
                     [
                         { text: 'Findings Date:', border: [true, false, true, true], style: 'cellLeft' },
                         { text: this.DATE_FORMAT(this.failureRecordList?.findings_date), border: [true, false, true, true] },
-                        { text: '', border: [true, false, true, true], style: 'cellLeft' },
-                        { text: '', border: [true, false, true, true] },
-                        { text: '', border: [true, false, true, true], style: 'cellLeft' },
-                        { text: '', border: [true, false, true, true] }
+                        { text: 'Risk Level', border: [true, false, true, true], style: 'cellLeft' },
+                        { text: this.failureRecordList?.id_risk, border: [true, false, true, true] },
+                        { text: 'RCFA Required', border: [true, false, true, true], style: 'cellLeft' },
+                        { text: this.failureRecordList?.is_rcfa, border: [true, false, true, true] }
                     ],
                 ]
             }
@@ -387,7 +298,7 @@ export default {
                         { text: 'Action No', style: 'cellSubTitle', border: [true, false, true, true] },
                         { text: 'Action Detail', style: 'cellSubTitle', border: [true, false, true, true] },
                         { text: 'Discipline', style: 'cellSubTitle', border: [true, false, true, true] },
-                        { text: 'Action Date', style: 'cellSubTitle', border: [true, false, true, true] }
+                        { text: 'Due Date', style: 'cellSubTitle', border: [true, false, true, true] }
                     ]
                 ];               
 
@@ -423,7 +334,7 @@ export default {
                         { text: 'Action No', style: 'cellSubTitle', border: [true, false, true, true] },
                         { text: 'Action Detail', style: 'cellSubTitle', border: [true, false, true, true] },
                         { text: 'Discipline', style: 'cellSubTitle', border: [true, false, true, true] },
-                        { text: 'Action Date', style: 'cellSubTitle', border: [true, false, true, true] }
+                        { text: 'Due Date', style: 'cellSubTitle', border: [true, false, true, true] }
                     ]
                 ];
 
@@ -451,6 +362,11 @@ export default {
 
                 return data;
             }
+
+            const riskMatrix = document.getElementById('risk-matrix');
+            const canvas = await html2canvas(riskMatrix);
+            const imgData = canvas.toDataURL('image/png');
+            console.log(imgData);
 
             const docDefinition = {
                 info: {
@@ -534,71 +450,53 @@ export default {
                     },
                     {
                         table: {
-                            widths: [85.5, '*'],
-                            body: [[
-                                { text: 'Production Loss:', style: 'cellLeft', border: [true, false, true, true] },
-                                {
-                                    text: this.failureRecordList.production_loss,
-                                    border: [true, false, true, true]
-                                }
-                            ]]
+                            widths: '*',
+                            body: [[{ text: 'FAILURE RISK', style: 'cellTitle', border: [true, false, true, true], }]]
                         },
-                        layout: {
-                            vLineWidth: function (i) {
-                                return (i === 1) ? 0 : 1;
-                            },
+                    },
+                    {
+                        table: {
+                            widths: [85.5, 85.5, '*'],
+                            body: [
+                                [
+                                    { text: 'Probability of Failure:', style: 'cellLeft', border: [true, false, true, true] },
+                                    { text: this.failureRecordList.id_pof, border: [true, false, true, true] },
+                                    { text: this.failureRecordList.note_pof, border: [true, false, true, true] }
+                                ],
+                                [
+                                    { text: 'COF-People:', style: 'cellLeft', border: [true, false, true, true] },
+                                    { text: this.failureRecordList.id_cof_people, border: [true, false, true, true] },
+                                    { text: this.failureRecordList.note_cof_people, border: [true, false, true, true] }
+                                ],
+                                [
+                                    { text: 'COF-Environment:', style: 'cellLeft', border: [true, false, true, true] },
+                                    { text: this.failureRecordList.id_cof_environment, border: [true, false, true, true] },
+                                    { text: this.failureRecordList.note_cof_environment, border: [true, false, true, true] }
+                                ],
+                                [
+                                    { text: 'COF-Production Loss:', style: 'cellLeft', border: [true, false, true, true] },
+                                    { text: this.failureRecordList.id_cof_production_loss, border: [true, false, true, true] },
+                                    { text: this.failureRecordList.note_cof_production_loss, border: [true, false, true, true] }
+                                ],
+                                [
+                                    { text: 'COF-Reputation:', style: 'cellLeft', border: [true, false, true, true] },
+                                    { text: this.failureRecordList.id_cof_reputation, border: [true, false, true, true] },
+                                    { text: this.failureRecordList.note_cof_reputation, border: [true, false, true, true] }
+                                ]
+                            ]
                         }
                     },
                     {
                         table: {
-                            widths: [85.5, '*'],
-                            body: [[
-                                { text: 'Environment Impact:', style: 'cellLeft', border: [true, false, true, true] },
-                                {
-                                    text: this.failureRecordList.environment_impact,
-                                    border: [true, false, true, true]
-                                }
-                            ]]
+                            widths: ['*'],
+                            border: [true, false, true, true],
+                            body: [
+                                [
+                                    // { image: imgData || 'logo', width: 500, border: [true, false, true, true] }
+                                    { text: 'Risk Matrix', width: 500, border: [true, false, true, true] }
+                                ]
+                            ]
                         },
-                        layout: {
-                            vLineWidth: function (i) {
-                                return (i === 1) ? 0 : 1;
-                            },
-                        }
-                    },
-                    {
-                        table: {
-                            widths: [85.5, '*'],
-                            body: [[
-                                { text: 'Material Cost:', style: 'cellLeft', border: [true, false, true, true] },
-                                {
-                                    text: this.failureRecordList.material_cost,
-                                    border: [true, false, true, true]
-                                }
-                            ]]
-                        },
-                        layout: {
-                            vLineWidth: function (i) {
-                                return (i === 1) ? 0 : 1;
-                            },
-                        }
-                    },
-                    {
-                        table: {
-                            widths: [85.5, '*'],
-                            body: [[
-                                { text: 'Health and Safety:', style: 'cellLeft', border: [true, false, true, true] },
-                                {
-                                    text: this.failureRecordList.health_and_safety,
-                                    border: [true, false, true, true]
-                                }
-                            ]]
-                        },
-                        layout: {
-                            vLineWidth: function (i) {
-                                return (i === 1) ? 0 : 1;
-                            },
-                        }
                     },
                     {
                         table: {
@@ -755,8 +653,8 @@ export default {
         },
         GET_DISC(id) {
             const disc = this.disc.filter(d => d.id == id);
-            return disc[0].discipline;
-        }
+            return disc[0]?.discipline ? disc[0].discipline : '-';
+        },
     }
 };
 </script>

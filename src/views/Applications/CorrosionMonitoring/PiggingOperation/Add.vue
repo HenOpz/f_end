@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
@@ -131,7 +131,7 @@ export default {
         DxNumberBox,
     },
     created() {
-        // this.FETCH_PIPELINE_LIST();
+        // GET_DATA(this, '/Md/get-md-moc-rrl-list', 'formSelect.pipelineList');
     },
     data() {
         return {
@@ -173,46 +173,7 @@ export default {
         CREATE_RECORD() {
             if (this.data.date !== null)
                 this.data.date = moment(this.data.date).format("L");
-            axios({
-                method: "post",
-                url: "/PiggingOperation",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.mocList
-            })
-                .then(res => {
-                    if (res.status == 201) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        FETCH_PIPELINE_LIST() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-rrl-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.pipelineList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            POST_DATA('/PiggingOperation', this.mocList, () => { this.SET_CURRENT_VIEW(0); });
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);

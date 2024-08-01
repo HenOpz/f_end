@@ -133,6 +133,11 @@ const routes = [
         alias: "Monthly Report",
         component: () => import("../views/Applications/IAMP/MonthlyReport/Page.vue"),
       },
+      {
+        path: "iamp-approval-process",
+        alias: "User Permission",
+        component: () => import("../views/Applications/IAMP/IAMPApprovalProcess/Page.vue"),
+      },
     ]
   },
   //GPI
@@ -161,6 +166,11 @@ const routes = [
         alias: "GPI Approval Process",
         component: () => import("../views/Applications/GPI/GPIApprovalProcess/Page.vue"),
       },
+      {
+        path: "gpi-record-edit/:id_record",
+        alias: "GPI Record Edit",
+        component: () => import("../views/Applications/GPI/GPIRecord/Edit.vue"),
+      },
     ]
   },
   //Ex-inspection
@@ -183,6 +193,21 @@ const routes = [
         path: "campaign",
         alias: "Campaign",
         component: () => import("../views/Applications/ExInspection/Campaign/Page.vue"),
+      },
+      {
+        path: "pending-approval",
+        alias: "Pending Approval",
+        component: () => import("../views/Applications/ExInspection/PendingApproval/Page.vue"),
+      },
+      {
+        path: "work-order",
+        alias: "Work Order",
+        component: () => import("../views/Applications/ExInspection/WorkOrder/Page.vue"),
+      },
+      {
+        path: "approval-process",
+        alias: "Approval Process",
+        component: () => import("../views/Applications/ExInspection/ApprovalProcess/Page.vue"),
       },
     ],
   },
@@ -279,6 +304,21 @@ const routes = [
         path: "ltt",
         alias: "Long Term Tracking",
         component: () => import("../views/Applications/Reliability/LTT/Page.vue"),
+      },
+      {
+        path: "rcfa-report",
+        alias: "RCFA Report",
+        component: () => import("../views/Applications/Reliability/RCFAReport/Page.vue"),
+      },
+      {
+        path: "rcfa-stt",
+        alias: "Short Term Tracking",
+        component: () => import("../views/Applications/Reliability/RCFASTT/Page.vue"),
+      },
+      {
+        path: "rcfa-ltt",
+        alias: "Long Term Tracking",
+        component: () => import("../views/Applications/Reliability/RCFALTT/Page.vue"),
       },
       {
         path: "failure-approval-process",
@@ -420,6 +460,11 @@ const routes = [
         alias: "Pigging Operation",
         component: () => import("../views/Applications/CorrosionMonitoring/PiggingOperation/Page.vue"),
       },
+      {
+        path: "pipeline/chemical-injection",
+        alias: "Chemical Injection",
+        component: () => import("../views/Applications/CorrosionMonitoring/ChemicalInjection/Page.vue"),
+      },
       // end
 
 
@@ -430,11 +475,6 @@ const routes = [
         path: "corrosion-coupon",
         alias: "Corrosion Coupon",
         component: () => import("../views/Applications/CorrosionMonitoring/CorrosionCoupon/Page.vue"),
-      },
-      {
-        path: "microbiology",
-        alias: "Microbiology",
-        component: () => import("../views/Applications/CorrosionMonitoring/Microbiology/Page.vue"),
       },
       {
         path: "library",

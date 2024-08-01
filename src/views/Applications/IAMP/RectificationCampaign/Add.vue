@@ -131,7 +131,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -178,46 +178,10 @@ export default {
   methods: {
     CREATE_RECORD() {
       this.rectificationCampaignList.target_completion = moment(this.rectificationCampaignList.target_completion).format("L")
-      axios({
-        method: "post",
-        url: "/RectificationCampaign",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.rectificationCampaignList
-      })
-        .then(res => {
-          if (res.status == 201) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/RectificationCampaign', this.rectificationCampaignList, () => { this.SET_CURRENT_VIEW(0); });
     },
     FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-rectification-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-rectification-status-list', 'formSelect.status');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);

@@ -135,6 +135,8 @@
                     </div>
                 </div>
 
+                <div v-if="system == 'pipeline'" />
+
                 <button class="create" @click="UPDATE_TAG">Edit</button>
                 <button @click="$emit('popup')">Cancel</button>
             </div>
@@ -143,7 +145,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA } from "/axios.js";
 import clone from "just-clone";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -168,7 +170,7 @@ export default {
         });
         if (this.$store.state.status.server == true) {
             this.registration = clone(this.infoData);
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
         }
     },
     data() {
@@ -190,53 +192,7 @@ export default {
         UPDATE_TAG() {
             const user = JSON.parse(localStorage.getItem("user"));
             this.registration.updated_by = user.id;
-            axios({
-                method: "put",
-                url: "/CMInfo/" + this.registration.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.registration,
-            })
-                .then(res => {
-                    console.log('UPDATE_TAG', res);
-                    if (res.status == 204) {
-                        this.$emit('popup');
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            PUT_DATA(`/CMInfo/${this.registration.id}`, this.registration, () => { this.$emit('popup'); });
         },
     }
 };

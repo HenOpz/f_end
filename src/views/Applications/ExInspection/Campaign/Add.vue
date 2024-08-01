@@ -69,7 +69,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -90,7 +90,7 @@ export default {
       subpageInnerName: null,
     });
     if (this.$store.state.status.server == true) {
-      this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
+      GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
     }
   },
   data() {
@@ -106,31 +106,6 @@ export default {
     CREATE_RECORD() {
 
     },
-    FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
   }
 };
 </script>

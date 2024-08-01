@@ -22,14 +22,14 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "MANAGEMENT OF CHANGE",
+            subpageName: "RESIDUAL CORROSION INHIBITOR",
             subpageInnerName: null,
         });
     },
     data() {
         return {
             current_view: 0,
-            edit_row: 0,
+            edit_row: null,
             moc_no: null,
         };
     },

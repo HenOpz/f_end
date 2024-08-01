@@ -93,7 +93,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -138,46 +138,10 @@ export default {
         this.inspectionCampaignList.start_date = moment(this.inspectionCampaignList.start_date).format("L");
       if (this.inspectionCampaignList.end_date !== null)
         this.inspectionCampaignList.end_date = moment(this.inspectionCampaignList.end_date).format("L");
-      axios({
-        method: "post",
-        url: "/InspectionCampaign",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.inspectionCampaignList
-      })
-        .then(res => {
-          if (res.status == 201) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/InspectionCampaign', this.inspectionCampaignList, () => { this.SET_CURRENT_VIEW(0); });
     },
     FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-insp-campaign-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-insp-campaign-status-list', 'formSelect.status');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);

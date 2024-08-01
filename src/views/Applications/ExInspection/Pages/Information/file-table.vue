@@ -153,7 +153,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 //import moment from "moment";
 
 //Components
@@ -241,26 +241,7 @@ export default {
     FETCH_LIBRARY() {
       var id_tag = this.$route.params.id_tag;
       this.isLoading = true;
-      axios({
-          method: "get",
-          url: "/ExInspectionRegisterInfoFile/get-ex-inspection-register-info-by-id?id=" + id_tag,
-          headers: {
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          }
-      })
-          .then(res => {
-              console.log('fetch library', res);
-              if (res.status == 200) {
-                  this.library = res.data;
-                  this.isLoading = false;
-              }
-          })
-          .catch(error => {
-              console.log(error);
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      GET_DATA(this, `/ExInspectionRegisterInfoFile/get-ex-inspection-register-info-by-id?id=${id_tag}`, 'library');
     },
     ADD_NEW_FILE(e) {
       var id_tag = this.$route.params.id_tag;
@@ -276,36 +257,7 @@ export default {
                   this.FETCH_LIBRARY();
               }
           });
-      axios({
-          method: "post",
-          url: "/ExInspectionRegisterInfoFile",
-          headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          },
-          data: formData
-      })
-          .then(res => {
-              console.log(res);
-              if (res.status == 201) {
-                  this.FETCH_LIBRARY();
-              }
-          })
-          .catch(error => {
-              this.isLoading = false;
-              this.$ons.notification
-                  .alert(error.message, {
-                      title: "Add New File failed"
-                  })
-                  .then(res => {
-                      if (res == 0) {
-                          this.FETCH_LIBRARY();
-                      }
-                  });
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      POST_DATA('/ExInspectionRegisterInfoFile', formData, true, () => { this.FETCH_LIBRARY(); });
     },
     UPDATE_DOC(e) {
       var formData = new FormData();
@@ -313,37 +265,7 @@ export default {
       formData.append("id_info", e.data.id_info);
       formData.append("file", this.file ?? "");
       formData.append("note", e.data.note);
-      axios({
-          method: "put",
-          url: "/ExInspectionRegisterInfoFile/" + e.data.id,
-          headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          },
-          data: formData
-      })
-          .then(res => {
-              console.log(res);
-              if (res.status == 204) {
-                  this.FETCH_LIBRARY();
-              }
-          })
-          .catch(error => {
-              console.log(error);
-              this.isLoading = false;
-              this.$ons.notification
-                  .alert(error.message, {
-                      title: "Update File failed"
-                  })
-                  .then(res => {
-                      if (res == 0) {
-                          this.FETCH_LIBRARY();
-                      }
-                  });
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      PUT_DATA(`/ExInspectionRegisterInfoFile/${e.data.id}`, true, () => { this.FETCH_LIBRARY(); });
     },
     VALUE_CHANGE(e) {
       //console.log("fileReader e data:");
@@ -376,34 +298,7 @@ export default {
     },
     DELETE_DOC(e) {
       const id = e.data.id;
-      axios({
-          method: "delete",
-          url: "/ExInspectionRegisterInfoFile/" + id,
-          headers: {
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          }
-      })
-          .then(res => {
-              if (res.status == 204) {
-                  this.FETCH_LIBRARY();
-              }
-          })
-          .catch(error => {
-              console.log(error);
-              this.isLoading = false;
-              this.$ons.notification
-                  .alert(error.message, {
-                      title: "Delete failed"
-                  })
-                  .then(res => {
-                      if (res == 0) {
-                          this.FETCH_LIBRARY();
-                      }
-                  });
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
+      DELETE_DATA(`/ExInspectionRegisterInfoFile/${id}`, () => { this.FETCH_LIBRARY(); });
     },
     ADD_ROW() {
       var grid = this.$refs[this.gridRefName].instance;

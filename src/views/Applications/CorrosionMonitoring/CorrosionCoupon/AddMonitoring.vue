@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxDateBox from 'devextreme-vue/date-box';
@@ -44,10 +44,6 @@ export default {
         DxDateBox
     },
     created() {
-        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "CORROSION COUPON",
-            subpageInnerName: null,
-        });
     },
     props: {
         id_tag: Number,
@@ -71,27 +67,9 @@ export default {
             this.data.updated_by = user.id;
             if(this.data.install_date) {
                 this.data.install_date = moment(this.data.install_date).format("L");
-                axios({
-                    method: "post",
-                    url: "/CMCorrosionCouponMonitorRecord",
-                    headers: {
-                        Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                    },
-                    data: this.data
-                })
-                    .then(res => {
-                        if (res.status == 201) {
-                            console.log(res);
-                            this.$emit('popup');
-                        }
-                    })
-                    .catch(error => {
-                        this.$ons.notification.alert(
-                            error.code + " " + error.response.status + " " + error.message
-                        );
-                    })
-                    .finally(() => { });
-                }
+                this.data.remove_date = this.data.remove_date ? moment(this.data.remove_date).format("L") : null;
+                POST_DATA('/CMCorrosionCouponMonitorRecord', this.data, () => { this.$emit('popup'); });
+            }
         }
     }
 };

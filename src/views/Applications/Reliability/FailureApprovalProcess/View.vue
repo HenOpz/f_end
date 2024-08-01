@@ -57,6 +57,15 @@
                         <DxLookup :data-source="userList" display-expr="username" value-expr="id" />
                     </DxColumn>
                     <DxColumn 
+                        data-field="id_role" 
+                        caption="Role" 
+                        :min-width="120" 
+                        alignment="left"
+                        :editor-options="{ placeholder: 'Select Role' }"
+                    >
+                        <DxLookup :data-source="roleList" display-expr="role_name" value-expr="id" />
+                    </DxColumn>
+                    <DxColumn 
                         data-field="authorized_name" 
                         caption="Permission Description" 
                         :min-width="120" 
@@ -79,7 +88,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
@@ -127,12 +136,13 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/User/get-active-user-list', null, 
+            GET_DATA(this, '/User/get-active-user-list', null, 
                 (data) => {
                     this.userList = data;
-                    this.FETCH_DATA(`/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList');
+                    GET_DATA(this, `/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList');
                 }
             );
+            GET_DATA(this, '/Md/get-md-failure-auth-role-list', (data) => { this.roleList = data.filter(e => e.id_work_group === this.active_tab) });
         }
     },
     data() {
@@ -140,6 +150,7 @@ export default {
             active_tab: 1,
             failureApprProcessList: [],
             userList: [],
+            roleList: [],
         };
     },
     computed: {},
@@ -147,7 +158,9 @@ export default {
         UPDATE_TAB(e) {
             this.active_tab = e;
             this.failureApprProcessList = [];
-            this.FETCH_DATA(`/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${e}`, 'failureApprProcessList');
+            this.roleList = [];
+            GET_DATA(this, `/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${e}`, 'failureApprProcessList');
+            GET_DATA(this, '/Md/get-md-failure-auth-role-list', (data) => { this.roleList = data.filter(e => e.id_work_group === this.active_tab) });
         },
         EXPORT_DATA(e) {
             const workbook = new Workbook();
@@ -169,91 +182,13 @@ export default {
             e.data.id = 0;
             e.data.is_active = true;
             e.data.id_work_group = this.active_tab;
-            axios({
-                method: "post",
-                url: "/FailureRecordAuth/add-failure-record-auth",
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: e.data
-            })
-                .then(res => {
-                if (res.status == 201) {
-                    this.FETCH_DATA(`/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList');
-                }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => {});
+            POST_DATA('/FailureRecordAuth/add-failure-record-auth', e.data, () => { GET_DATA(this, `/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList'); });
         },
         UPDATE_RECORD(e) {
-            axios({
-                method: "put",
-                url: "/FailureRecordAuth/edit-failure-record-auth?id=" + e.data.id,
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: e.data
-            })
-                .then(res => {
-                if (res.status == 204) {
-                    this.FETCH_DATA(`/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList');
-                }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => {});
+            PUT_DATA(`/FailureRecordAuth/edit-failure-record-auth?id=${e.data.id}`, e.data, () => { GET_DATA(this, `/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList'); });
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "FailureRecordAuth/delete-failure-record-auth?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_DATA(`/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList');
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            DELETE_DATA(`FailureRecordAuth/delete-failure-record-auth?id=${e.key}`, () => { GET_DATA(this, `/FailureRecordAuth/failure-record-by-id-work-group?id_work_group=${this.active_tab}`, 'failureApprProcessList'); });
         },
     }
 };

@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import moment from "moment";
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
@@ -43,12 +43,12 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/Md/get-md-asset-type-list', 'assetTypeList');
-            this.FETCH_DATA('/Md/get-md-gpi-main-component-list', 'mainComponentList');
-            this.FETCH_DATA('/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
-            this.FETCH_DATA('/Md/get-md-gpi-severity-list', 'severityList');
-            this.FETCH_DATA('/Md/get-md-gpi-repair-list', 'typeOfRepairList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'assetTypeList');
+            GET_DATA(this, '/Md/get-md-gpi-main-component-list', 'mainComponentList');
+            GET_DATA(this, '/Md/get-md-gpi-damage-mechanism-list', 'damageMechanismList');
+            GET_DATA(this, '/Md/get-md-gpi-severity-list', 'severityList');
+            GET_DATA(this, '/Md/get-md-gpi-repair-list', 'typeOfRepairList');
             this.FETCH_FAILURE_RECORD();
             // this.FETCH_LIBRARY();
             pdfMake.vfs = {
@@ -88,99 +88,24 @@ export default {
     },
     methods: {
         FETCH_FAILURE_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/HighlightActivities/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+            GET_DATA(this, `/HighlightActivities/${this.id_record}`, (data) => { 
+                if (data) {
+                    this.failureRecordList = data;
+                    this.$nextTick(function () {
+                        window.setTimeout(() => {
+                            this.generatePDF();
+                        },500);
+                    })
                 }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.failureRecordList = res.data;
-                        // this.FETCH_PICTURE_LOG();
-                        this.$nextTick(function () {
-                            window.setTimeout(() => {
-                                this.generatePDF();
-                            },500);
-                        })
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+             });
         },
         FETCH_PICTURE_LOG() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/GpiFile/get-gpi-file-by-id?id=" + this.data_row.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.pictureLogList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, `/GpiFile/get-gpi-file-by-id?id=${this.data_row.id}`, (data) => {
+                if (data) this.pictureLogList = data;
+            });
         },
         FETCH_LIBRARY() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/FailureFile/get-failure-file-by-id?id=" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log('fetch library', res);
-                    if (res.status == 200) {
-                        this.library = res.data;
-                        this.isLoading = false;
-                        console.log("library", this.library);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DATA(url, targetVariable) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-            .then(res => {
-                if (res.status == 200 && res.data) {
-                this.$set(this, targetVariable, res.data);
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            })
-            .finally(() => {
-                this.isLoading = false;
-            });
+            GET_DATA(this, `/FailureFile/get-failure-file-by-id?id=${this.id_record}`, 'library');
         },
         DATE_FORMAT(d) {
             return moment(d).format("DD MMM yyyy");

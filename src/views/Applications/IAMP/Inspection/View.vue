@@ -61,7 +61,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -285,29 +285,7 @@ export default {
     FETCH_INSP_RECORD() {
       this.isLoading = true;
       var id_tag = this.$route.params.id_tag;
-      axios({
-        method: "get",
-        url:
-          "/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          console.log("insp record:");
-          console.log(res);
-          if (res.status == 200 && res.data) {
-            console.log("success");
-            this.inspRecordList = res.data;
-            console.log(this.inspRecordList);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${id_tag}`, 'inspRecordList');
     },
     CREATE_RECORD(e) {
       e.data.id_line = this.$route.params.id_tag;
@@ -315,71 +293,15 @@ export default {
       e.data.is_active = true;
       e.data.inspection_date = moment(e.data.inspection_date).format("L");
       console.log(e.data);
-      axios({
-        method: "post",
-        url: "/PipingInspectionRecord",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 201) {
-            console.log("create success");
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/PipingInspectionRecord', e.data, () => { this.FETCH_INSP_RECORD(); });
     },
     UPDATE_RECORD(e) {
       e.data.inspection_date = moment(e.data.inspection_date).format("L");
       console.log(e.data);
-      axios({
-        method: "put",
-        url: "/PipingInspectionRecord/" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 204) {
-            console.log("update success");
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/PipingInspectionRecord/${e.key}`, e.data, () => { this.FETCH_INSP_RECORD(); });
     },
     DELETE_RECORD(e) {
-      axios({
-        method: "delete",
-        url: "/PipingInspectionRecord/" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            console.log("delete success");
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/PipingInspectionRecord/${e.key}`, () => { this.FETCH_INSP_RECORD(); });
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", false);

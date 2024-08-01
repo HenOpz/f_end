@@ -49,6 +49,51 @@ export default {
                     name: 'Dashboard'
                 },
                 {
+                    name: 'System'
+                },
+                {
+                    url: '/corrosion-monitoring/pipeline',
+                    icon: "/img/svg/window-layout-svg.svg",
+                    name: 'Pipeline',
+                    menu: [
+                        {
+                            url: '/corrosion-monitoring/pipeline/tag-registration',
+                            name: 'Tag Registration',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/pigging-operation',
+                            name: 'Splash Pig',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/water-analysis',
+                            name: 'Water Analysis',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/microbiological-bacteria',
+                            name: 'Microbiological Bacteria',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/corrosion-coupon',
+                            name: 'Corrosion Coupon',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/er-probe',
+                            name: 'ER Probe',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/chemical-injection',
+                            name: 'Chemical Injection',
+                        },
+                        {
+                            url: '/corrosion-monitoring/pipeline/residual-corrosion-inhibitor',
+                            name: 'Residual Corrosion Inhibitor',
+                        },
+                    ]
+                },
+                {
+                    name: 'Circuit'
+                },
+                {
                     url: '/corrosion-monitoring/cooling-medium',
                     icon: "/img/svg/window-layout-svg.svg",
                     name: 'Cooling Medium',
@@ -126,45 +171,6 @@ export default {
                         {
                             url: '/corrosion-monitoring/sea-water/er-probe',
                             name: 'ER Probe',
-                        },
-                    ]
-                },
-                {
-                    url: '/corrosion-monitoring/pipeline',
-                    icon: "/img/svg/window-layout-svg.svg",
-                    name: 'Pipeline',
-                    menu: [
-                        {
-                            url: '/corrosion-monitoring/pipeline/tag-registration',
-                            name: 'Tag Registration',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/pigging-operation',
-                            name: 'Pigging Operation',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/water-analysis',
-                            name: 'Water Analysis',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/microbiological-bacteria',
-                            name: 'Microbiological Bacteria',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/corrosion-coupon',
-                            name: 'Corrosion Coupon',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/er-probe',
-                            name: 'ER Probe',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/chemical-injection',
-                            name: 'Chemical Injection',
-                        },
-                        {
-                            url: '/corrosion-monitoring/pipeline/residual-corrosion-inhibitor',
-                            name: 'Residual Corrosion Inhibitor',
                         },
                     ]
                 },

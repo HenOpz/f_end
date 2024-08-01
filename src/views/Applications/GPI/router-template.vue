@@ -13,15 +13,9 @@
 </template>
 
 <script>
-// import axios from "/axios.js";
-// Structures
 import toolbar from "@/components/app-structures/app-navbar-toolbar.vue";
 import sidebar from "@/components/app-structures/app-sidebar.vue";
 import banner from "@/components/app-structures/app-banner.vue"
-
-// import pieChartSvg from "@/components/svg/pie-chart-svg.vue"
-// import windowLayoutSvg from "@/components/svg/window-layout-svg.vue"
-// import rewindTimeSvg from "@/components/svg/rewind-time-svg.vue"
 
 export default {
     name: "router-template-detail",

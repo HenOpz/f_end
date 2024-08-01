@@ -5,9 +5,8 @@
                 <div class="table-wrapper">
                     <DxDataGrid 
                         id="data-grid-list" 
-                        key-expr="id" 
-                        :data-source="mocList" 
-                        :selection="{ mode: 'single' }"
+                        key-expr="id_tag" 
+                        :data-source="erProbeList"              
                         :hover-state-enabled="true" 
                         :allow-column-reordering="true" 
                         :show-borders="true"
@@ -26,77 +25,73 @@
                         />
                         <DxFilterRow :visible="true" />
                         <DxHeaderFilter :visible="true" />
-                        <DxSelection mode="single" />
-                        <!-- <DxColumn 
-                            data-field="id" 
-                            caption="No." 
-                            :width="80" 
-                            alignment="center" 
-                        /> -->
+                        
                         <DxColumn 
-                            data-field="moc_number" 
-                            caption="Item" 
-                            :width="140" 
-                            alignment="center"
-                        />
-                        <DxColumn 
-                            data-field="title" 
+                            data-field="id_platform"
                             caption="Platform" 
-                            :width="200"
-                            alignment="left" 
+                            alignment="center" 
+                            :width="100"
+                        >
+                            <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
+                        </DxColumn>
+
+                        <DxColumn 
+                            data-field="tag_no" 
+                            caption="Tag No." 
+                            alignment="left"
+                            :width="120"
                         />
                         <DxColumn 
-                            data-field="worksite" 
-                            caption="Tag Number" 
-                            :width="120" 
-                            alignment="center"
-                        />
-                        <DxColumn 
-                            data-field="id_moc_noc" 
+                            data-field="desc" 
                             caption="Description" 
                             :min-width="120" 
                             alignment="left"
                         />
                         <DxColumn 
-                            data-field="id_moc_rrl" 
+                            data-field="record_lastest_date" 
                             caption="Latest Record Date" 
                             :width="120" 
                             alignment="center"
-                            dataType="date" 
-                            format="dd MMM yyyy" 
+                            type="date"
+                            format="dd MMM yyyy"
                         />
                         <DxColumn 
-                            data-field="start_date" 
+                            data-field="metal_loss" 
                             caption="Metal Loss (mm)" 
                             :width="100" 
                             alignment="center"
+                            type="number"
                         />
                         <DxColumn 
-                            data-field="expiry_date" 
+                            data-field="corrosion_rate" 
                             caption="Corrosion Rate (mm/y)" 
                             :width="100" 
                             alignment="center"
-                            dataType="date" 
-                            format="dd MMM yyyy" 
+                            type="number"
                         />
-                        <DxColumn 
-                            data-field="expiry_date" 
-                            caption="Comments" 
-                            :width="100" 
-                            alignment="center"
-                        />
-                        <!-- <DxColumn caption="MOC" :width="80" alignment="center" cell-template="moc-cell-template" />
-                        <DxColumn caption="RA" :width="80" alignment="center" cell-template="ra-cell-template" /> -->
-                        <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
+                        <DxColumn :width="60" alignment="center" cell-template="action-cell-template" />
 
                         <template #action-cell-template="{ data }">
                             <div class="action-wrapper">
-                                <div @click="SET_CURRENT_VIEW(2, data.data.id)">
+                                <div @click="SET_CURRENT_VIEW(2, data.data)">
                                     <img src="/img/svg/magnifying-glass-svg.svg" class="penSvg" />
                                 </div>
+                                <!-- <div @click="DELETE_RECORD(data)">
+                                    <img src="/img/svg/trash-svg.svg" class="trashSvg" />
+                                </div> -->
                             </div>
                         </template>
 
+                        <DxToolbar>
+                            <!-- <DxItem
+                                location="after"
+                                template="addButton"
+                            /> -->
+                            <DxItem
+                                location="after"
+                                name="searchPanel"
+                            />
+                        </DxToolbar>
                         <!-- Configuration goes here -->
                         <!-- <DxFilterRow :visible="true" /> -->
                         <DxScrolling mode="standard" />
@@ -115,26 +110,15 @@
 </template>
 
 <script>
-//API
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
-import AddPopup from "./Add.vue"
-// import EditPopup from "./Edit.vue"
-
-//Components
-//import VueTabsChrome from "vue-tabs-chrome";
-// import downloadFileSvg from "@/components/svg/download-file-svg.vue"
-// import magnifyingGlassSvg from "@/components/svg/magnifying-glass-svg.vue"
-// import penSvg from "@/components/svg/pen-svg.vue"
-// import trashSvg from "@/components/svg/trash-svg.vue"
-
-//DataGrid
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
 import { exportDataGrid } from "devextreme/excel_exporter";
+import { DxItem } from "devextreme-vue/form";
 // import DxButton from "devextreme-vue/button";
-// import { DxItem } from "devextreme-vue/form";
+
 import {
     DxDataGrid,
     DxSearchPanel,
@@ -143,18 +127,15 @@ import {
     DxScrolling,
     DxColumn,
     DxExport,
-    // DxToolbar,
-    DxHeaderFilter,
-    DxSelection,
+    DxToolbar,
     DxEditing,
+    DxLookup,
     DxFilterRow,
-    // DxLookup,
-    // DxRequiredRule,
+    DxHeaderFilter,
+    // DxButton,
     // DxFormItem,
     // DxForm
 } from "devextreme-vue/data-grid";
-
-//Structures
 
 export default {
     name: "inspection-record",
@@ -166,23 +147,18 @@ export default {
         DxScrolling,
         DxColumn,
         DxExport,
-        // DxToolbar,
-        DxHeaderFilter,
-        DxSelection,
+        DxToolbar,
         // DxForm,
-        // DxItem,
+        DxItem,
         DxEditing,
+        DxLookup,
         DxFilterRow,
+        DxHeaderFilter,
         // DxButton,
-        // DxLookup,
-        // DxRequiredRule,
-        // DxFormItem
-        // downloadFileSvg,
-        // magnifyingGlassSvg,
+        // DXButton,
+        // DxFormItem,
         // penSvg,
         // trashSvg,
-        AddPopup,
-        // EditPopup
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -190,24 +166,19 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DROPDOWN_NOC();
-            this.FETCH_DROPDOWN_RRL();
-            this.FETCH_DROPDOWN_STATUS();
-            this.FETCH_MOC_RECORD();
             this.system = this.$route.fullPath.split('/')[2];
             this.isCoolingMedium = this.CHECK_SYSTEM('cooling-medium');
             this.isProducedWater = this.CHECK_SYSTEM('produced-water');
             this.isSeaWater = this.CHECK_SYSTEM('sea-water');
             this.isPipeline = this.CHECK_SYSTEM('pipeline');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, this.listApiUrl, 'erProbeList');
         }
     },
     data() {
         return {
-            testList: null,
-            mocList: {},
-            dataGridAttributes: {
-                class: "data-grid-style"
-            },
+            platformList: [],
+            erProbeList: [],
             isShow: 0,
             system: null,
             isCoolingMedium: false,
@@ -216,7 +187,28 @@ export default {
             isPipeline: false,
         };
     },
-    computed: {},
+    computed: {
+        baseURL() {
+            var mode = this.$store.state.mode;
+            if (mode == "dev") return this.$store.state.modeURL.dev;
+            else if (mode == "prod") return this.$store.state.modeURL.prod;
+            else return console.log("develpment mode set up incorrect.");
+        },
+        SYSTEM_ID() {
+            if(this.system == 'cooling-medium') return 1; 
+            else if(this.system == 'produced-water') return 2; 
+            else if(this.system == 'sea-water') return 3; 
+            else if(this.system == 'pipeline') return 4;
+            else return 0;
+        },
+        listApiUrl() {
+            if(this.system == 'cooling-medium') return '/CMInfo/get-tag-cooling-medium-view-in-corrosion-coupon'; 
+            else if(this.system == 'produced-water') return '/CMInfo/get-tag-produced-water-view-in-corrosion-coupon'; 
+            else if(this.system == 'sea-water') return '/CMInfo/get-tag-sea-water-view-in-corrosion-coupon'; 
+            else if(this.system == 'pipeline') return '/CMInfo/get-tag-pipeline-view-in-corrosion-coupon';
+            else return '';
+        },
+    },
     methods: {
         EXPORT_DATA(e) {
             const workbook = new Workbook();
@@ -228,7 +220,7 @@ export default {
                 workbook.xlsx.writeBuffer().then(function (buffer) {
                     saveAs(
                         new Blob([buffer], { type: "application/octet-stream" }),
-                        "inspection_record.xlsx"
+                        "CM-ER-PROBE.xlsx"
                     );
                 });
             });
@@ -238,135 +230,12 @@ export default {
             if (this.system === e) return true;
             else return false;
         },
-        FETCH_MOC_RECORD() {
-            this.isLoading = true;
-            this.isShow = 0;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        console.log("delete success");
-                        this.FETCH_MOC_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        GET_STATUS_CELL_COLOR(value) {
-            if (value.rowType === "data" && value.column.dataField === "id_moc_status") {
-                if(value.data.id_moc_status) {
-                    const color = this.status.filter(item => {
-                        return item.id === value.data.id_moc_status
-                    });
-                    console.log(color);
-                    return color[0].color_code;
-                } else {
-                    return '#fff';
-                }
-
-            }
-        },
-        FETCH_DROPDOWN_NOC() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-noc-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.noc = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DROPDOWN_RRL() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-rrl-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.rrl = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    SET_CURRENT_VIEW(view, data = null, data2 = null) {
-        this.$store.commit("SET_SHOW_BACK_BUTTON", false);
-        if (data !== null && data2 === null) this.$emit('currentView', view, data);
-        else if (data !== null && data2 !== null) this.$emit('currentView', view, data, data2);
-        else this.$emit('currentView', view);
-    }
+        SET_CURRENT_VIEW(view, data = null, data2 = null) {
+            this.$store.commit("SET_SHOW_BACK_BUTTON", false);
+            if (data !== null && data2 === null) this.$emit('currentView', view, data);
+            else if (data !== null && data2 !== null) this.$emit('currentView', view, data, data2);
+            else this.$emit('currentView', view);
+        }
 }
 };
 </script>

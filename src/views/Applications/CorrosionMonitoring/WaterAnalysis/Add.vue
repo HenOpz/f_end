@@ -5,7 +5,10 @@
                 <h3 fill style="margin-bottom: 0; margin-top: 0;">New Result</h3>
 
                 <div span-2 class="input-wrapper">
-                    <span>Tag Number</span>
+                    <div class="title-wrapper">
+                        <span>Tag Number</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="tagList" 
@@ -18,7 +21,10 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>Year</span>
+                    <div class="title-wrapper">
+                        <span>Year</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="yearList" 
@@ -29,7 +35,10 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
-                    <span>Period</span>
+                    <div class="title-wrapper">
+                        <span>Period</span>
+                        <span>*</span>
+                    </div>
                     <div class="input">
                         <DxSelectBox 
                             :items="periodList" 
@@ -78,7 +87,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { POST_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
 // import DxTextBox from 'devextreme-vue/text-box';
@@ -111,7 +120,7 @@ export default {
                 updated_by: null,
                 id_status: null,
             },
-            yearList: [2022,2023,2024],
+            yearList: [2022,2023,2024,2025,2026,2027],
             periodList: ['H1','H2'],
         };
     },
@@ -128,37 +137,15 @@ export default {
                 this.data.year && 
                 this.data.period
             ){
-                this.POST_DATA('/CMWaterAnalysisPH');
-                this.POST_DATA('/CMWaterAnalysisDissolvedO2');
-                this.POST_DATA('/CMWaterAnalysisIonCount');
+                POST_DATA('/CMWaterAnalysisPH', this.data);
+                POST_DATA('/CMWaterAnalysisDissolvedO2', this.data);
+                POST_DATA('/CMWaterAnalysisIonCount', this.data);
                 this.$emit('popup');
             }
         },
-        POST_DATA(url) {
-            this.isLoading = true;
-            axios({
-                method: "post",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.data,
-            })
-                .then(res => {
-                    if (res.status == 201 && res.data) {
-                        console.log(url, res);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
     }
 };
-</script>
+</script>x
 
 <style lang="scss" scoped>
 @import "@/style/main.scss";
@@ -223,6 +210,16 @@ export default {
         span {
             font-size: 12px;
             font-weight: 600;
+        }
+
+        .title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+
+            span:last-child {
+                color: red;
+            }
         }
     }
 

@@ -117,13 +117,12 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 // import { Workbook } from "exceljs";
 // import saveAs from "file-saver";
 // import { exportDataGrid } from "devextreme/excel_exporter";
-
 
 import exportingInit from "highcharts/modules/exporting";
 import offlineExporting from "highcharts/modules/offline-exporting";
@@ -145,7 +144,7 @@ import {
 } from "devextreme-vue/data-grid";
 
 export default {
-    name: "inspection-record",
+    name: "pigging-operation-detail",
     props: {
         id_record: Number,
     },
@@ -249,68 +248,15 @@ export default {
     computed: {},
     methods: {
         FETCH_PIGGING() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/PiggingOperation/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.piggingList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/PiggingOperation/', 'piggingList');
         },
         UPDATE_RECORD() {
             if (this.piggingList.date !== null)
                 this.piggingList.date = moment(this.piggingList.date).format("L");
-            axios({
-                method: "put",
-                url: "/PiggingOperation/" + this.mocList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.piggingList
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_PIGGING();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            PUT_DATA(`/PiggingOperation/${this.mocList.id}`, this.piggingList, () => { this.FETCH_PIGGING(); });
         },
         DELETE_RECORD() {
-            axios({
-                method: "delete",
-                url: "/PiggingOperation/delete-pigging-operation?id=" + this.piggingList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_PIGGING(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/PiggingOperation/delete-pigging-operation?id=${this.piggingList.id}`, () => { this.FETCH_PIGGING(0); });
         },
     }
 };

@@ -164,7 +164,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA } from "/axios.js";
 import clone from "just-clone";
 import DxSelectBox from "devextreme-vue/select-box";
 import contentLoading from "@/components/app-structures/app-content-loading.vue";
@@ -207,28 +207,11 @@ export default {
         this.$ons.notification.confirm("Confirm save?").then((res) => {
           if (res == 1) {
             const data = this.formData;
-            axios({
-              method: "put",
-              url: "/account-user/edit-dexon-account",
-              headers: {
-                Authorization:
-                  "Bearer " + JSON.parse(localStorage.getItem("token")),
-              },
-              data: data,
-            })
-              .then((res) => {
-                if (res.status == 200) {
-                  this.$ons.notification.alert("Edit successful");
-                  this.$emit("btn-cancel-edit");
-                  this.$emit("refreshList");
-                }
-              })
-              .catch((error) => {
-                this.$ons.notification.alert(
-                  error.code + " " + error.response.status + " " + error.message
-                );
-              })
-              .finally(() => {});
+            PUT_DATA('/account-user/edit-dexon-account', data, () => {
+              this.$ons.notification.alert("Edit successful");
+              this.$emit("btn-cancel-edit");
+              this.$emit("refreshList");
+            });
           }
         });
       } else {
@@ -256,76 +239,16 @@ export default {
       this.FETCH_DROPDOWN_PREFIX();
     },
     FETCH_DROPDOWN_DEXON_DEPARTMENT() {
-      axios({
-        method: "get",
-        url: "/MdDexonDepartment",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.formSelect.departmentList = res.data;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {});
+      GET_DATA(this, '/MdDexonDepartment', 'formSelect.departmentList');
     },
     FETCH_DROPDOWN_DEXON_POSITION() {
-      axios({
-        method: "get",
-        url: "/MdDexonPosition",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.formSelect.positionList = res.data;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {});
+      GET_DATA(this, '/MdDexonPosition', 'formSelect.positionList');
     },
     FETCH_DROPDOWN_ROLE() {
-      axios({
-        method: "get",
-        url: "/account-user/role-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.formSelect.roleList = res.data;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {});
+      GET_DATA(this, '/account-user/role-list', 'formSelect.roleList');
     },
     FETCH_DROPDOWN_PREFIX() {
-      axios({
-        method: "get",
-        url: "/MdPrefix",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.formSelect.prefixList = res.data;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-        .finally(() => {});
+      GET_DATA(this, '/MdPrefix', 'formSelect.prefixList');
     },
   },
   computed: {

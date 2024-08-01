@@ -421,7 +421,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js"
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js"
 // import moment from "moment";
 
 //Components
@@ -501,20 +501,20 @@ export default {
       subpageInnerName: null,
     });
     if (this.$store.state.status.server == true) {
-      this.FETCH_DATA(`/ExInspectionRegisterInfo/${this.id_record}`, 'inspRecordList')
-      this.FETCH_DATA('/Md/get-md-ex-insp-area-std-list', 'areaStandardList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-area-class-list', 'areaClassList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-area-temp-class-list', 'areaTempClassList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-area-gas-group-list', 'areaGasGroupList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-std-list', 'equipStandardList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-protec-type-list', 'equipProtectTypeList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-type-list', 'equipTypeList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-gas-group-list', 'equipGasGroupList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-temp-class-list', 'equipTempClassList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-class-list', 'equipClassList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-protec-lv-cat-list', 'equipProtectLvlList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-ip-rating-list', 'equipIPRatingList');
-      this.FETCH_DATA('/Md/get-md-ex-insp-equip-enclosure-type-list', 'equipEnclosureTypeList');
+      GET_DATA(this, `/ExInspectionRegisterInfo/${this.id_record}`, 'inspRecordList')
+      GET_DATA(this, '/Md/get-md-ex-insp-area-std-list', 'areaStandardList');
+      GET_DATA(this, '/Md/get-md-ex-insp-area-class-list', 'areaClassList');
+      GET_DATA(this, '/Md/get-md-ex-insp-area-temp-class-list', 'areaTempClassList');
+      GET_DATA(this, '/Md/get-md-ex-insp-area-gas-group-list', 'areaGasGroupList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-std-list', 'equipStandardList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-protec-type-list', 'equipProtectTypeList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-type-list', 'equipTypeList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-gas-group-list', 'equipGasGroupList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-temp-class-list', 'equipTempClassList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-class-list', 'equipClassList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-protec-lv-cat-list', 'equipProtectLvlList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-ip-rating-list', 'equipIPRatingList');
+      GET_DATA(this, '/Md/get-md-ex-insp-equip-enclosure-type-list', 'equipEnclosureTypeList');
       this.operatingDuringESDList = [
         { id: 1, code: 'Yes' },
         { id: 2, code: 'No' },
@@ -557,75 +557,15 @@ export default {
     UPDATE_RECORD() {
     //   if (this.inspRecordList.action_date)
     //     this.inspRecordList.action_date = moment(this.inspRecordList.action_date).format("L");
-      axios({
-        method: "put",
-        url: "/ExInspectionRegisterInfo/" + this.inspRecordList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.inspRecordList
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.$emit('popup');
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/ExInspectionRegisterInfo/${this.inspRecordList.id}`, this.inspRecordList, () => { this.$emit('popup'); });
     },
     DELETE_RECORD() {
-      axios({
-        method: "delete",
-        url: "/ExInspectionRegisterInfo/delete-ex-inspection-register-info?id=" + this.inspRecordList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/ExInspectionRegisterInfo/delete-ex-inspection-register-info?id=${this.inspRecordList.id}`, () => { this.SET_CURRENT_VIEW(0); });
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);
         if (data !== null) this.$emit('currentView', view, data);
         else this.$emit('currentView', view);
-    },
-    FETCH_DATA(url, targetVariable, callback) {
-      this.isLoading = true;
-      axios({
-          method: "get",
-          url: url,
-          headers: {
-              Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          }
-      })
-          .then(res => {
-              if (res.status == 200 && res.data) {
-                  if (callback && typeof callback === 'function') {
-                      callback(res.data);
-                  } else {
-                      this.$set(this, targetVariable, res.data);
-                  }
-              }
-          })
-          .catch(error => {
-              console.log(error);
-          })
-          .finally(() => {
-              this.isLoading = false;
-          });
     },
   }
 };

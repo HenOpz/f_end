@@ -365,7 +365,7 @@
 
 <script>
 //API
-import { axios, axiosFileMaker } from "/axios.js";
+import { GET_DATA, axiosFileMaker } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -584,6 +584,7 @@ export default {
       // highlightActivitiesList: {},
       // inspRecordList: {},
       // campaigeList: {},
+      cmwoChart: {},
       dataGridAttributes: {
         class: "data-grid-style"
       },
@@ -724,58 +725,17 @@ export default {
       e.cancel = true;
     },
     FETCH_FILTER_REPORT(){
-      this.isLoading = true;
-        axios({
-            method: "get",
-            url:
-                "/ReportGenerate/get-filter-report-data-by-period?fromMonth="+ this.month.fromMonth +"&toMonth=" + this.month.toMonth + "&fromYear="+ this.year.fromYear +"&toYear=" + this.year.toYear,
-            headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            }
-        })
-        .then(res => {
-            console.log("filter report:");
-            console.log(res);
-            if (res.status == 200 && res.data) {
-                this.filterReport.cmManagement = res.data['CM WO management'],
-                this.filterReport.inspCampaigns = res.data['Inspection campaigns'];
-                this.filterReport.anomalyRectification = res.data['Anomaly rectification plan'];
-                this.filterReport.highlightActivities = res.data['Highlight activities'];
-            } 
-        })
-        .catch(error => {
-            console.log(error);
-        })
-        .finally(() => {
-            this.isLoading = false;
-        });
+      GET_DATA(this, `/ReportGenerate/get-filter-report-data-by-period?fromMonth=${this.month.fromMonth}&toMonth=${this.month.toMonth}&fromYear=${this.year.fromYear}&toYear=${this.year.toYear}`, (data) => {
+        this.filterReport.cmManagement = data['CM WO management'],
+        this.filterReport.inspCampaigns = data['Inspection campaigns'];
+        this.filterReport.anomalyRectification = data['Anomaly rectification plan'];
+        this.filterReport.highlightActivities = data['Highlight activities'];
+      });
     },
     FETCH_INSP_RECORD() {
       this.isLoading = true;
       var id_tag = this.$route.params.id_tag;
-      axios({
-        method: "get",
-        url:
-          "/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          console.log("insp record:");
-          console.log(res);
-          if (res.status == 200 && res.data) {
-            console.log("success");
-            this.inspRecordList = res.data;
-            console.log(this.inspRecordList);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${id_tag}`, 'inspRecordList');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", false);
@@ -800,37 +760,20 @@ export default {
         }
     },
     FETCH_CM_WO_MANAGEMENT_CHART(){
-        this.isLoading = true;
-        axios({
-            method: "get",
-            url:
-                "/CMWOManagement/get-cm-wo-management-for-chart",
-            headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            }
-        })
-        .then(res => {
-            if (res.status == 200 && res.data) {
-                this.cmwoChart = res.data;
-                for (var i = 0; i < this.cmwoChart.length; i++) {
-                    this.chartData.xAxis.push(moment(this.cmwoChart[i].record_month).format("MMM yyyy"));
-                    this.chartData.total.push(this.cmwoChart[i].cm_total);
-                    this.chartData.opened.push(this.cmwoChart[i].cm_opened);
-                    this.chartData.closed.push(this.cmwoChart[i].cm_closed);
-                    this.chartData.linear.push([i, this.cmwoChart[i].cm_total]);
-                }
-                console.warn(this.chartData);
-                this.chartOptions.xAxis.categories = this.chartData.xAxis;
-                this.chartOptions.series[0].data = this.chartData.total;
-                this.chartOptions.series[1].data = this.chartData.closed;
-                this.chartOptions.series[2].data = this.GET_TREND_LINE(this.chartData.linear);
-            }
-        })
-        .catch(error => {
-            console.log(error);
-        })
-        .finally(() => {
-            this.isLoading = false;
+        GET_DATA(this, '/CMWOManagement/get-cm-wo-management-for-chart', 'cmwoChart', () => {
+          console.log('cmwoChart', this.cmwoChart);
+          // this.cmwoChart = data;
+          for (var i = 0; i < this.cmwoChart.length; i++) {
+            this.chartData.xAxis.push(moment(this.cmwoChart[i].record_month).format("MMM yyyy"));
+            this.chartData.total.push(this.cmwoChart[i].cm_total);
+            this.chartData.opened.push(this.cmwoChart[i].cm_opened);
+            this.chartData.closed.push(this.cmwoChart[i].cm_closed);
+            this.chartData.linear.push([i, this.cmwoChart[i].cm_total]);
+          }
+          this.chartOptions.xAxis.categories = this.chartData.xAxis;
+          this.chartOptions.series[0].data = this.chartData.total;
+          this.chartOptions.series[1].data = this.chartData.closed;
+          this.chartOptions.series[2].data = this.GET_TREND_LINE(this.chartData.linear);
         });
     },
     GET_TREND_LINE(data) {
@@ -940,7 +883,7 @@ export default {
           if (item)
             tableBody.push([
               { text: item.fieldData.module_name || '-', border: [true, false, true, true] },
-              { text: item.fieldData.inspection_plan_status || '-', border: [true, false, true, true] },
+              { text: '', border: [true, false, true, true], fillColor: this.GET_STATUS_COLOR(item.fieldData.inspection_plan_status || '') },
               { text: '-', border: [true, false, true, true] },
               { text: item.fieldData.remark || '-', border: [true, false, true, true] },
             ])
@@ -1021,12 +964,12 @@ export default {
           if (item)
             tableBody.push([
               { text: item.inspection_program || '-', border: [true, false, true, true] },
-              { text: item.start_date || '-', border: [true, false, true, true] },
-              { text: item.end_date || '-', border: [true, false, true, true] },
+              { text: this.DATE_FORMAT(item.start_date) || '-', border: [true, false, true, true] },
+              { text: this.DATE_FORMAT(item.end_date) || '-', border: [true, false, true, true] },
               { text: item.person_in_charge || '-', border: [true, false, true, true] },
               { text: item.contractor || '-', border: [true, false, true, true] },
               { text: item.comments || '-', border: [true, false, true, true] },
-              { text: item.ic_status || '-', border: [true, false, true, true] },
+              { text: '', border: [true, false, true, true], fillColor: this.GET_STATUS_COLOR(item.ic_status || '') },
             ])
         }
         return [
@@ -1070,7 +1013,7 @@ export default {
               { text: item.rc_issue || '-', border: [true, false, true, true] },
               { text: item.person_in_charge || '-', border: [true, false, true, true] },
               { text: item.contactor || '-', border: [true, false, true, true] },
-              { text: item.target_completion || '-', border: [true, false, true, true] },
+              { text: this.DATE_FORMAT(item.target_completion) || '-', border: [true, false, true, true] },
               { text: item.id_status_execute || '-', border: [true, false, true, true] },
               { text: item.comments || '-', border: [true, false, true, true] },
             ])
@@ -1116,7 +1059,7 @@ export default {
           if (item) {
             console.log('details', this.HTML_TO_PDF_MAKE(this.replaceFontFamily(item.details, 'Roboto')));
             tableBody.push([
-              { text: item.report_date || '-', border: [true, false, true, true] },
+              { text: this.DATE_FORMAT(item.report_date) || '-', border: [true, false, true, true] },
               { text: item.platform_code_name || '-', border: [true, false, true, true] },
               { text: item.asset_type || '-', border: [true, false, true, true] },
               { text: item.tag_number || '-', border: [true, false, true, true] },
@@ -1127,6 +1070,9 @@ export default {
               let details = this.HTML_TO_PDF_MAKE(this.replaceFontFamily(item.details, 'Roboto'));
               for (let index = 0; index < details.length; index++) {
                 const detailsItem = details[index];
+                // tableBody.push([
+                //   detailsItem
+                // ])
                 detailTableBody.push([
                   detailsItem
                 ])
@@ -1254,8 +1200,22 @@ export default {
     HTML_TO_PDF_MAKE(html) {
         if (html === null) return '-';
         let pdfContent = htmlToPdfmake(html);
+        // if (pdfContent !== undefined)
+        //   pdfContent.forEach(item => { item.text.colSpan = 6; });
         console.log('pdfContent', pdfContent);
         return pdfContent;
+    },
+    GET_STATUS_COLOR(value) {
+        const status = value.toLowerCase();
+        switch (status) {
+            case 'overdue': return '#C00000';
+            case 'not due':
+            case 'on progress': return '#43A047';
+            case 'on due':
+            case 'completed': return '#FFFF00';
+
+            default: return '#000';
+        }
     },
     INSP_CAMPAIGNS_CHANGED(e) {
       if (e.selectedRowsData.length > 0)
@@ -1268,6 +1228,9 @@ export default {
     HIGHLIGHT_CHANGED(e) {
       if (e.selectedRowsData.length > 0)
         this.filterReportSelection.highlightActivities = e.selectedRowsData;
+    },
+    DATE_FORMAT(d) {
+        return moment(d).format("DD MMM yyyy");
     },
     GENERATE_SESSION(action, data) {
             axiosFileMaker({

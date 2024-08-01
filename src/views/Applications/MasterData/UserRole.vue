@@ -73,7 +73,7 @@ import {
 import contentLoading from "@/components/app-structures/app-content-loading.vue";
 
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 
 export default {
   name: "ViewApplicableStatus",
@@ -121,92 +121,17 @@ export default {
       e.cancel = true;
     },
     FETCH_LIST() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url: "/Md/get-md-user-role-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-      })
-        .then((res) => {
-          if (res.status == 200 && res.data) {
-            this.dataList = res.data;
-            console.log("this.dataList", this.dataList);
-          }
-        })
-        .catch((error) => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-user-role-list', 'dataList');
     },
     CREATE(e) {
       e.data.id = 0;
-      axios({
-        method: "post",
-        url: "/Md/add-md-user-role",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-        data: e.data,
-      })
-        .then((res) => {
-          if (res.status == 201) {
-            this.FETCH_LIST();
-          }
-        })
-        .catch((error) => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/Md/add-md-user-role', e.data, () => { this.FETCH_LIST(); });
     },
     UPDATE(e) {
-      axios({
-        method: "put",
-        url: "/Md/edit-md-user-role?id=" + e.data.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-        data: e.data,
-      })
-        .then((res) => {
-          if (res.status == 200) {
-            this.FETCH_LIST();
-          }
-        })
-        .catch((error) => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/Md/edit-md-user-role?id=${e.data.id}`, e.data, () => { this.FETCH_LIST(); });
     },
     DELETE(e) {
-      axios({
-        method: "delete",
-        url: "/Md/delete-md-user-role?id=" + e.data.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token")),
-        },
-        data: e.data,
-      })
-        .then((res) => {
-          if (res.status == 204) {
-            this.FETCH_LIST();
-          }
-        })
-        .catch((error) => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/Md/delete-md-user-role?id=${e.data.id}`, () => { this.FETCH_LIST(); });
     },
   },
 };

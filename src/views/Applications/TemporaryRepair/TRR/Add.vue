@@ -130,7 +130,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -233,26 +233,7 @@ export default {
       e.data.is_active = true;
       e.data.inspection_date = moment(e.data.inspection_date).format("L");
       console.log(e.data);
-      axios({
-        method: "post",
-        url: "/PipingInspectionRecord",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: e.data
-      })
-        .then(res => {
-          if (res.status == 201) {
-            console.log("create success");
-            this.FETCH_INSP_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/PipingInspectionRecord', e.data, () => { this.FETCH_INSP_RECORD(); });
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);
@@ -260,49 +241,10 @@ export default {
         else this.$emit('currentView', view);
     },
     FETCH_PLATFORM_LIST() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url:
-          "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.platform = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-platform-list', 'formSelect.platform');
     },
     FETCH_ASSET_TYPE_LIST() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url:
-          "/Md/get-md-asset-type-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.assetType = res.data;
-            console.log("assetType", this.formSelect.assetType);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-asset-type-list', 'formSelect.assetType');
     },
   }
 };

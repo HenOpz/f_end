@@ -164,7 +164,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -287,88 +287,16 @@ export default {
         this.mocList.start_date = moment(this.mocList.start_date).format("L");
       if (this.mocList.expiry_date !== null)
         this.mocList.expiry_date = moment(this.mocList.expiry_date).format("L");
-      axios({
-        method: "post",
-        url: "/ManagementOfChange",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.mocList
-      })
-        .then(res => {
-          if (res.status == 201) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/ManagementOfChange', this.mocList, () => { this.SET_CURRENT_VIEW(0); });
     },
     FETCH_DROPDOWN_NOC() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-noc-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.noc = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-moc-noc-list', 'formSelect.noc');
     },
     FETCH_DROPDOWN_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-moc-status-list', 'formSelect.status');
     },
     FETCH_DROPDOWN_RRL() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-moc-rrl-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.rrl = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-moc-rrl-list', 'formSelect.rrl');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);

@@ -315,7 +315,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -391,10 +391,10 @@ export default {
     },
     created() {
         if (this.$store.state.status.server == true) {
-            this.FETCH_DROPDOWN_ASSET();
-            this.FETCH_DROPDOWN_PLATFORM();
-            this.FETCH_DROPDOWN_INSP_TYPE();
-            this.FETCH_DROPDOWN_TASK_STATUS();
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'asset');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platform');
+            GET_DATA(this, '/Md/get-md-insp-type-list', 'insp_type');
+            GET_DATA(this, '/Md/get-md-insp-task-status-list', 'task_status');
             this.FETCH_INSP_TASK_RECORD();
             this.FETCH_INSP_TASK_FILE();
             this.FETCH_LIBRARY();
@@ -427,200 +427,29 @@ export default {
     },
     methods: {
         FETCH_INSP_TASK_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/InspectionTask/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.inspTaskRecordList = res.data;
-                        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-                            subpageName: "IT NUMBER: " + this.inspTaskRecordList.it_number,
-                            subpageInnerName: null,
-                        });
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
+            GET_DATA(this, `/InspectionTask/${this.id_record}`, (data) => {
+                this.inspTaskRecordList = data;
+                this.$store.commit("UPDATE_CURRENT_PAGENAME", {
+                    subpageName: "IT NUMBER: " + this.inspTaskRecordList.it_number,
+                    subpageInnerName: null,
                 });
+            });
         },
         FETCH_INSP_TASK_FILE() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/InspectionTaskFile",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.inspTaskFileList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/InspectionTaskFile', 'inspTaskFileList');
         },
         UPDATE_RECORD() {
             if (this.inspTaskRecordList.due_insp_date)
                 this.inspTaskRecordList.due_insp_date = moment(this.inspTaskRecordList.due_insp_date).format("L");
             if (this.inspTaskRecordList.plan_insp_date)
                 this.inspTaskRecordList.plan_insp_date = moment(this.inspTaskRecordList.plan_insp_date).format("L");
-            axios({
-                method: "put",
-                url: "/InspectionTask/" + this.inspTaskRecordList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.inspTaskRecordList
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            PUT_DATA(`/InspectionTask/${this.inspTaskRecordList.id}`, this.inspTaskRecordList, () => { this.SET_CURRENT_VIEW(0); });
         },
         DELETE_RECORD() {
-            axios({
-                method: "delete",
-                url: "/InspectionTask/delete-insp-task?id=" + this.inspTaskRecordList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.$emit('currentView', 0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        FETCH_DROPDOWN_INSP_TYPE() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-insp-type-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.insp_type = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_PLATFORM() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-platform-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.platform = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_ASSET() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-asset-type-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.asset = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_TASK_STATUS() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-insp-task-status-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.task_status = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            DELETE_DATA(`/InspectionTask/delete-insp-task?id=${this.inspTaskRecordList.id}`, () => { this.$emit('currentView', 0); });
         },
         FETCH_LIBRARY() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/InspectionTaskFile/get-insp-task-file-by-id-task?id=" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log('fetch library', res);
-                    if (res.status == 200) {
-                        this.library = res.data;
-                        this.isLoading = false;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, `/InspectionTaskFile/get-insp-task-file-by-id-task?id=${this.id_record}`, 'library');
         },
         ADD_NEW_FILE(e) {
             // const user = JSON.parse(localStorage.getItem("user"));
@@ -635,36 +464,7 @@ export default {
                         this.FETCH_LIBRARY();
                     }
                 });
-            axios({
-                method: "post",
-                url: "/InspectionTaskFile",
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: formData
-            })
-                .then(res => {
-                    console.log(res);
-                    if (res.status == 201) {
-                        this.FETCH_LIBRARY();
-                    }
-                })
-                .catch(error => {
-                    this.isLoading = false;
-                    this.$ons.notification
-                        .alert(error.message, {
-                            title: "Add New File failed"
-                        })
-                        .then(res => {
-                            if (res == 0) {
-                                this.FETCH_LIBRARY();
-                            }
-                        });
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            POST_DATA('/InspectionTaskFile', true, () => { this.FETCH_LIBRARY(); });
         },
         UPDATE_DOC(e) {
             var formData = new FormData();
@@ -672,37 +472,7 @@ export default {
             formData.append("id_insp_task", e.data.id_insp_task);
             formData.append("file", this.file ?? "");
             formData.append("note", e.data.note);
-            axios({
-                method: "put",
-                url: "/InspectionTaskFile/" + e.data.id,
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: formData
-            })
-                .then(res => {
-                    console.log(res);
-                    if (res.status == 204) {
-                        this.FETCH_LIBRARY();
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                    this.isLoading = false;
-                    this.$ons.notification
-                        .alert(error.message, {
-                            title: "Update File failed"
-                        })
-                        .then(res => {
-                            if (res == 0) {
-                                this.FETCH_LIBRARY();
-                            }
-                        });
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            POST_DATA(`/InspectionTaskFile/${e.data.id}`, formData, true, () => { this.FETCH_LIBRARY(); });
         },
         VALUE_CHANGE(e) {
             //console.log("fileReader e data:");
@@ -735,34 +505,7 @@ export default {
         },
         DELETE_DOC(e) {
             const id = e.data.id;
-            axios({
-                method: "delete",
-                url: "/InspectionTaskFile/" + id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_LIBRARY();
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                    this.isLoading = false;
-                    this.$ons.notification
-                        .alert(error.message, {
-                            title: "Delete failed"
-                        })
-                        .then(res => {
-                            if (res == 0) {
-                                this.FETCH_LIBRARY();
-                            }
-                        });
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            DELETE_DATA(`/InspectionTaskFile/${id}`, () => { this.FETCH_LIBRARY(); })
         },
         ADD_ROW() {
             var grid = this.$refs[this.gridRefName].instance;

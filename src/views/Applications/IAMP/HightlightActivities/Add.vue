@@ -126,22 +126,20 @@
                 <DxItem name="strike" />
                 <DxItem name="bulletList" />
                 <DxItem name="orderedList" />
-                <DxItem name="image" />
                 <DxItem name="alignLeft" />
                 <DxItem name="alignCenter" />
                 <DxItem name="alignRight" />
                 <DxItem name="alignJustify" />
-                <DxItem name="insertTable" />
-                <DxItem name="deleteTable" />
-                <DxItem name="insertRowAbove" />
-                <DxItem name="insertRowBelow" />
-                <DxItem name="deleteRow" />
-                <DxItem name="insertColumnLeft" />
-                <DxItem name="insertColumnRight" />
-                <DxItem name="deleteColumn" />
               </DxToolbar>
             </DxHtmlEditor>
           </div>
+        </div>
+
+        <div>
+          picture
+        </div>
+        <div>
+          picture
         </div>
 
         <button class="create" @click="CREATE_RECORD">Create</button>
@@ -155,7 +153,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -266,29 +264,7 @@ export default {
     FETCH_INSP_RECORD() {
       this.isLoading = true;
       var id_tag = this.$route.params.id_tag;
-      axios({
-        method: "get",
-        url:
-          "/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=" + id_tag,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          console.log("insp record:");
-          console.log(res);
-          if (res.status == 200 && res.data) {
-            console.log("success");
-            this.inspRecordList = res.data;
-            console.log(this.inspRecordList);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, `/PipingInspectionRecord/get-piping-ir-by-id-line?id_line=${id_tag}`, 'inspRecordList');
     },
     CREATE_RECORD() {
       if (this.highlightActivitiesList.id_platform === null || 
@@ -297,67 +273,13 @@ export default {
           this.highlightActivitiesList.report_date === null) 
           return;
       this.highlightActivitiesList.report_date = moment(this.highlightActivitiesList.report_date).format("L");
-      axios({
-        method: "post",
-        url: "/HighlightActivities",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.highlightActivitiesList
-      })
-        .then(res => {
-          if (res.status == 201) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/HighlightActivities', this.highlightActivitiesList, () => { this.SET_CURRENT_VIEW(0); });
     },
     FETCH_DROPDOWN_ASSET() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-asset-type-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.asset = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-asset-type-list', 'formSelect.asset');
     },
     FETCH_DROPDOWN_PLATFORM() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.platform = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-platform-list', 'formSelect.platform');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);

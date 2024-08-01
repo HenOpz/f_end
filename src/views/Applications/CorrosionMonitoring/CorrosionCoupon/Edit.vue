@@ -14,18 +14,18 @@
                             {{ tab }}
                         </button>
                     </div>
-                    <div fill v-if="active_tab === tabs[0]" class="table-chart">
-                        <div class="chart-container">
-                            <highcharts :options="chartOptions"  />
+                    <div fill v-if="active_tab === tabs[1]" class="table-chart">
+                        <div class="chart-container" style="border: 1px solid gray; padding: 10px;">
+                            <highcharts :options="chartHighestWeightTrendingOptions"  />
                         </div>
-                        <div class="chart-container">
-                            <highcharts :options="chartOptions"  />
+                        <div class="chart-container" style="border: 1px solid gray; padding: 10px;">
+                            <highcharts :options="chartHighestWeightLossTrendingOptions"  />
                         </div>
-                        <div class="chart-container">
-                            <highcharts :options="chartOptions"  />
+                        <div class="chart-container" style="border: 1px solid gray; padding: 10px;">
+                            <highcharts :options="chartHighestCorrosionRateTrendingOptions" />
                         </div>
                     </div>
-                    <div fill v-if="active_tab === tabs[1]">
+                    <div fill v-if="active_tab === tabs[0]">
                         <DxDataGrid 
                             id="data-grid-list" 
                             key-expr="id" 
@@ -101,6 +101,12 @@
                                 :width="120" 
                                 alignment="center"
                             />
+                            <DxColumn 
+                                data-field="probe_status" 
+                                caption="Probe Status" 
+                                :width="120" 
+                                alignment="center"
+                            />
                             <!-- <DxColumn caption="MOC" :width="80" alignment="center" cell-template="moc-cell-template" />
                             <DxColumn caption="RA" :width="80" alignment="center" cell-template="ra-cell-template" /> -->
                             <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
@@ -129,20 +135,160 @@
 
                             <template #action-cell-template="{ data }">
                                 <div class="action-wrapper">
-                                    <div @click="() => [isShow = 2, selectedId = data.data.id]">
+                                    <div @click="() => [isShow = 2, selectedData = data.data]">
                                         <img src="/img/svg/pen-svg.svg" class="penSvg" />
                                     </div>
-                                    <div @click="DELETE_RECORD(data)">
+                                    <div @click="DELETE_RECORD(data.data.id)">
                                         <img src="/img/svg/trash-svg.svg" class="trashSvg" />
                                     </div>
                                 </div>
                             </template>
 
                             <template #masterDetailTemplate="{ data }">
-                                <CouponGrid 
-                                    :monitorData="data"
-                                    @action="SET_IS_SHOW"
-                                />
+                                <DxTabPanel>
+                                    <DxItem title="Coupon" template="coupon" />
+                                    <DxItem title="Picture Log" template="picture-log" />
+                                    <template #coupon>
+                                        <CouponGrid 
+                                            :monitorData="data"
+                                            @action="SET_IS_SHOW"
+                                            :ref="'couponGrid-' + data.data.id"
+                                        />
+                                    </template>
+                                    <template #picture-log>
+                                        <DxDataGrid 
+                                            id="data-grid-list" 
+                                            key-expr="id" 
+                                            :ref="gridRefName" 
+                                            :data-source="library"
+                                            :hover-state-enabled="true" 
+                                            :allow-column-reordering="true" 
+                                            :show-borders="true"
+                                            :show-row-lines="true" 
+                                            :focused-row-enabled="false" 
+                                            :row-alternation-enabled="false"
+                                            @row-inserted="ADD_NEW_FILE" 
+                                            @row-removed="DELETE_DOC" 
+                                            @init-new-row="() => {
+                                                this.file = [];
+                                                this.isEdit = false;
+                                            }" 
+                                            @editing-start="(e) => {
+                                                this.file = [];
+                                                this.isEdit = true;
+                                                this.dataFileTemp = e;
+                                            }" 
+                                            @row-removing="() => {
+                                                this.isEdit = false;
+                                            }" 
+                                            @saved="SAVE"
+                                        >
+                                            <DxEditing 
+                                                :allow-deleting="true" 
+                                                :allow-adding="true" 
+                                                :allow-updating="true" 
+                                                :use-icons="true"
+                                                :show-borders="true" 
+                                                mode="popup"
+                                            >
+                                                <DxPopup
+                                                    :show-title="true"
+                                                    :width="650"
+                                                    :height="300"
+                                                    title="Attachment"
+                                                />
+                                                <DxForm label-location="top">
+                                                    <DxItem :col-count="2" :col-span="2" :row-count="1" item-type="group">
+                                                        <DxItem item-type="group">
+                                                            <DxItem data-field="file" :col-span="1" />
+                                                        </DxItem>
+                                                        <DxItem item-type="group">
+                                                            <DxItem data-field="note" :col-span="1" />
+                                                        </DxItem>
+                                                    </DxItem>
+                                                </DxForm>
+                                            </DxEditing>
+
+                                            <DxColumn 
+                                                data-field="file" 
+                                                :visible="false" 
+                                                edit-cell-template="insertCellTemplate" 
+                                            />
+
+                                            <DxColumn 
+                                                data-field="file_name" 
+                                                :allow-adding="true" 
+                                                :allow-editing="true" 
+                                                caption="File Name"
+                                                :editor-options="fileNameInputOptions" 
+                                                sort-order="desc" 
+                                                :min-width="120" 
+                                            />
+
+                                            <DxColumn 
+                                                data-field="note" 
+                                                caption="Note" 
+                                                :min-width="120" 
+                                                alignment="left" 
+                                            />
+
+                                            <template #dateHeader>
+                                                <div>Uploaded<br />Date</div>
+                                            </template>
+
+                                            <DxColumn
+                                                data-field="file_path" 
+                                                cell-template="pathCellTemplate" 
+                                                caption="Attachment"
+                                                :width="120" 
+                                                alignment="center" 
+                                            />
+
+                                            <template #insertCellTemplate>
+                                                <div class="widget-container">
+                                                    <DxFileUploader 
+                                                        id="file-uploader" 
+                                                        :multiple="false" 
+                                                        upload-mode="useForm"
+                                                        @value-changed="VALUE_CHANGE" 
+                                                        :visible="true" 
+                                                    />
+                                                </div>
+                                            </template>
+
+                                            <!-- <template #noteCellTemplate="{ data }">
+                                                <div>
+                                                    <DxTextArea :height="100" :value="data.data.value" placeholder="Enter Note" />
+                                                </div>
+                                            </template> -->
+
+                                            <template #pathCellTemplate="{ data }">
+                                                <div>
+                                                    <button class="library-btn-download" @click="DOWNLOAD(data.value, data.data.file_name)">
+                                                        <i class="fa-regular fa-circle-down"></i>
+                                                        DOWNLOAD</button>
+                                                </div>
+                                            </template>
+
+                                            <DxToolbar>
+                                                <DxItem location="after" template="addButton" />
+                                                <DxItem location="after" name="searchPanel" />
+                                            </DxToolbar>
+                                            <template #addButton>
+                                                <DxButton icon="las la-plus" @click="ADD_ROW" hint="Add" />
+                                            </template>
+
+                                            <DxHeaderFilter :visible="true" />
+                                            <!-- <DxFilterRow :visible="false" /> -->
+                                            <DxScrolling mode="standard" />
+                                            <DxSearchPanel :visible="true" />
+                                            <DxPaging :page-size="10" :page-index="0" />
+                                            <DxPager :visible="false" :show-page-size-selector="true" :allowed-page-sizes="[5, 10, 'all']"
+                                                :show-navigation-buttons="true" :show-info="true" info-text="Page {0} of {1} ({2} items)" />
+                                            <DxExport :enabled="false" />
+                                        </DxDataGrid>
+                                    </template>
+                                </DxTabPanel>
                             </template>
 
                             <!-- Configuration goes here -->
@@ -212,22 +358,24 @@
         />
         <EditMonitoringPopup 
             v-if="isShow === 2" 
-            @popup="isShow = 0"
+            @popup="CLOSE_POPUP"
+            :selectedData="selectedData"
         />
         <AddCouponPopup 
             v-if="isShow === 3" 
-            @popup="isShow = 0"
+            @popup="COUPON_POPUP"
             :id_record="id_record"
         />
         <EditCouponPopup 
             v-if="isShow === 4" 
-            @popup="isShow = 0" 
+            @popup="COUPON_POPUP" 
+            :selectedData="selectedCouponData"
         />
     </div>
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import CouponGrid from "./Coupon.vue"
 import AddMonitoringPopup from "./AddMonitoring.vue"
@@ -240,6 +388,8 @@ import "devextreme/dist/css/dx.light.css";
 // import DxDateBox from 'devextreme-vue/date-box';
 import DxButton from "devextreme-vue/button";
 import { DxItem } from "devextreme-vue/form";
+import { DxTabPanel } from "devextreme-vue/tab-panel";
+import { DxFileUploader } from 'devextreme-vue/file-uploader';
 import {
     DxDataGrid,
     DxSearchPanel,
@@ -257,16 +407,17 @@ import {
     // DxLookup,
     // DxRequiredRule,
     // DxFormItem,
-    // DxForm
-    DxMasterDetail
+    DxForm,
+    DxMasterDetail,
+    DxPopup
 } from "devextreme-vue/data-grid";
 
 //Structures
 
 export default {
-    name: "inspection-record",
+    name: "corrosion-coupon-detail",
     props: {
-        id_tag: Number,
+        info: Object,
     },
     components: {
         DxDataGrid,
@@ -279,7 +430,7 @@ export default {
         DxToolbar,
         DxHeaderFilter,
         DxSelection,
-        // DxForm,
+        DxForm,
         DxItem,
         DxEditing,
         DxFilterRow,
@@ -292,6 +443,9 @@ export default {
         // DxTextBox,
         // DxDateBox,
         DxMasterDetail,
+        DxTabPanel,
+        DxFileUploader,
+        DxPopup,
         CouponGrid,
         AddMonitoringPopup,
         EditMonitoringPopup,
@@ -300,11 +454,12 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "CORROSION COUPON: ",
+            subpageName: "CORROSION COUPON: " + this.info.tag_no,
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList');
+            GET_DATA(this, '/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList');
+            this.FETCH_LIBRARY();
             this.chartOptions = {
                 title: {
                     text: 'Trending Results Chart',
@@ -325,71 +480,153 @@ export default {
                     name: 'Trend',
                     data: [12.3, 9.5, 4, 18.4, 6, 3, 111, 9.5]
                 }]
+            },
+            this.chartHighestWeightTrendingOptions = {
+                title: {
+                    text: 'Highest Weight Trending Results Chart',
+                    align: 'center'
+                },
+                xAxis: {
+                    categories: ['25 Apr 2021', '21 Dec 2021']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Weight (g)'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Initial Weight',
+                    data: [37.8504, 37.0381],
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    color: '#3F2DCA',
+                },{
+                    name: 'Final Weight',
+                    data: [37.7437, null],
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    color: '#2D9BCA'
+                },]
+            },
+            this.chartHighestWeightLossTrendingOptions = {
+                title: {
+                    text: 'Highest Weight Loss Trending Results Chart',
+                    align: 'center'
+                },
+                xAxis: {
+                    categories: ['25 Apr 2021', '21 Dec 2021']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Weight (g)'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Weight Loss',
+                    data: [0.1067],
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    color: '#3F2DCA',
+                },]
+            },
+            this.chartHighestCorrosionRateTrendingOptions = {
+                title: {
+                    text: 'Highest Corrosion Rate Trending Chart',
+                    align: 'center'
+                },
+                xAxis: {
+                    categories: ['25 Apr 2021', '21 Dec 2021']
+                },
+                yAxis: {
+                    title: {
+                        text: 'Corrosion Rate (mm/yr)'
+                    }
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        enableMouseTracking: false
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Corrosion Rate',
+                    data: [0.0061],
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    color: '#3F2DCA',
+                },]
             }
+
         }
     },
     data() {
         return {
             recordList: [],
-            libraryList: [
-                {
-                    id: 1,
-                    year: 2023,
-                    period: 'H2',
-                    library: 0.2
-                },
-                {
-                    id: 2,
-                    year: 2022,
-                    period: 'H1',
-                    library: 'N/A'
-                },
-                {
-                    id: 3,
-                    year: 2021,
-                    period: 'H2',
-                    library: 'N/A'
-                }
-            ],
+            libraryList: [],
             chartOptions: {},
-            tabs: ['Summary Dashboard', 'Monitoring Record', 'Library'],
-            active_tab: 'Summary Dashboard',
+            chartHighestWeightTrendingOptions: {},
+            chartHighestWeightLossTrendingOptions: {},
+            chartHighestCorrosionRateTrendingOptions: {},
+            tabs: ['Monitoring Record','Summary Dashboard'],
+            active_tab: 'Monitoring Record',
             isShow: 0,
             id_record: 0,
+            selectedCouponData: null,
+            id_tag: this.info.id_tag,
+            library: [],
+            file: [],
+            gridRefName: "grid-library",
+            fileNameInputOptions: { placeholder: "File Name" },
+            dataFileTemp: "",
+            isEdit: false
         };
     },
     computed: {},
     methods: {
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+        DELETE_RECORD(id) {
+            this.$ons.notification.confirm("Confirm Delete This Row?").then((res) => {
+                if (res == 1) {
+                    DELETE_DATA(`/CMCorrosionCouponMonitorRecord/${id}`, () => { GET_DATA(this, '/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList'); });
                 }
             })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
-        SET_IS_SHOW(val, id) {
+        SET_IS_SHOW(val, id, data) {
             console.log('val', val);
             console.log('id', id);
             if (val) this.isShow = val;
             if (id) this.id_record = id;
+            if (data) this.selectedCouponData = data;
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);
@@ -398,7 +635,80 @@ export default {
         },
         CLOSE_POPUP() {
             this.isShow = 0;
-            this.FETCH_DATA('/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList');
+            GET_DATA(this, '/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList');
+        },
+        COUPON_POPUP(id_record) {
+            this.isShow = 0;
+            console.log('ffffffffff', this.$refs);
+            // this.$refs.couponGrid.FETCH_COUPON(id_record);
+            // this.$refs.couponGrid.forEach(child => {
+            //     child.FETCH_COUPON();
+            // });
+            const refName = 'couponGrid-' + id_record;
+            const detailComponent = this.$refs[refName];
+            if (detailComponent) {
+                detailComponent.FETCH_COUPON(id_record);
+            }
+        },
+        FETCH_LIBRARY() {
+            GET_DATA(this, `/CMCorrosionCouponPictureLog/ByTag/${this.id_record}`, 'library');
+        },
+        ADD_NEW_FILE(e) {
+            var formData = new FormData();
+            formData.append("id_record", this.id_record);
+            formData.append("file", this.file);
+            formData.append("note", e.data.note);
+            if (this.file.length == 0)
+                return this.$ons.notification.alert("Please select file").then(res => {
+                    if (res == 0) {
+                        this.FETCH_LIBRARY();
+                    }
+                });
+            POST_DATA('/CMCorrosionCouponPictureLog', formData, true, () => { this.FETCH_LIBRARY(); });
+        },
+        UPDATE_DOC(e) {
+            console.log("e.data", e.data);
+            var formData = new FormData();
+            formData.append("id", e.data.id);
+            formData.append("id_record", e.data.id_record);
+            formData.append("file", this.file ?? "");
+            formData.append("note", e.data.note);
+            PUT_DATA(`/CMCorrosionCouponPictureLog/${e.data.id}`, formData, true, () => { this.FETCH_LIBRARY(); });
+        },
+        VALUE_CHANGE(e) {
+            console.log(e);
+            console.log(e.value[0].name);
+            let reader = new FileReader();
+            reader.readAsDataURL(e.value[0]);
+            reader.onload = () => {};
+            this.file = e.value[0];
+        },
+        SAVE(e) {
+            console.log('save', e, this.isEdit);
+            console.log(this.file);
+            if((e.changes.length > 0 || this.file.size > 0) && this.isEdit) {
+                console.log('save');
+                this.UPDATE_DOC(this.dataFileTemp);
+            }
+        },
+        DOWNLOAD(p,n) {
+            console.log(this.baseURL + p);
+            const url = this.baseURL + p;
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", n);
+            link.setAttribute("target", "_blank");
+            document.body.appendChild(link);
+            link.click();
+        },
+        DELETE_DOC(e) {
+            const id = e.data.id;
+            DELETE_DATA(`/CMCorrosionCouponPictureLog/${id}`, () => { this.FETCH_LIBRARY(); });
+        },
+        ADD_ROW() {
+            var grid = this.$refs[this.gridRefName].instance;
+            grid.addRow();
+            grid.deselectAll();
         },
     }
 };
@@ -427,12 +737,12 @@ export default {
     padding: 10px 40px;
     background-color: white;
     border: solid 1px gray;
-    border-radius: 10px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     transition: 1s;
     cursor: pointer;
     margin-bottom: 15px;
+    width: 130px;
 }
 
 .table-wrapper {
@@ -472,7 +782,7 @@ export default {
         button {
             border-radius: 0;
             padding: 10px;
-            width: 120px;
+            width: 130px;
         }
         .active {
             color: white;
@@ -484,7 +794,7 @@ export default {
     .table-chart {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 5px;
+        gap: 15px;
     }
 
     .input-wrapper {
@@ -511,6 +821,20 @@ export default {
         color: white;
         background-color: $web-theme-color-secondary;
         border: solid 1px $web-theme-color-secondary;
+    }
+    .library-btn-download {
+        font-size: 12px;
+        font-weight: 500;
+        border-radius: 20px;
+        border: 1px solid gray;
+        padding: 8px !important;
+        color: #3c3c3c;
+        background: transparent;
+
+        &:hover {
+          transition: 0.4s;
+          background: #d8d8d8;
+        }
     }
 }
 </style>

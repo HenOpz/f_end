@@ -135,7 +135,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -204,11 +204,11 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DROPDOWN_ASSET();
-            this.FETCH_DROPDOWN_PLATFORM();
-            this.FETCH_DROPDOWN_INSP_TYPE();
-            this.FETCH_DROPDOWN_TASK_STATUS();
-            this.FETCH_TASK();
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'asset');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platform');
+            GET_DATA(this, '/Md/get-md-insp-type-list', 'insp_type');
+            GET_DATA(this, '/Md/get-md-insp-task-status-list', 'task_status');
+            GET_DATA(this, '/InspectionTask', 'taskList');
         }
     },
     data() {
@@ -237,107 +237,6 @@ export default {
                 });
             });
             e.cancel = true;
-        },
-        FETCH_TASK() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: "/InspectionTask",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200) {
-                        this.taskList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_INSP_TYPE() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-insp-type-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.insp_type = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_PLATFORM() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-platform-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.platform = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_ASSET() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-asset-type-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.asset = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_TASK_STATUS() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-insp-task-status-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.task_status = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         SET_CURRENT_VIEW(view, data = null) {
             console.log('data', data);

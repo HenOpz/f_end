@@ -109,7 +109,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import { axiosFileMaker } from "/axios.js";
 import contentLoading from "@/components/app-structures/app-content-loading.vue";
 import "devextreme/dist/css/dx.light.css";
@@ -244,25 +244,7 @@ export default {
             }
         },
         FETCH_STATUS() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-integrity-status-list",
-                headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                console.log(res);
-                if (res.status == 200 && res.data) {
-                    this.statusList = res.data;
-                }
-                })
-                .catch(error => {
-                console.log(error);
-                })
-                .finally(() => {
-                this.isLoading = false;
-                });
+            GET_DATA(this, '/Md/get-md-integrity-status-list', 'statusList');
         },
     }
 };

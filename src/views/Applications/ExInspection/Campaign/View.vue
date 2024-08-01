@@ -154,7 +154,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
@@ -227,7 +227,7 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
             this.campaignList = [
                 {
                     id: 1,
@@ -309,31 +309,6 @@ export default {
                 });
             });
             e.cancel = true;
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         ADD_ROW() {
             this.isShow = 1

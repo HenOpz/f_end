@@ -4,7 +4,7 @@
             <div class="page-section">
                 <DxDataGrid
                 id="data-grid-list"
-                key-expr="id"
+                key-expr="id_tag"
                 :ref="gridRefName"
                 :data-source="waterAnalysisList"
                 :hover-state-enabled="true"
@@ -34,7 +34,7 @@
                     data-field="id_platform"
                     caption="Platform" 
                     alignment="center" 
-                    :width="100"
+                    :width="90"
                 >
                     <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
                 </DxColumn>
@@ -42,61 +42,79 @@
                     data-field="tag_no" 
                     caption="Tag No." 
                     alignment="left"
-                    :width="120"
+                    :width="110"
                 >
                 </DxColumn>
-                <DxColumn 
+                <!-- <DxColumn 
                     data-field="desc" 
                     caption="Description" 
                     alignment="left"  
-                    :min-width="150"
+                    :min-width="120"
                 >
-                </DxColumn>
-                <DxColumn caption="pH">
+                </DxColumn> -->
+                <DxColumn 
+                    data-field="ph_lastest_period" 
+                    caption="Latest Period" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="ph_value" 
+                    caption="pH" 
+                    alignment="center"
+                    :width="80"
+                />
+                <DxColumn 
+                    data-field="co2_value" 
+                    caption="CO2 (ppb)" 
+                    alignment="center"
+                    :width="90"
+                />
+                <DxColumn 
+                    data-field="o2_value" 
+                    caption="Dissolved O2 (ppb)" 
+                    alignment="center"
+                    :width="100"
+                />
+                <DxColumn 
+                    data-field="ion_value" 
+                    caption="Fe Count" 
+                    alignment="center"
+                    :width="90"
+                />
+                
+                <DxColumn caption="Hydro Dynamic">
                     <DxColumn 
-                        data-field="ph_latest_date" 
+                        data-field="hydro_dynamic_lastest_date" 
                         caption="Latest Date" 
                         alignment="center"
                         :width="100"
                     />
                     <DxColumn 
-                        data-field="ph" 
-                        caption="pH" 
+                        data-field="hydro_dynamic_cr_90_value" 
+                        caption="CR 90% (mm/yr)" 
                         alignment="center"
-                        :width="100"
+                        :width="90"
+                    />
+                    <DxColumn 
+                        data-field="hydro_dynamic_cr_95_value" 
+                        caption="CR 95% (mm/yr)" 
+                        alignment="center"
+                        :width="90"
+                    />
+                    <DxColumn 
+                        data-field="hydro_dynamic_cr_99_value" 
+                        caption="CR 99% (mm/yr)" 
+                        alignment="center"
+                        :width="90"
+                    />
+                    <DxColumn 
+                        data-field="hydro_dynamic_not_injected_value" 
+                        caption="CR Not Injected (mm/yr)" 
+                        alignment="center"
+                        :width="90"
                     />
                 </DxColumn>
-
-                <DxColumn caption="Dissolved O2">
-                    <DxColumn 
-                        data-field="dissolved_o2_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="dissolved_o2" 
-                        caption="Dissolved O2 (ppb)" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-
-                <DxColumn caption="Ion Count">
-                    <DxColumn 
-                        data-field="ion_count_latest_date" 
-                        caption="Latest Date" 
-                        alignment="center"
-                        :width="100"
-                    />
-                    <DxColumn 
-                        data-field="ion_count" 
-                        caption="Ion Count" 
-                        alignment="center"
-                        :width="100"
-                    />
-                </DxColumn>
-
                 <!-- <DxColumn 
                     data-field="next_due_date" 
                     caption="Next Due Date" 
@@ -151,19 +169,19 @@
         </div>
         <AddTagRegistration 
             v-if="isShow === 1" 
-            @popup="FETCH_DATA('/CMInfo', 'waterAnalysisList');"
+            @popup="POPUP_CALL"
             :tagList="waterAnalysisList" 
         />
         <EditTagRegistration 
             v-if="isShow === 2" 
-            @popup="FETCH_DATA('/CMInfo', 'waterAnalysisList');" 
+            @popup="POPUP_CALL" 
             :dataInfo="selectedData" 
         />
     </div>
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
@@ -228,14 +246,16 @@ export default {
             this.isProducedWater = this.CHECK_SYSTEM('produced-water');
             this.isSeaWater = this.CHECK_SYSTEM('sea-water');
             this.isPipeline = this.CHECK_SYSTEM('pipeline');
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/CMInfo', 'waterAnalysisList');
+            GET_DATA(this, '/Md/get-md-cm-water-analysis-status-list/', 'dissolvedStatusList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, this.listApiUrl, 'waterAnalysisList');
         }
     },
     data() {
         return {
             platformList: [],
             waterAnalysisList: [],
+            dissolvedStatusList: [],
             isShow: 0,
             system: null,
             gridRefName: "grid",
@@ -264,6 +284,13 @@ export default {
             else if(this.system == 'pipeline') return 4;
             else return 0;
         },
+        listApiUrl() {
+            if(this.system == 'cooling-medium') return '/CMInfo/get-tag-cooling-medium-view-in-water-analysis'; 
+            else if(this.system == 'produced-water') return '/CMInfo/get-tag-produced-water-view-in-water-analysis'; 
+            else if(this.system == 'sea-water') return '/CMInfo/get-tag-sea-water-view-in-water-analysis'; 
+            else if(this.system == 'pipeline') return '/CMInfo/get-tag-pipeline-view-in-water-analysis';
+            else return '';
+        },
     },
     methods: {
         EXPORT_DATA(e) {
@@ -282,56 +309,17 @@ export default {
             });
             e.cancel = true;
         },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                            if(url == '/CMInfo') {
-                                this.isShow = 0;
-                                this.waterAnalysisList = this.waterAnalysisList.filter(t => t.id_system == this.SYSTEM_ID && t.is_water_analysis);
-                            }
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+        POPUP_CALL() {
+            this.isShow = 0;
+            GET_DATA(this, this.listApiUrl, 'waterAnalysisList');
         },
         CHECK_SYSTEM(e) {
             if (this.system === e) return true;
             else return false;
         },
-        GET_STATUS_CELL_COLOR(value) {
-            if (value.rowType === "data" && value.column.dataField === "dissolved") {
-                if (value.data.dissolved) {
-                    let str = value.data.dissolved.split(" ");
-                    let num = Number(str[str.length - 1]);
-
-                    if (num <= 30) return this.cellColors.green;
-                    else if (isNaN(num)) return this.cellColors.yellow;
-                    else if (num > 30) return this.cellColors.red;
-                }
-            }
-        },
         onCellPrepared(e) {
-            if(e.rowType === "data" && e.column.dataField === "dissolved_o2") {
-                e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
-                // e.cellElement.style.color = "#fff";
-                e.cellElement.style.textTransform = "uppercase";
+            if(e.rowType === "data" && e.column.dataField === "o2_value") {
+                e.cellElement.style.backgroundColor = '#fff';
             }
         },
         ADD_ROW() {

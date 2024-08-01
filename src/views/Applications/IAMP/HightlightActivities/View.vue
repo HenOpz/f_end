@@ -130,7 +130,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -233,95 +233,23 @@ export default {
         },
         FETCH_HIGHLIGHT_RECORD() {
             this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/HighlightActivities",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.highlightActivitiesList = res.data;
-                        console.log("highlightActivitiesList", this.highlightActivitiesList);
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/HighlightActivities', 'highlightActivitiesList');
         },
         DELETE_RECORD(e) {
-            axios({
-                method: "delete",
-                url: "/HighlightActivities/delete-highlight-activities?id=" + e.key,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.FETCH_HIGHLIGHT_RECORD();
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            DELETE_DATA(`/HighlightActivities/delete-highlight-activities?id=${e.key}`, () => { this.FETCH_HIGHLIGHT_RECORD(); });
         },
         FETCH_DROPDOWN_ASSET() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-asset-type-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+            GET_DATA(this, '/Md/get-md-asset-type-list', 'asset');
         },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.asset = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    FETCH_DROPDOWN_PLATFORM() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
+        FETCH_DROPDOWN_PLATFORM() {
+            GET_DATA(this, '/Md/get-md-platform-list', 'platform');
         },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.platform = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
-    },
-    SET_CURRENT_VIEW(view, data = null) {
-        this.$store.commit("SET_SHOW_BACK_BUTTON", false);
-        if (data !== null) this.$emit('currentView', view, data);
-        else this.$emit('currentView', view);
+        SET_CURRENT_VIEW(view, data = null) {
+            this.$store.commit("SET_SHOW_BACK_BUTTON", false);
+            if (data !== null) this.$emit('currentView', view, data);
+            else this.$emit('currentView', view);
+        }
     }
- }
 };
 </script>
 

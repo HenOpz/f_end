@@ -51,10 +51,16 @@ export default {
                 // {
                 //     name: 'Information'
                 // },
+                // {
+                //     line: true
+                // },
                 {
                     url: '/reliability',
                     icon: "/img/svg/pie-chart-svg.svg",
                     name: 'Dashboard'
+                },
+                {
+                    name: 'Failure'
                 },
                 {
                     url: '/reliability/failure-report',
@@ -62,22 +68,37 @@ export default {
                     name: 'Failure Report'
                 },
                 {
+                    url: '/reliability/stt',
+                    icon: "/img/svg/list-check-solid.svg",
+                    name: 'Short-Term Repair'
+                },
+                {
+                    url: '/reliability/ltt',
+                    icon: "/img/svg/list-check-solid.svg",
+                    name: 'Long-Term Repair'
+                },
+                {
                     url: '/reliability/pending-approval',
                     icon: "/img/svg/rewind-time-svg.svg",
                     name: 'Pending Approval'
                 },
                 {
-                    line: true
+                    name: 'RCFA'
                 },
                 {
-                    url: '/reliability/stt',
-                    icon: "/img/svg/list-check-solid.svg",
-                    name: 'Short Term Tracking'
+                    url: '/reliability/rcfa-report',
+                    icon: "/img/svg/window-layout-svg.svg",
+                    name: 'RCFA Report'
                 },
                 {
-                    url: '/reliability/ltt',
+                    url: '/reliability/rcfa-stt',
                     icon: "/img/svg/list-check-solid.svg",
-                    name: 'Long Term Tracking'
+                    name: 'Short-Term Repair'
+                },
+                {
+                    url: '/reliability/rcfa-ltt',
+                    icon: "/img/svg/list-check-solid.svg",
+                    name: 'Long-Term Repair'
                 },
                 {
                     line: true

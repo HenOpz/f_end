@@ -201,7 +201,7 @@ import { sha256 } from "js-sha256";
 // import moment from "moment";
 
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA } from "/axios.js";
 
 //UI Components
 
@@ -242,39 +242,11 @@ export default {
   mounted() {},
   methods: {
     FETCH_USER_INFO() {
-      this.isLoading = true;
-      setTimeout(() => {
+      window.setTimeout(() => {
         var id_account = JSON.parse(localStorage.getItem("user")).id;
-        axios({
-          method: "get",
-          url: "/UserAccount/get-info-by-id-account?id_account=" + id_account,
-          headers: {
-            Authorization:
-              "Bearer " + JSON.parse(localStorage.getItem("token")),
-          },
-        })
-          .then((res) => {
-            // console.log(res);
-            if (res.status == 200) {
-              // var user = res.data[0];
-              this.user = JSON.parse(localStorage.getItem("user"));
-              console.log("user", this.user);
-              // if (user.profile_picture == null) {
-              //   this.user.profile_picture = null;
-              // } else {
-              //   this.user.profile_picture =
-              //     this.baseURL + this.user.profile_picture;
-              // }
-              console.log("==> Fetch User Info : Account View <==");
-            }
-          })
-          .catch((error) => {
-            console.log(error);
-          })
-          .finally(() => {
-            this.isLoading = false;
-          });
-      }, 500);
+        this.FETCH_USER_INFO(); GET_DATA(this, `/UserAccount/get-info-by-id-account?id_account=${id_account}`, 
+        () => { this.user = JSON.parse(localStorage.getItem("user")); })
+      },1500);
     },
     UPLOAD_PIC() {
       console.log("  ==> UPLOAD PIC");
@@ -285,34 +257,14 @@ export default {
         this.picUpload.type == "image/png"
       ) {
         if (this.picUpload.size < 20000000) {
-          axios({
-            method: "post",
-            url: "/user/upload-pic",
-            headers: {
-              "Content-Type": "multipart/form-data",
-              Authorization:
-                "Bearer " + JSON.parse(localStorage.getItem("token")),
-            },
-            data: {
-              id_user: this.user.id_user,
-              file: this.picUpload,
-            },
-          })
-            .then((res) => {
-              console.log("  ==> UPLOAD DONE");
-
-              if (res.status == 200) {
-                // this.$router.go();
-                this.isEdit.photo = false;
-                this.$router.go();
-              }
-            })
-            .catch((error) => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {});
+          let data = {
+            id_user: this.user.id_user,
+            file: this.picUpload,
+          }
+          POST_DATA('/user/upload-pic', data, true, () => {
+            this.isEdit.photo = false;
+            this.$router.go();
+          });
         } else {
           this.$ons.notification.alert("File size too large. (20 MB max)");
           const file = document.getElementById("pic-upload-btn");
@@ -367,29 +319,12 @@ export default {
         if (res == 1) {
           const data = this.formData;
           console.log("data save", data);
-          axios({
-            method: "put",
-            url: "/UserAccount/edit-user-info-by-id-account?id_account=" + data.id_account,
-            headers: {
-              Authorization:
-                "Bearer " + JSON.parse(localStorage.getItem("token")),
-            },
-            data: data,
+          PUT_DATA(`/UserAccount/edit-user-info-by-id-account?id_account=${data.id_account}`, data, 
+          () => {
+            this.isEdit.user = false;
+            this.isEdit.info = false;
+            this.FETCH_USER_INFO();
           })
-            .then((res) => {
-              if (res.status == 204) {
-                this.isEdit.user = false;
-                // this.$router.go();
-                this.isEdit.info = false;
-                this.FETCH_USER_INFO();
-              }
-            })
-            .catch((error) => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {});
         }
       });
     },
@@ -401,40 +336,17 @@ export default {
               if (sha256(this.formData.oldPassword) == this.user.password) {
                 this.$ons.notification.confirm("Confirm Save").then((res) => {
                   if (res == 1) {
-                    axios({
-                      method: "put",
-                      url: "account-user/change-password",
-                      headers: {
-                        Authorization:
-                          "Bearer " + JSON.parse(localStorage.getItem("token")),
-                      },
-                      data: {
-                        id_account: this.formData.id_account,
-                        password: sha256(this.formData.confirmPassword),
-                      },
+                    let data = {
+                      id_account: this.formData.id_account,
+                      password: sha256(this.formData.confirmPassword),
+                    }
+                    PUT_DATA('account-user/change-password', data, 
+                    (data) => {
+                      if (data == 0) {
+                        this.isEdit.account = false;
+                        this.FETCH_USER_INFO();
+                      }
                     })
-                      .then((res) => {
-                        if (res.status == 200 && res.data) {
-                          this.$ons.notification
-                            .alert("Account password changed")
-                            .then((respone) => {
-                              if (respone == 0) {
-                                this.isEdit.account = false;
-                                this.FETCH_USER_INFO();
-                              }
-                            });
-                        }
-                      })
-                      .catch((error) => {
-                        this.$ons.notification.alert(
-                          error.code +
-                            " " +
-                            error.response.status +
-                            " " +
-                            error.message
-                        );
-                      })
-                      .finally(() => {});
                   }
                 });
               } else {

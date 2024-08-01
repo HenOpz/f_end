@@ -247,7 +247,7 @@
   
   <script>
   //API
-  import {axios} from "/axios.js";
+  import {GET_DATA, PUT_DATA} from "/axios.js";
   import DxSelectBox from "devextreme-vue/select-box";
   // import DxTextBox from 'devextreme-vue/text-box';
   // import { DxFileUploader } from 'devextreme-vue/file-uploader';
@@ -293,34 +293,15 @@
         subpageInnerName: null,
       });
       if (this.$store.state.status.server == true) {
-        this.FETCH_DATA(`/ExInspectionChecklist/get-ex-insp-chk-list-insp-id?id_insp_record=${this.record}`, 'checkRecordList');
-        this.FETCH_DATA('Md/get-md-ex-insp-chk-status-list', 'checkStatus');
+        GET_DATA(this, `/ExInspectionChecklist/get-ex-insp-chk-list-insp-id?id_insp_record=${this.record}`, 'checkRecordList');
+        GET_DATA(this, 'Md/get-md-ex-insp-chk-status-list', 'checkStatus');
         console.log('record: ',this.record)
       }
     },
     methods: {
       UPDATE_RESULT(item) {
-      console.log('test ',item)
-        axios({
-          method: "put",
-          url: "ExInspectionChecklist/edit-ex-insp-chk-list-result",
-          headers: {
-            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-          },
-          data: item
-        })
-          .then(res => {
-            if (res.status == 200 && res.data) {
-              console.log("==> RESULT UPDATED");
-            }
-          })
-          .catch(error => {
-            console.log(error);
-            this.$ons.notification.alert(
-              "Update Failed!<br/>Please try again later"
-            );
-          })
-          .finally(() => {});
+        console.log('test ',item)
+        PUT_DATA('ExInspectionChecklist/edit-ex-insp-chk-list-result', item);
       },
       // SET_CHECKLIST_ACTION(popupShow,row) {
       //   // this.current_view = view;
@@ -335,31 +316,6 @@
         this.checklist_row = row;
         this.popupShow = popupShow;
         console.log("test row ",row, ' popup ', popupShow);
-      },
-      FETCH_DATA(url, targetVariable, callback) {
-          this.isLoading = true;
-          axios({
-              method: "get",
-              url: url,
-              headers: {
-                  Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-              }
-          })
-              .then(res => {
-                  if (res.status == 200 && res.data) {
-                      if (callback && typeof callback === 'function') {
-                          callback(res.data);
-                      } else {
-                          this.$set(this, targetVariable, res.data);
-                      }
-                  }
-              })
-              .catch(error => {
-                  console.log(error);
-              })
-              .finally(() => {
-                  this.isLoading = false;
-              });
       },
     }
   };

@@ -28,7 +28,7 @@
             alignment="center"
         />
         <DxColumn 
-            data-field="inital_weight" 
+            data-field="initial_weight" 
             caption="Initial Weight (g)" 
             :width="120" 
             alignment="center"
@@ -63,17 +63,15 @@
             :width="120" 
             alignment="center"
         />
-        
-        <!-- <DxColumn caption="MOC" :width="80" alignment="center" cell-template="moc-cell-template" />
-        <DxColumn caption="RA" :width="80" alignment="center" cell-template="ra-cell-template" /> -->
+
         <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
 
         <template #action-cell-template="{ data }">
             <div class="action-wrapper">
-                <div @click="$emit('action', 4)">
+                <div @click="$emit('action', 4, id_record, data.data)">
                     <img src="/img/svg/pen-svg.svg" class="penSvg" />
                 </div>
-                <div @click="DELETE_RECORD(data)">
+                <div @click="DELETE_RECORD(data.data.id)">
                     <img src="/img/svg/trash-svg.svg" class="trashSvg" />
                 </div>
             </div>
@@ -109,24 +107,12 @@
 </template>
 
 <script>
-/* eslint-disable */
-//API
-import { axios } from "/axios.js";
-import moment from "moment";
-
-//Components
-//import VueTabsChrome from "vue-tabs-chrome";
-// import trashSvg from "@/components/svg/trash-svg.vue"
-
-//DataGrid
+import { GET_DATA, DELETE_DATA } from "/axios.js";
+//import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
-// import { Workbook } from "exceljs";
-// import saveAs from "file-saver";
-// import { exportDataGrid } from "devextreme/excel_exporter";
-import DxSelectBox from 'devextreme-vue/select-box';
-import DxTextBox from 'devextreme-vue/text-box';
-import DxDateBox from 'devextreme-vue/date-box';
-// import DxTextArea from 'devextreme-vue/text-area';
+// import DxSelectBox from 'devextreme-vue/select-box';
+// import DxTextBox from 'devextreme-vue/text-box';
+// import DxDateBox from 'devextreme-vue/date-box';
 import DxButton from "devextreme-vue/button";
 import { DxItem } from "devextreme-vue/form";
 import {
@@ -150,7 +136,7 @@ import {
 } from "devextreme-vue/data-grid";
 
 export default {
-    name: "inspection-record",
+    name: "corrosion-coupon-list",
     props: {
         monitorData: Object
     },
@@ -174,14 +160,14 @@ export default {
         // DxLookup,
         // DxRequiredRule,
         // DxFormItem,
-        DxSelectBox,
-        DxTextBox,
-        DxDateBox,
+        // DxSelectBox,
+        // DxTextBox,
+        // DxDateBox,
         // DxTextArea,
         // trashSvg,
     },
     created() {
-        this.FETCH_COUPON();
+        this.FETCH_COUPON(this.id_record);
     },
     data() {
         return {
@@ -192,24 +178,11 @@ export default {
     },
     computed: {},
     methods: {
-        FETCH_COUPON() {
-            axios({
-                method: "get",
-                url: "/CMCorrosionCouponMonitorDetail/ByRecord/"+ this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.couponList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                });
+        FETCH_COUPON(id_record) {
+            GET_DATA(this, `/CMCorrosionCouponMonitorDetail/ByRecord/${id_record}`, 'couponList');
+        },
+        DELETE_RECORD(id_coupon) {
+            DELETE_DATA(`/CMCorrosionCouponMonitorDetail/${id_coupon}`, () => { this.FETCH_COUPON(this.id_record); });
         },
     }
 };

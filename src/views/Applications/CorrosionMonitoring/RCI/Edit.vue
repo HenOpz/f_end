@@ -86,7 +86,7 @@
 <script>
 /* eslint-disable */
 //API
-import { axios } from "/axios.js";
+import { PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -170,15 +170,7 @@ export default {
         highcharts: Chart
     },
     created() {
-        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "MOC Number: " + this.moc_no,
-            subpageInnerName: null,
-        });
         if (this.$store.state.status.server == true) {
-            // this.FETCH_DROPDOWN_NOC();
-            // this.FETCH_DROPDOWN_RRL();
-            // this.FETCH_DROPDOWN_STATUS();
-            // this.FETCH_MOC_RECORD();
             const years = []
             for (let index = 0; index < 11; index++) {
                 years.push({ id: index, year: 2020 + index })
@@ -266,135 +258,15 @@ export default {
     },
     computed: {},
     methods: {
-        FETCH_MOC_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         UPDATE_RECORD() {
             if (this.mocList.start_date !== null)
                 this.mocList.start_date = moment(this.mocList.start_date).format("L");
             if (this.mocList.expiry_date !== null)
                 this.mocList.expiry_date = moment(this.mocList.expiry_date).format("L");
-            axios({
-                method: "put",
-                url: "/ManagementOfChange/" + this.mocList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.mocList
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            PUT_DATA(`/ManagementOfChange/${this.mocList.id}`, this.mocList, () => { this.SET_CURRENT_VIEW(0); });
         },
         DELETE_RECORD() {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + this.mocList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        FETCH_DROPDOWN_NOC() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-noc-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.noc = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_STATUS() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-status-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.status = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_RRL() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-rrl-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.rrl = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            DELETE_DATA(`/ManagementOfChange/delete-management-of-change?id=${this.mocList.id}`, () => { this.SET_CURRENT_VIEW(0); });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "rci") {

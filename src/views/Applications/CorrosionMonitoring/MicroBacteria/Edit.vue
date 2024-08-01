@@ -13,261 +13,11 @@
                         {{ tab }}
                     </button>
                 </div>
+
                 <div fill v-if="active_tab === tabs[0]" class="table-chart">
                     <div>
                         <DxDataGrid 
-                            id="data-grid-list" 
-                            key-expr="id" 
-                            :element-attr="dataGridAttributesAtp"
-                            :data-source="atpList"
-                            :selection="{ mode: 'single' }" 
-                            :hover-state-enabled="true" 
-                            :allow-column-reordering="true"
-                            :show-borders="true" 
-                            :show-row-lines="true" 
-                            :row-alternation-enabled="false"
-                            :word-wrap-enabled="true" 
-                            :column-auto-width="true"
-                            @row-inserted="CREATE_RECORD" 
-                            @row-updated="UPDATE_RECORD"
-                            @row-removed="DELETE_RECORD"
-                            :onCellPrepared="onCellPrepared"
-                        >
-                            <DxEditing 
-                                :allow-updating="true" 
-                                :allow-deleting="true" 
-                                :allow-adding="true" 
-                                :use-icons="true"
-                                mode="row" 
-                            />
-                            <DxFilterRow :visible="true" />
-                            <DxHeaderFilter :visible="true" />
-                            <DxColumn 
-                                data-field="year" 
-                                caption="Year" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="yearList" />
-                            </DxColumn>
-                            <DxColumn
-                                data-field="period" 
-                                caption="Period" 
-                                :width="100" 
-                                alignment="center" 
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="periodList" />
-                            </DxColumn>
-                            <DxColumn 
-                                data-field="atp_val" 
-                                caption="ATP (pgATP/mL)" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'ATP' }"
-                            />
-                        </DxDataGrid>
-                    </div>
-                    <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
-                    </div>
-                </div>
-
-                <div fill v-if="active_tab === tabs[1]" class="table-chart">
-                    <div>
-                        <DxDataGrid 
-                            id="data-grid-list" 
-                            key-expr="id" 
-                            :element-attr="dataGridAttributesGhp"
-                            :data-source="ghbList"
-                            :selection="{ mode: 'single' }" 
-                            :hover-state-enabled="true" 
-                            :allow-column-reordering="true"
-                            :show-borders="true" 
-                            :show-row-lines="true" 
-                            :row-alternation-enabled="false"
-                            :word-wrap-enabled="true" 
-                            :column-auto-width="true"
-                            @row-inserted="CREATE_RECORD" 
-                            @row-updated="UPDATE_RECORD"
-                            @row-removed="DELETE_RECORD"
-                            :onCellPrepared="onCellPrepared"
-                        >
-                            <DxEditing 
-                                :allow-updating="true" 
-                                :allow-deleting="true" 
-                                :allow-adding="true" 
-                                :use-icons="true"
-                                mode="row" 
-                            />
-                            <DxFilterRow :visible="true" />
-                            <DxHeaderFilter :visible="true" />
-                            <DxColumn 
-                                data-field="year" 
-                                caption="Year" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="yearList" />
-                            </DxColumn>
-                            <DxColumn
-                                data-field="period" 
-                                caption="Period" 
-                                :width="100" 
-                                alignment="center" 
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="periodList" />
-                            </DxColumn>
-                            <DxColumn 
-                                data-field="ghb_val" 
-                                caption="GHB (Cells/mL)" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'GHB' }"
-                            />
-                        </DxDataGrid>
-                    </div>
-                    <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
-                    </div>
-                </div>
-
-                <div fill v-if="active_tab === tabs[2]" class="table-chart">
-                    <div>
-                        <DxDataGrid 
-                            id="data-grid-list" 
-                            key-expr="id" 
-                            :element-attr="dataGridAttributesApghb"
-                            :data-source="apghbList"
-                            :selection="{ mode: 'single' }" 
-                            :hover-state-enabled="true" 
-                            :allow-column-reordering="true"
-                            :show-borders="true" 
-                            :show-row-lines="true" 
-                            :row-alternation-enabled="false"
-                            :word-wrap-enabled="true" 
-                            :column-auto-width="true"
-                            @row-inserted="CREATE_RECORD" 
-                            @row-updated="UPDATE_RECORD"
-                            @row-removed="DELETE_RECORD"
-                            :onCellPrepared="onCellPrepared"
-                        >
-                            <DxEditing 
-                                :allow-updating="true" 
-                                :allow-deleting="true" 
-                                :allow-adding="true" 
-                                :use-icons="true"
-                                mode="row" 
-                            />
-                            <DxFilterRow :visible="true" />
-                            <DxHeaderFilter :visible="true" />
-                            <DxColumn 
-                                data-field="year" 
-                                caption="Year" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="yearList" />
-                            </DxColumn>
-                            <DxColumn
-                                data-field="period" 
-                                caption="Period" 
-                                :width="100" 
-                                alignment="center" 
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="periodList" />
-                            </DxColumn>
-                            <DxColumn 
-                                data-field="apghb_val" 
-                                caption="APGHB (Cells/mL)" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'APGHB' }"
-                            />
-                        </DxDataGrid>
-                    </div>
-                    <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
-                    </div>
-                </div>
-
-                <div fill v-if="active_tab === tabs[3]" class="table-chart">
-                    <div>
-                        <DxDataGrid 
-                            id="data-grid-list" 
-                            key-expr="id" 
-                            :element-attr="dataGridAttributesSulphide"
-                            :data-source="sulphideList"
-                            :selection="{ mode: 'single' }" 
-                            :hover-state-enabled="true" 
-                            :allow-column-reordering="true"
-                            :show-borders="true" 
-                            :show-row-lines="true" 
-                            :row-alternation-enabled="false"
-                            :word-wrap-enabled="true" 
-                            :column-auto-width="true"
-                            @row-inserted="CREATE_RECORD" 
-                            @row-updated="UPDATE_RECORD"
-                            @row-removed="DELETE_RECORD"
-                        >
-                            <DxEditing 
-                                :allow-updating="true" 
-                                :allow-deleting="true" 
-                                :allow-adding="true" 
-                                :use-icons="true"
-                                mode="row" 
-                            />
-                            <DxFilterRow :visible="true" />
-                            <DxHeaderFilter :visible="true" />
-                            <DxColumn 
-                                data-field="year" 
-                                caption="Year" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="yearList" />
-                            </DxColumn>
-                            <DxColumn
-                                data-field="period" 
-                                caption="Period" 
-                                :width="100" 
-                                alignment="center" 
-                                :editor-options="{ placeholder: 'Select' }"
-                                sort-order="desc"
-                            >
-                                <DxLookup :data-source="periodList" />
-                            </DxColumn>
-                            <DxColumn 
-                                data-field="sulphide_val" 
-                                caption="Sulphide (mg/L)" 
-                                :width="100" 
-                                alignment="center"
-                                :editor-options="{ placeholder: 'Sulphide' }"
-                            />
-                        </DxDataGrid>
-                    </div>
-                    <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
-                    </div>
-                </div>
-
-                <div fill v-if="active_tab === tabs[4]" class="table-chart">
-                    <div>
-                        <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
                             :element-attr="dataGridAttributesSrb"
                             :data-source="srbList"
@@ -287,50 +37,351 @@
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="true" 
+                                :allow-adding="false" 
                                 :use-icons="true"
                                 mode="row" 
                             />
-                            <DxFilterRow :visible="true" />
+                            <DxFilterRow :visible="false" />
                             <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
                             <DxColumn 
                                 data-field="year" 
                                 caption="Year" 
-                                :width="100" 
+                                :width="dxColumnWidth[0]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn
                                 data-field="period" 
                                 caption="Period" 
-                                :width="100" 
+                                :width="dxColumnWidth[1]" 
                                 alignment="center" 
                                 :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
                             >
                                 <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
                             </DxColumn>
                             <DxColumn 
                                 data-field="srb_val" 
                                 caption="SRB (cfu)" 
-                                :width="100" 
+                                :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'SRB' }"
                             />
                         </DxDataGrid>
                     </div>
                     <div class="chart-container">
-                        <highcharts :options="chartOptions"  />
+                        <highcharts :options="chartSrbOptions" :key="'chart-srb-' + chartSrbOptions.id" />
+                    </div>
+                </div>
+
+                <div fill v-if="active_tab === tabs[1]" class="table-chart">
+                    <div>
+                        <DxDataGrid 
+                            id="data-grid-dashboard" 
+                            key-expr="id" 
+                            :element-attr="dataGridAttributesGhp"
+                            :data-source="ghbList"
+                            :selection="{ mode: 'single' }" 
+                            :hover-state-enabled="true" 
+                            :allow-column-reordering="true"
+                            :show-borders="true" 
+                            :show-row-lines="true" 
+                            :row-alternation-enabled="false"
+                            :word-wrap-enabled="true" 
+                            :column-auto-width="true"
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                            :onCellPrepared="onCellPrepared"
+                        >
+                            <DxEditing 
+                                :allow-updating="true" 
+                                :allow-deleting="true" 
+                                :allow-adding="false" 
+                                :use-icons="true"
+                                mode="row" 
+                            />
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
+                            <DxColumn 
+                                data-field="year" 
+                                caption="Year" 
+                                :width="dxColumnWidth[0]"
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn
+                                data-field="period" 
+                                caption="Period" 
+                                :width="dxColumnWidth[1]"
+                                alignment="center" 
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="ghb_val" 
+                                caption="GHB (Cells/mL)" 
+                                :width="dxColumnWidth[2]"
+                                alignment="center"
+                                :editor-options="{ placeholder: 'GHB' }"
+                            />
+                        </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartGhbOptions" :key="'chart-ghb-' + chartGhbOptions.id" />
+                    </div>
+                </div>
+
+                <div fill v-if="active_tab === tabs[2]" class="table-chart">
+                    <div>
+                        <DxDataGrid 
+                            id="data-grid-dashboard" 
+                            key-expr="id" 
+                            :element-attr="dataGridAttributesApghb"
+                            :data-source="apghbList"
+                            :selection="{ mode: 'single' }" 
+                            :hover-state-enabled="true" 
+                            :allow-column-reordering="true"
+                            :show-borders="true" 
+                            :show-row-lines="true" 
+                            :row-alternation-enabled="false"
+                            :word-wrap-enabled="true" 
+                            :column-auto-width="true"
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                            :onCellPrepared="onCellPrepared"
+                        >
+                            <DxEditing 
+                                :allow-updating="true" 
+                                :allow-deleting="true" 
+                                :allow-adding="false" 
+                                :use-icons="true"
+                                mode="row" 
+                            />
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
+                            <DxColumn 
+                                data-field="year" 
+                                caption="Year" 
+                                :width="dxColumnWidth[0]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn
+                                data-field="period" 
+                                caption="Period" 
+                                :width="dxColumnWidth[1]" 
+                                alignment="center" 
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="apghb_val" 
+                                caption="APGHB (Cells/mL)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'APGHB' }"
+                            />
+                        </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartApghbOptions" :key="'chart-apghb-' + chartApghbOptions.id" />
+                    </div>
+                </div>
+
+                <div fill v-if="active_tab === tabs[3]" class="table-chart">
+                    <div>
+                        <DxDataGrid 
+                            id="data-grid-dashboard" 
+                            key-expr="id" 
+                            :element-attr="dataGridAttributesAtp"
+                            :data-source="atpList"
+                            :selection="{ mode: 'single' }" 
+                            :hover-state-enabled="true" 
+                            :allow-column-reordering="true"
+                            :show-borders="true" 
+                            :show-row-lines="true" 
+                            :row-alternation-enabled="false"
+                            :word-wrap-enabled="true" 
+                            :column-auto-width="true"
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                            :onCellPrepared="onCellPrepared"
+                        >
+                            <DxEditing 
+                                :allow-updating="true" 
+                                :allow-deleting="true" 
+                                :allow-adding="false" 
+                                :use-icons="true"
+                                mode="row" 
+                            />
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
+                            <DxColumn 
+                                data-field="year" 
+                                caption="Year" 
+                                :width="dxColumnWidth[0]"
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn
+                                data-field="period" 
+                                caption="Period" 
+                                :width="dxColumnWidth[1]"
+                                alignment="center" 
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="atp_val" 
+                                caption="ATP (pgATP/mL)" 
+                                :width="dxColumnWidth[2]"
+                                alignment="center"
+                                :editor-options="{ placeholder: 'ATP' }"
+                            />
+                        </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartAtpOptions" :key="'chart-atp-' + chartAtpOptions.id" />
+                    </div>
+                </div>
+
+                <div fill v-if="active_tab === tabs[4]" class="table-chart">
+                    <div>
+                        <DxDataGrid 
+                            id="data-grid-dashboard" 
+                            key-expr="id" 
+                            :element-attr="dataGridAttributesSulphide"
+                            :data-source="sulphideList"
+                            :selection="{ mode: 'single' }" 
+                            :hover-state-enabled="true" 
+                            :allow-column-reordering="true"
+                            :show-borders="true" 
+                            :show-row-lines="true" 
+                            :row-alternation-enabled="false"
+                            :word-wrap-enabled="true" 
+                            :column-auto-width="true"
+                            @row-inserted="CREATE_RECORD" 
+                            @row-updated="UPDATE_RECORD"
+                            @row-removed="DELETE_RECORD"
+                        >
+                            <DxEditing 
+                                :allow-updating="true" 
+                                :allow-deleting="true" 
+                                :allow-adding="false" 
+                                :use-icons="true"
+                                mode="row" 
+                            />
+                            <DxFilterRow :visible="false" />
+                            <DxHeaderFilter :visible="true" />
+                            <DxPaging :page-size="8" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[8, 16, 24]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
+                            <DxColumn 
+                                data-field="year" 
+                                caption="Year" 
+                                :width="dxColumnWidth[0]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="yearList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn
+                                data-field="period" 
+                                caption="Period" 
+                                :width="dxColumnWidth[1]" 
+                                alignment="center" 
+                                :editor-options="{ placeholder: 'Select' }"
+                                sort-order="desc"
+                            >
+                                <DxLookup :data-source="periodList" />
+                                <DxRequiredRule />
+                            </DxColumn>
+                            <DxColumn 
+                                data-field="sulphide_val" 
+                                caption="Sulphide (mg/L)" 
+                                :width="dxColumnWidth[2]" 
+                                alignment="center"
+                                :editor-options="{ placeholder: 'Sulphide' }"
+                            />
+                        </DxDataGrid>
+                    </div>
+                    <div class="chart-container">
+                        <highcharts :options="chartSulphideOptions" :key="'chart-sulphide-' + chartSulphideOptions.id" />
                     </div>
                 </div>
 
                 <div fill v-if="active_tab === tabs[5]" class="table-chart">
                     <div style="grid-column: span 2;">
                         <DxDataGrid 
-                            id="data-grid-list" 
+                            id="data-grid-dashboard" 
                             key-expr="id" 
                             :data-source="libraryList"
                             :selection="{ mode: 'single' }" 
@@ -384,16 +435,8 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
-// import moment from "moment";
+import { GET_DATA, POST_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
-// import { Workbook } from "exceljs";
-// import saveAs from "file-saver";
-// import { exportDataGrid } from "devextreme/excel_exporter";
-// import DxTextArea from 'devextreme-vue/text-area';
-// import DxAddRowButton from "devextreme-vue/button";
-// import { DxItem } from "devextreme-vue/form";
-
 import exportingInit from "highcharts/modules/exporting";
 import offlineExporting from "highcharts/modules/offline-exporting";
 import { Chart } from "highcharts-vue";
@@ -403,25 +446,15 @@ offlineExporting(Highcharts);
 
 import {
     DxDataGrid,
-    // DxSearchPanel,
-    // DxPaging,
-    // DxPager,
-    // DxScrolling,
+    DxPaging,
+    DxPager,
     DxColumn,
-    // DxExport,
-    // DxToolbar,
     DxHeaderFilter,
-    // DxSelection,
     DxEditing,
     DxFilterRow,
-    // DxButton,
     DxLookup,
-    // DxRequiredRule,
-    // DxFormItem,
-    // DxForm
+    DxRequiredRule,
 } from "devextreme-vue/data-grid";
-
-//Structures
 
 export default {
     name: "edit-micro-bacteria-result",
@@ -430,30 +463,14 @@ export default {
     },
     components: {
         DxDataGrid,
-        // DxSearchPanel,
-        // DxPaging,
-        // DxPager,
-        // DxScrolling,
+        DxPaging,
+        DxPager,
         DxColumn,
-        // DxExport,
-        // DxToolbar,
         DxHeaderFilter,
-        // DxSelection,
-        // DxForm,
-        // DxItem,
         DxEditing,
         DxFilterRow,
-        // DxButton,
-        // DxAddRowButton,
         DxLookup,
-        // DxRequiredRule,
-        // DxFormItem,
-        // DxSelectBox,
-        // DxTextBox,
-        // DxDateBox,
-        // DxCheckBox,
-        // DxTextArea,
-        // trashSvg
+        DxRequiredRule,
         highcharts: Chart
     },
     created() {
@@ -463,32 +480,12 @@ export default {
         });
         if (this.$store.state.status.server == true) {
             console.log('dataInfo', this.dataInfo);
-            this.FETCH_DATA('/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id, 'apghbList');
-            this.FETCH_DATA('/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id, 'atpList');
-            this.FETCH_DATA('/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id, 'ghbList');
-            this.FETCH_DATA('/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id, 'srbList');
-            this.FETCH_DATA('/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id, 'sulphideList');
-            this.chartOptions = {
-                title: {
-                    text: 'Trending Results Chart',
-                    align: 'center'
-                },
-                xAxis: {
-                    categories: ['2020 H1', '2020 H2', '2021 H1', '2021 H2', '2022 H1', '2022 H2', '2023 H1', '2023 H2']
-                },
-                yAxis: {
-                    title: {
-                        text: this.active_tab
-                    }
-                },
-                credits: {
-                    enabled: false
-                },
-                series: [{
-                    name: 'Trend',
-                    data: [12.3, 9.5, 4, 18.4, 6, 3, 111, 9.5]
-                }]
-            }
+            GET_DATA(this, '/Md/get-md-cm-micro-bact-status-list/', 'statusList');
+            this.FETCH_SRB();
+            this.FETCH_ATP();
+            this.FETCH_GHB();
+            this.FETCH_APGHB();
+            this.FETCH_SULPHIDE();
         }
     },
     data() {
@@ -499,173 +496,292 @@ export default {
             sulphideList: [],
             srbList: [],
             libraryList: [],
-            tabs: ['ATP', 'GHB', 'APGHB', 'Sulphide', 'SRB', 'Library'],
-            active_tab: 'ATP',
-            chartOptions: {},
+            tabs: ['SRB', 'GHB', 'APGHB', 'ATP', 'Sulphide', 'Library'],
+            active_tab: 'SRB',
+            chartSrbOptions: {},
+            chartAtpOptions: {},
+            chartGhbOptions: {},
+            chartApghbOptions: {},
+            chartSulphideOptions: {},
+            statusList: [],
             dataGridAttributesAtp: {
-                class: "data-grid-list-atp"
+                class: "data-grid-dashboard-atp"
             },
             dataGridAttributesGhp: {
-                class: "data-grid-list-ghb"
+                class: "data-grid-dashboard-ghb"
             },
             dataGridAttributesApghb: {
-                class: "data-grid-list-apghb"
+                class: "data-grid-dashboard-apghb"
             },
             dataGridAttributesSulphide: {
-                class: "data-grid-list-sulphide"
+                class: "data-grid-dashboard-sulphide"
             },
             dataGridAttributesSrb: {
-                class: "data-grid-list-srb"
+                class: "data-grid-dashboard-srb"
             },
             yearList: [2022,2023,2024,2025,2026],
             periodList: ['H1','H2'],
+            dxColumnWidth: [110, 110, 120],
+            formatDecimal2: {
+                type: 'fixedPoint',
+                precision: 2,
+            },
         };
     },
     computed: {},
     methods: {
+        FETCH_SULPHIDE() {
+            GET_DATA(this, '/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id_tag, 'sulphideList', () => {
+                let categories = [];
+                let value = [];
+
+                this.sulphideList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.sulphide_val,
+                    })
+                })
+
+                this.chartSulphideOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'Sulphide Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Sulphide (mg/L)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'Sulphide (mg/L)',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+
+            });
+        },
+        FETCH_SRB() {
+            GET_DATA(this, '/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id_tag, 'srbList', () => {
+                let categories = [];
+                let value = [];
+
+                this.srbList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.srb_val,
+                        color: this.GET_COLOR_STATUS(item.id_status)
+                    })
+                })
+
+                this.chartSrbOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'SRB Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'SRB (cfu)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'SRB (cfu)',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+
+            });
+        },
+        FETCH_GHB() {
+            GET_DATA(this, '/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id_tag, 'ghbList', () => {
+                let categories = [];
+                let value = [];
+
+                this.ghbList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.ghb_val,
+                        color: this.GET_COLOR_STATUS(item.id_status)
+                    })
+                })
+
+                this.chartGhbOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'GHB Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'GHB (Cells/mL)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'GHB (Cells/mL)',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+
+            });
+        },
+        FETCH_ATP() {
+            GET_DATA(this, '/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id_tag, 'atpList', () => {
+                let categories = [];
+                let value = [];
+
+                this.atpList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.atp_val,
+                        color: this.GET_COLOR_STATUS(item.id_status)
+                    })
+                })
+
+                this.chartAtpOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'ATP Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'ATP (pgATP/mL)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'ATP (pgATP/mL)',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+
+            });
+        },
+        FETCH_APGHB() {
+            GET_DATA(this, '/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id_tag, 'apghbList', () => {
+                let categories = [];
+                let value = [];
+
+                this.apghbList.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.apghb_val,
+                        color: this.GET_COLOR_STATUS(item.id_status)
+                    })
+                })
+
+                this.chartApghbOptions = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'APGHB Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'APGHB'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'APGHB',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+
+            });
+        },
+        GET_COLOR_STATUS(id) {
+            if(id) {
+                console.log(id);
+                const color = this.statusList.filter(s => s.id == id);
+                return color[0].color_code;
+            }
+            return '#FFFFFF';
+        },
         CREATE_RECORD(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             e.data.id = 0;
-            e.data.id_tag = this.dataInfo.id;
+            e.data.id_tag = this.dataInfo.id_tag;
             e.data.created_by = user.id;
             e.data.updated_by = user.id;
-            if(e.component._customClass == 'data-grid-list-atp'){
-                this.POST_DATA('/CMMicroBacteriaATP', e.data, () => {this.FETCH_DATA('/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id, 'atpList')});
-            } else if (e.component._customClass == 'data-grid-list-ghb') {
-                this.POST_DATA('/CMMicroBacteriaGHB', e.data, () => {this.FETCH_DATA('/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id, 'ghbList')});
-            } else if (e.component._customClass == 'data-grid-list-apghb') {
-                this.POST_DATA('/CMMicroBacteriaAPGHB', e.data, () => {this.FETCH_DATA('/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id, 'apghbList')});
-            } else if (e.component._customClass == 'data-grid-list-sulphide') {
-                this.POST_DATA('/CMMicroBacteriaSulphide', e.data, () => {this.FETCH_DATA('/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id, 'sulphideList')});
-            } else if (e.component._customClass == 'data-grid-list-srb') {
-                this.POST_DATA('/CMMicroBacteriaSRB', e.data, () => {this.FETCH_DATA('/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id, 'srbList')});
+            if(e.component._customClass == 'data-grid-dashboard-atp'){
+                POST_DATA('/CMMicroBacteriaATP', e.data, () => {GET_DATA(this, '/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id_tag, 'atpList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-ghb') {
+                POST_DATA('/CMMicroBacteriaGHB', e.data, () => {GET_DATA(this, '/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id_tag, 'ghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-apghb') {
+                POST_DATA('/CMMicroBacteriaAPGHB', e.data, () => {GET_DATA(this, '/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id_tag, 'apghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-sulphide') {
+                POST_DATA('/CMMicroBacteriaSulphide', e.data, () => {GET_DATA(this, '/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id_tag, 'sulphideList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-srb') {
+                POST_DATA('/CMMicroBacteriaSRB', e.data, () => {GET_DATA(this, '/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id_tag, 'srbList')});
             }
         },
         UPDATE_RECORD(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             e.data.updated_by = user.id;
-            if(e.component._customClass == 'data-grid-list-atp'){
-                this.PUT_DATA('/CMMicroBacteriaATP/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id, 'atpList')});
-            } else if (e.component._customClass == 'data-grid-list-ghb') {
-                this.PUT_DATA('/CMMicroBacteriaGHB/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id, 'ghbList')});
-            } else if (e.component._customClass == 'data-grid-list-apghb') {
-                this.PUT_DATA('/CMMicroBacteriaAPGHB/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id, 'apghbList')});
-            } else if (e.component._customClass == 'data-grid-list-sulphide') {
-                this.PUT_DATA('/CMMicroBacteriaSulphide/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id, 'sulphideList')});
-            } else if (e.component._customClass == 'data-grid-list-srb') {
-                this.PUT_DATA('/CMMicroBacteriaSRB/' + e.data.id, e.data, () => {this.FETCH_DATA('/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id, 'srbList')});
+            if(e.component._customClass == 'data-grid-dashboard-atp'){
+                PUT_DATA('/CMMicroBacteriaATP/' + e.data.id, e.data, () => {GET_DATA(this, '/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id_tag, 'atpList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-ghb') {
+                PUT_DATA('/CMMicroBacteriaGHB/' + e.data.id, e.data, () => {GET_DATA(this, '/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id_tag, 'ghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-apghb') {
+                PUT_DATA('/CMMicroBacteriaAPGHB/' + e.data.id, e.data, () => {GET_DATA(this, '/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id_tag, 'apghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-sulphide') {
+                PUT_DATA('/CMMicroBacteriaSulphide/' + e.data.id, e.data, () => {GET_DATA(this, '/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id_tag, 'sulphideList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-srb') {
+                PUT_DATA('/CMMicroBacteriaSRB/' + e.data.id, e.data, () => {GET_DATA(this, '/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id_tag, 'srbList')});
             }
         },
         DELETE_RECORD(e) {
-            if(e.component._customClass == 'data-grid-list-atp'){
-                this.DELETE_DATA('/CMMicroBacteriaATP/' + e.data.id, () => {this.FETCH_DATA('/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id, 'atpList')});
-            } else if (e.component._customClass == 'data-grid-list-ghb') {
-                this.DELETE_DATA('/CMMicroBacteriaGHB/' + e.data.id, () => {this.FETCH_DATA('/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id, 'ghbList')});
-            } else if (e.component._customClass == 'data-grid-list-apghb') {
-                this.DELETE_DATA('/CMMicroBacteriaAPGHB/' + e.data.id, () => {this.FETCH_DATA('/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id, 'apghbList')});
-            } else if (e.component._customClass == 'data-grid-list-sulphide') {
-                this.DELETE_DATA('/CMMicroBacteriaSulphide/' + e.data.id, () => {this.FETCH_DATA('/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id, 'sulphideList')});
-            } else if (e.component._customClass == 'data-grid-list-srb') {
-                this.DELETE_DATA('/CMMicroBacteriaSRB/' + e.data.id, () => {this.FETCH_DATA('/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id, 'srbList')});
+            if(e.component._customClass == 'data-grid-dashboard-atp'){
+                DELETE_DATA('/CMMicroBacteriaATP/' + e.data.id, () => {GET_DATA(this, '/CMMicroBacteriaATP/ByTag/' + this.dataInfo.id_tag, 'atpList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-ghb') {
+                DELETE_DATA('/CMMicroBacteriaGHB/' + e.data.id, () => {GET_DATA(this, '/CMMicroBacteriaGHB/ByTag/' + this.dataInfo.id_tag, 'ghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-apghb') {
+                DELETE_DATA('/CMMicroBacteriaAPGHB/' + e.data.id, () => {GET_DATA(this, '/CMMicroBacteriaAPGHB/ByTag/' + this.dataInfo.id_tag, 'apghbList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-sulphide') {
+                DELETE_DATA('/CMMicroBacteriaSulphide/' + e.data.id, () => {GET_DATA(this, '/CMMicroBacteriaSulphide/ByTag/' + this.dataInfo.id_tag, 'sulphideList')});
+            } else if (e.component._customClass == 'data-grid-dashboard-srb') {
+                DELETE_DATA('/CMMicroBacteriaSRB/' + e.data.id, () => {GET_DATA(this, '/CMMicroBacteriaSRB/ByTag/' + this.dataInfo.id_tag, 'srbList')});
             }
-        },
-        DELETE_DATA(url, callback) {
-            this.isLoading = true;
-            axios({
-                method: "delete",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        PUT_DATA(url, data, callback) {
-            this.isLoading = true;
-            axios({
-                method: "put",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: data,
-            })
-                .then(res => {
-                    if (res.status == 204 && res.data) {
-                        console.log(url, res);
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        POST_DATA(url, data, callback) {
-            this.isLoading = true;
-            axios({
-                method: "post",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: data,
-            })
-                .then(res => {
-                    if (res.status == 201 && res.data) {
-                        console.log(url, res);
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } 
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         GET_STATUS_CELL_COLOR(value) {
             if (value.rowType === "data" && value.column.dataField === "atp_val") {

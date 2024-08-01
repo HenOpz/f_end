@@ -135,6 +135,8 @@
                     </div>
                 </div>
 
+                <div v-if="system == 'pipeline'" />
+
                 <button class="create" @click="CREATE_TAG">Create</button>
                 <button @click="CANCEL">Cancel</button>
             </div>
@@ -143,7 +145,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
 import DxTextBox from 'devextreme-vue/text-box';
@@ -162,7 +164,9 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList', () => {
+                this.platformList = this.platformList.filter(e => e.code_name === "MDPP");
+            });
         }
     },
     data() {
@@ -210,56 +214,10 @@ export default {
             this.registration.created_by = user.id;
             this.registration.updated_by = user.id;
             this.registration.id_system = this.SYSTEM_ID;
-            axios({
-                method: "post",
-                url: "/CMInfo",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.registration,
-            })
-                .then(res => {
-                    console.log('CREATE_TAG', res);
-                    if (res.status == 201) {
-                        this.$emit('popup');
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            POST_DATA('/CMInfo', this.registration, () => { this.$emit('popup'); });
         },
         CANCEL() {
             this.$emit('popup');
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
     }
 };

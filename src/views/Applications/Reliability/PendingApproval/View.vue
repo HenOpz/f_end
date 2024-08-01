@@ -89,7 +89,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 
 //Components
@@ -208,87 +208,16 @@ export default {
       e.cancel = true;
     },
     FETCH_FAILURE_RECORD() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url: this.FAILURE_API,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.failureRecordList = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, this.FAILURE_API, 'failureRecordList');
     },
     DELETE_RECORD(e) {
-      axios({
-        method: "delete",
-        url: "/FailureRecord/delete-failure-record?id=" + e.key,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.FETCH_FAILURE_RECORD();
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      DELETE_DATA(`/FailureRecord/delete-failure-record?id=${e.key}`, () => { this.FETCH_FAILURE_RECORD(); });
     },
     FETCH_DROPDOWN_PLATFORM() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.platform = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-platform-list', 'platform');
     },
     FETCH_DROPDOWN_DISC() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-discipline-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.disc = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-discipline-list', 'disc');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", false);

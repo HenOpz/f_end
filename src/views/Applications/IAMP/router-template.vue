@@ -137,6 +137,14 @@ export default {
                     icon: "/img/svg/chart-column-solid.svg",
                     name: 'CM WO Management'
                 },
+                {
+                    line: true
+                },
+                {
+                    url: '/iamp/iamp-approval-process',
+                    icon: "/img/svg/user-lock-solid.svg",
+                    name: 'User Permission'
+                },
             ]
         };
     },

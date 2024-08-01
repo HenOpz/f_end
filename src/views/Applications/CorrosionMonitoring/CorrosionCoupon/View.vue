@@ -5,7 +5,7 @@
                 <div class="table-wrapper">
                     <DxDataGrid 
                         id="data-grid-list" 
-                        key-expr="id" 
+                        key-expr="id_tag" 
                         :data-source="ccList" 
                         :hover-state-enabled="true" 
                         :allow-column-reordering="true" 
@@ -47,11 +47,11 @@
                             alignment="left"
                         />
                         <DxColumn 
-                            data-field="latest_remove_date" 
+                            data-field="remove_lastest_date" 
                             caption="Latest Remove Date" 
                             :width="120" 
                             alignment="center"
-                            type="date"
+                            dataType="date"
                             format="dd MMM yyyy"
                         />
                         <DxColumn 
@@ -69,7 +69,7 @@
                             type="number"
                         />
                         <DxColumn 
-                            data-field="pitting_date" 
+                            data-field="pitting_rate" 
                             caption="Pitting Rate (mm/y)" 
                             :width="100" 
                             alignment="center"
@@ -79,7 +79,7 @@
 
                         <template #action-cell-template="{ data }">
                             <div class="action-wrapper">
-                                <div @click="SET_CURRENT_VIEW(2, data.data.id)">
+                                <div @click="SET_CURRENT_VIEW(2, data.data)">
                                     <img src="/img/svg/magnifying-glass-svg.svg" class="penSvg" />
                                 </div>
                                 <!-- <div @click="DELETE_RECORD(data)">
@@ -124,7 +124,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 // import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
@@ -185,8 +185,8 @@ export default {
             this.isProducedWater = this.CHECK_SYSTEM('produced-water');
             this.isSeaWater = this.CHECK_SYSTEM('sea-water');
             this.isPipeline = this.CHECK_SYSTEM('pipeline');
-            this.FETCH_DATA('/Md/get-md-platform-list', 'platformList');
-            this.FETCH_DATA('/CMInfo', 'ccList');
+            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
+            GET_DATA(this, this.listApiUrl, 'ccList');
         }
     },
     data() {
@@ -215,6 +215,13 @@ export default {
             else if(this.system == 'pipeline') return 4;
             else return 0;
         },
+        listApiUrl() {
+            if(this.system == 'cooling-medium') return '/CMInfo/get-tag-cooling-medium-view-in-corrosion-coupon'; 
+            else if(this.system == 'produced-water') return '/CMInfo/get-tag-produced-water-view-in-corrosion-coupon'; 
+            else if(this.system == 'sea-water') return '/CMInfo/get-tag-sea-water-view-in-corrosion-coupon'; 
+            else if(this.system == 'pipeline') return '/CMInfo/get-tag-pipeline-view-in-corrosion-coupon';
+            else return '';
+        },
     },
     methods: {
         EXPORT_DATA(e) {
@@ -232,35 +239,6 @@ export default {
                 });
             });
             e.cancel = true;
-        },
-        FETCH_DATA(url, targetVariable, callback) {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url: url,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        if (callback && typeof callback === 'function') {
-                            callback(res.data);
-                        } else {
-                            this.$set(this, targetVariable, res.data);
-                            if(url == '/CMInfo') {
-                                this.isShow = 0;
-                                this.ccList = this.ccList.filter(t => t.id_system == this.SYSTEM_ID && t.is_corrosion_coupon);
-                            }
-                        }
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
         },
         CHECK_SYSTEM(e) {
             if (this.system === e) return true;

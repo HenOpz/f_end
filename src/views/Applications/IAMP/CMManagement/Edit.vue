@@ -103,7 +103,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 
 //Components
@@ -195,31 +195,13 @@ export default {
   computed: {},
   methods: {
     FETCH_CM_WO_MANAGEMENT_RECORD() {
-      this.isLoading = true;
-      axios({
-        method: "get",
-        url:
-          "/HighlightActivities/" + this.id_record,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.cmManagementList = res.data;
-            this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-              subpageName: "HA NUMBER : " + this.cmManagementList.ha_number,
-              subpageInnerName: null,
-            });
-            console.log("cmManagementList", this.cmManagementList);
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
+      GET_DATA(this, `/HighlightActivities/${this.id_record}`, (data) => {
+        this.cmManagementList = data;
+        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
+          subpageName: "HA NUMBER : " + this.cmManagementList.ha_number,
+          subpageInnerName: null,
         });
+      });
     },
     UPDATE_RECORD() {
       if (this.cmManagementList.id_platform === null || 
@@ -228,87 +210,16 @@ export default {
           this.cmManagementList.report_date === null) 
           return;
       this.cmManagementList.report_date = moment(this.cmManagementList.report_date).format("L");
-      axios({
-        method: "put",
-        url: "/HighlightActivities/" + this.cmManagementList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.cmManagementList
-      })
-        .then(res => {
-          if (res.status == 204) {
-            this.SET_CURRENT_VIEW(0);
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      PUT_DATA(`/HighlightActivities/${this.cmManagementList.id}`, this.cmManagementList, () => { this.SET_CURRENT_VIEW(0); });
     },
     DELETE_RECORD() {
-      axios({
-        method: "delete",
-        url: "/HighlightActivities/delete-highlight-activities?id=" + this.cmManagementList.id,
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        }
-      })
-      .then(res => {
-        if (res.status == 204) {
-          this.SET_CURRENT_VIEW(0);
-        }
-      })
-      .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-      .finally(() => { });
+      DELETE_DATA(`/HighlightActivities/delete-highlight-activities?id=${this.cmManagementList.id}`, () => { this.SET_CURRENT_VIEW(0); });
     },
     FETCH_DROPDOWN_ASSET() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-asset-type-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.asset = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-asset-type-list', 'formSelect.asset');
     },
     FETCH_DROPDOWN_PLATFORM() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.platform = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-platform-list', 'formSelect.platform');
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);

@@ -14,7 +14,7 @@
                             {{ tab }}
                         </button>
                     </div>
-                    <div fill v-if="active_tab === tabs[0]" class="table-chart">
+                    <div fill v-if="active_tab === tabs[1]" class="table-chart">
                         <div class="chart-container">
                             <highcharts :options="chartOptions"  />
                         </div>
@@ -24,8 +24,8 @@
                         <div class="chart-container">
                             <highcharts :options="chartOptions"  />
                         </div>
-                    </div>
-                    <div fill v-if="active_tab === tabs[1]">
+                    </div> 
+                    <div fill v-if="active_tab === tabs[0]">
                         <DxDataGrid 
                             id="data-grid-list" 
                             key-expr="id" 
@@ -70,9 +70,15 @@
                                 alignment="center"
                             />
                             <DxColumn 
-                                data-field="comments" 
-                                caption="Comments" 
+                                data-field="note" 
+                                caption="Note" 
                                 :min-width="120" 
+                                alignment="center"
+                            />
+                            <DxColumn 
+                                data-field="id_probe_status" 
+                                caption="Probe Status" 
+                                :width="120" 
                                 alignment="center"
                             />
                             <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
@@ -175,7 +181,7 @@
 <script>
 /* eslint-disable */
 //API
-import { axios } from "/axios.js";
+import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
 import moment from "moment";
 import AddProbe from "./AddProbe.vue"
 import EditProbe from "./EditProbe.vue"
@@ -222,8 +228,7 @@ import {
 export default {
     name: "inspection-record",
     props: {
-        id_record: Number,
-        moc_no: String,
+        info: Object,
     },
     components: {
         DxDataGrid,
@@ -255,14 +260,14 @@ export default {
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "MOC Number: " + this.moc_no,
+            subpageName: "ER PROBE: " + this.info.tag_no,
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            // this.FETCH_DROPDOWN_NOC();
-            // this.FETCH_DROPDOWN_RRL();
-            // this.FETCH_DROPDOWN_STATUS();
-            // this.FETCH_MOC_RECORD();
+            // GET_DATA(this, '/Md/get-md-moc-noc-list', 'formSelect.noc');
+            // GET_DATA(this, '/Md/get-md-moc-rrl-list', 'formSelect.rrl');
+            // GET_DATA(this, '/Md/get-md-moc-status-list', 'formSelect.status');
+            // GET_DATA(this, `/ManagementOfChange/${this.id_record}`, 'mocList');
             this.chartOptions = {
                 credits: {
                 enabled: false
@@ -335,12 +340,13 @@ export default {
                 }
             ],
             chartOptions: {},
-            tabs: ['Summary Dashboard', 'Probe Record', 'Library'],
-            active_tab: 'Summary Dashboard',
+            tabs: ['Probe Record', 'Summary Dashboard'],
+            active_tab: 'Probe Record',
             isShow: 0,
             dataGridAttributes: {
                 class: "data-grid"
             },
+            id_tag: this.info.id_tag,
         };
     },
     computed: {},
@@ -348,135 +354,15 @@ export default {
         SET_IS_SHOW(val) {
             if (val) this.isShow = val;
         },
-        FETCH_MOC_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/ManagementOfChange/" + this.id_record,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.mocList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
         UPDATE_RECORD() {
             if (this.mocList.start_date !== null)
                 this.mocList.start_date = moment(this.mocList.start_date).format("L");
             if (this.mocList.expiry_date !== null)
                 this.mocList.expiry_date = moment(this.mocList.expiry_date).format("L");
-            axios({
-                method: "put",
-                url: "/ManagementOfChange/" + this.mocList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.mocList
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            PUT_DATA(`/ManagementOfChange/${this.mocList.id}`, this.mocList, () => { this.SET_CURRENT_VIEW(0); });
         },
         DELETE_RECORD() {
-            axios({
-                method: "delete",
-                url: "/ManagementOfChange/delete-management-of-change?id=" + this.mocList.id,
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    if (res.status == 204) {
-                        this.SET_CURRENT_VIEW(0);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
-        },
-        FETCH_DROPDOWN_NOC() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-noc-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.noc = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_STATUS() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-status-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.status = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
-        },
-        FETCH_DROPDOWN_RRL() {
-            axios({
-                method: "get",
-                url: "/Md/get-md-moc-rrl-list",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: {}
-            })
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.formSelect.rrl = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            DELETE_DATA(`/ManagementOfChange/delete-management-of-change?id=${this.mocList.id}`, () => { this.SET_CURRENT_VIEW(0); });
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);
@@ -510,12 +396,12 @@ export default {
     padding: 10px 40px;
     background-color: white;
     border: solid 1px gray;
-    border-radius: 10px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 12px;
     transition: 1s;
     cursor: pointer;
     margin-bottom: 15px;
+    width: 130px;
 }
 
 .table-wrapper {
@@ -554,12 +440,13 @@ export default {
 
         button {
             border-radius: 0;
-            padding: 5px;
-            width: 160px;
+            padding: 10px;
+            width: 130px;
         }
         .active {
             color: white;
-             background-color: $web-theme-color-secondary;
+            background-color: $web-theme-color-secondary;
+            border: solid 1px $web-theme-color-secondary;
         }
     }
 

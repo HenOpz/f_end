@@ -33,10 +33,6 @@ export default {
         highcharts: Chart
     },
     created() {
-        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "CM WO MANAGEMENT",
-            subpageInnerName: null,
-        });
     },
     data() {
         return {

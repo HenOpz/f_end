@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, DELETE_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
@@ -180,51 +180,12 @@ export default {
             e.cancel = true;
         },
         FETCH_INSPECTION_RECORD() {
-            this.isLoading = true;
-            axios({
-                method: "get",
-                url:
-                    "/InspectionCampaign",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                }
-            })
-                .then(res => {
-                    console.log("insp record:");
-                    console.log(res);
-                    if (res.status == 200 && res.data) {
-                        this.inspectionCampaignList = res.data;
-                    }
-                })
-                .catch(error => {
-                    console.log(error);
-                })
-                .finally(() => {
-                    this.isLoading = false;
-                });
+            GET_DATA(this, '/InspectionCampaign', 'inspectionCampaignList');
         },
         DELETE_RECORD(e) {
             this.$ons.notification.confirm("Confirm Delete Inspection Campaign?").then((res) => {
                 if (res == 1) {
-                    axios({
-                        method: "delete",
-                        url: "InspectionCampaign/delete-insp-campaign?id=" + e.key,
-                        headers: {
-                            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                        }
-                    })
-                        .then(res => {
-                            if (res.status == 204) {
-                                console.log("delete success");
-                                this.FETCH_INSPECTION_RECORD();
-                            }
-                        })
-                        .catch(error => {
-                            this.$ons.notification.alert(
-                                error.code + " " + error.response.status + " " + error.message
-                            );
-                        })
-                        .finally(() => { });
+                    DELETE_DATA(`InspectionCampaign/delete-insp-campaign?id=${e.key}`, () => { this.FETCH_INSPECTION_RECORD(); });
                 }
             });
         },
@@ -242,25 +203,7 @@ export default {
             }
         },
         FETCH_DROPDOWN_STATUS() {
-        axios({
-            method: "get",
-            url: "/Md/get-md-insp-campaign-status-list",
-            headers: {
-            Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-            },
-            data: {}
-        })
-            .then(res => {
-            if (res.status == 200 && res.data) {
-                this.status = res.data;
-            }
-            })
-            .catch(error => {
-            console.log(error);
-            })
-            .finally(() => {
-            this.isLoading = false;
-            });
+            GET_DATA(this, '/Md/get-md-insp-campaign-status-list', 'status');
         },
         SET_CURRENT_VIEW(view, data = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);

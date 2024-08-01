@@ -35,7 +35,7 @@
                 </div>
 
                 <div class="input-wrapper">
-                    <span>Area (in^2)</span>
+                    <span>Area (cm^2)</span>
                     <div class="input">
                         <DxNumberBox 
                             placeholder="Enter Area" 
@@ -84,17 +84,15 @@
 </template>
 
 <script>
-import { axios } from "/axios.js";
-import moment from "moment";
+import { POST_DATA } from "/axios.js";
+// import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
-//mport DxDateBox from 'devextreme-vue/date-box';
+// import DxDateBox from 'devextreme-vue/date-box';
 import DxNumberBox from "devextreme-vue/number-box";
 import DxTextBox from "devextreme-vue/text-box";
 
-
-
 export default {
-    name: "inspection-record",
+    name: "add-coupon-detail",
     components: {
         // DxDateBox,
         DxNumberBox,
@@ -110,7 +108,7 @@ export default {
         return {
             data: {
                 id: 0,
-                id_record: null,
+                id_record: this.id_record,
                 coupon_id: null,
                 material: null,
                 density: null,
@@ -127,30 +125,10 @@ export default {
     computed: {},
     methods: {
         CREATE_RECORD() {
-            console.log("pdf", this.mocList.moc_file_path);
-            if (this.mocList.start_date !== null)
-                this.mocList.start_date = moment(this.mocList.start_date).format("L");
-            if (this.mocList.expiry_date !== null)
-                this.mocList.expiry_date = moment(this.mocList.expiry_date).format("L");
-            axios({
-                method: "post",
-                url: "/ManagementOfChange",
-                headers: {
-                    Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-                },
-                data: this.mocList
-            })
-                .then(res => {
-                    if (res.status == 201) {
-                        console.log(res);
-                    }
-                })
-                .catch(error => {
-                    this.$ons.notification.alert(
-                        error.code + " " + error.response.status + " " + error.message
-                    );
-                })
-                .finally(() => { });
+            const user = JSON.parse(localStorage.getItem("user"));
+            this.data.created_by = user.id;
+            this.data.updated_by = user.id;
+            POST_DATA('/CMCorrosionCouponMonitorDetail', this.data, () => { this.$emit('popup', this.id_record); });
         },
     }
 };

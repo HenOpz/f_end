@@ -308,7 +308,7 @@
 </template> 
 
 <script>
-import { axios } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -409,398 +409,84 @@ export default {
       this.failureActionRecordList.action_date = this.failureActionRecordList.action_date ? moment(this.failureActionRecordList.action_date).format("L") : '';
       this.failureActionRecordList.created_by = user.id;
       this.failureActionRecordList.updated_by = user.id;
-      axios({
-        method: "post",
-        url: "/FailureActionRecord",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: this.failureActionRecordList
-      })
-        .then(res => {
-          console.log('FailureActionRecordRes',res);
-          if (res.status == 201) {
-            this.sapHeader.id_from_module = res.data.id;
-            this.sapHeader.id_reference = 'RR' + res.data.id;  
-            // this.sapHeader.description = (this.sapHeader.id_reference + '-' + this.sapHeader.equipment_no + '-' + this.failureActionRecordList.action_details).substring(0,41);
-            this.sapHeader.required_start_date = this.sapHeader.required_start_date ? moment(this.sapHeader.required_start_date).format("YYYYMMDD") : '';
-            this.sapHeader.required_end_date = this.sapHeader.required_end_date ? moment(this.sapHeader.required_end_date).format("YYYYMMDD") : '';
-            this.sapHeader.required_start_time = this.sapHeader.required_start_time ? moment(this.sapHeader.required_start_time).format("HHmmss") : null;
-            this.sapHeader.required_end_time = this.sapHeader.required_end_time ? moment(this.sapHeader.required_end_time).format("HHmmss") : null;
-            this.sapHeader.created_by = user.id;
-            this.sapHeader.updated_by = user.id;
-            axios({
-              method: "post",
-              url: "/SapHeader",
-              headers: {
-                Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-              },
-              data: this.sapHeader
-            }) 
-            .then(res => {
-              console.log('SapHeaderRes', res);
-              this.$emit('popup');
-            })
-            .catch(error => {
-              this.$ons.notification.alert(
-                error.code + " " + error.response.status + " " + error.message
-              );
-            })
-            .finally(() => {});
-          }
-        })
-        .catch(error => {
-          this.$ons.notification.alert(
-            error.code + " " + error.response.status + " " + error.message
-          );
-        })
-        .finally(() => {});
+      POST_DATA('/FailureActionRecord', this.failureActionRecordList, (data) => {
+        this.sapHeader.id_from_module = data.id;
+        this.sapHeader.id_reference = 'RR' + data.id;  
+        // this.sapHeader.description = (this.sapHeader.id_reference + '-' + this.sapHeader.equipment_no + '-' + this.failureActionRecordList.action_details).substring(0,41);
+        this.sapHeader.required_start_date = this.sapHeader.required_start_date ? moment(this.sapHeader.required_start_date).format("YYYYMMDD") : '';
+        this.sapHeader.required_end_date = this.sapHeader.required_end_date ? moment(this.sapHeader.required_end_date).format("YYYYMMDD") : '';
+        this.sapHeader.required_start_time = this.sapHeader.required_start_time ? moment(this.sapHeader.required_start_time).format("HHmmss") : null;
+        this.sapHeader.required_end_time = this.sapHeader.required_end_time ? moment(this.sapHeader.required_end_time).format("HHmmss") : null;
+        this.sapHeader.created_by = user.id;
+        this.sapHeader.updated_by = user.id;
+        POST_DATA('/SapHeader', this.sapHeader, () => { this.$emit('popup'); });
+      });
     },
     FETCH_FAILURE_ACTION_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-action-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.failureactionStatus = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-action-status-list', 'formSelect.failureactionStatus');
     },
     FETCH_DISCIPLINE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-discipline-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.discipline = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-discipline-list', 'formSelect.discipline');
     },
     FETCH_STATUS() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-failure-action-status-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.status = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-failure-action-status-list', 'formSelect.status');
     },
     FETCH_FUNC_LOCATION() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-functional-location-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.functionalLocation = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-functional-location-list', 'formSelect.functionalLocation');
     },
     FETCH_PLANNER_GRP() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-planner-grp-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.plannerGrp = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-planner-grp-list', 'formSelect.plannerGrp');
     },
     FETCH_PLANNER_GRP_PLANNING_PLANT() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-planner-grp-planning-plant-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.plannerGrpPlanning = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-planner-grp-planning-plant-list', 'formSelect.plannerGrpPlanning');
     },
     FETCH_MAIN_WORK_CTR() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-main-work-ctr-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.mainWorkCtr = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-main-work-ctr-list', 'formSelect.mainWorkCtr');
     },
     FETCH_OBJECT_PART_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-object-part-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.objectpartCode = res.data;
-            for(let i = 0; i < this.formSelect.objectpartCode.length; i++) {
-              this.formSelect.objectpartCode[i].ddl = this.formSelect.objectpartCode[i].object_part_code + "-" + this.formSelect.objectpartCode[i].object_part_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-object-part-code-list', (data) => {
+        this.formSelect.objectpartCode = data;
+        for(let i = 0; i < this.formSelect.objectpartCode.length; i++) {
+          this.formSelect.objectpartCode[i].ddl = this.formSelect.objectpartCode[i].object_part_code + "-" + this.formSelect.objectpartCode[i].object_part_text
+        }
+      });
     },
     FETCH_CODE_GROUP_OBJECT_PART() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-object-part-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpObjectpart = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-object-part-list', 'formSelect.codegrpObjectpart');
     },
     FETCH_CODE_GRP_DAMAGE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-damage-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpDamage = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-damage-list', 'formSelect.codegrpDamage');
     },
     FETCH_DAMAGE_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-damage-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.damageCode = res.data;
-            for(let i = 0; i < this.formSelect.damageCode.length; i++) {
-              this.formSelect.damageCode[i].ddl = this.formSelect.damageCode[i].damage_code + "-" + this.formSelect.damageCode[i].damage_code_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-damage-code-list', (data) => {
+        this.formSelect.damageCode = data;
+        for(let i = 0; i < this.formSelect.damageCode.length; i++) {
+          this.formSelect.damageCode[i].ddl = this.formSelect.damageCode[i].damage_code + "-" + this.formSelect.damageCode[i].damage_code_text
+        }
+      });
     },
     FETCH_CODE_GRP_CAUSE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-code-grp-cause-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.codegrpCause = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-code-grp-cause-list', 'formSelect.codegrpCause');
     },
     FETCH_CAUSE_CODE() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-cause-code-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.causeCode = res.data;
-            for(let i = 0; i < this.formSelect.causeCode.length; i++) {
-              this.formSelect.causeCode[i].ddl = this.formSelect.causeCode[i].cause_code + "-" + this.formSelect.causeCode[i].cause_text
-            }
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-cause-code-list', (data) => {
+        this.formSelect.causeCode = data;
+        for(let i = 0; i < this.formSelect.causeCode.length; i++) {
+          this.formSelect.causeCode[i].ddl = this.formSelect.causeCode[i].cause_code + "-" + this.formSelect.causeCode[i].cause_text
+        }
+      });
     },
     FETCH_ACCESSIBILITY() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-accessibility-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.accessibility = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-accessibility-list', 'formSelect.accessibility');
     },
     FETCH_SCAFFOLDING_REQ() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-sap-scaffolding-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            this.formSelect.scaffoldingReq = res.data;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-sap-scaffolding-list', 'formSelect.scaffoldingReq');
     },
     FETCH_PLATFORM() {
-      axios({
-        method: "get",
-        url: "/Md/get-md-platform-list",
-        headers: {
-          Authorization: "Bearer " + JSON.parse(localStorage.getItem("token"))
-        },
-        data: {}
-      })
-        .then(res => {
-          if (res.status == 200 && res.data) {
-            const platform = res.data.filter(p => p.id == this.id_platform);
-            this.sapHeader.planner_grp_planning_plant = platform[0].planning_plant;
-          }
-        })
-        .catch(error => {
-          console.log(error);
-        })
-        .finally(() => {
-          this.isLoading = false;
-        });
+      GET_DATA(this, '/Md/get-md-platform-list', (data) => {
+        const platform = data.filter(p => p.id == this.id_platform);
+        this.sapHeader.planner_grp_planning_plant = platform[0].planning_plant;
+      });
     },
     SET_CURRENT_VIEW(view, data = null) {
         this.$store.commit("SET_SHOW_BACK_BUTTON", true);
