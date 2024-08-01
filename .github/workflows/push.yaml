@@ -68,10 +68,3 @@ jobs:
         run: |
           docker tag mydockerimage:latest ${{ secrets.DOCKERHUB_USERNAME }}/fend:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/fend:latest
-
-      # - name: Push Docker image to Docker Hub
-      #   uses: docker/build-push-action@v2
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: ${{ secrets.DOCKERHUB_USERNAME }}/mydockerimage:latest

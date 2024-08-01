@@ -1,16 +1,15 @@
 services:
   backend:
-    image: cpoc-aims-ii-backend-dev-backend:latest
+    image: henopz/bend:latest
     ports:
-      - 7129:80
-      
+      - 3000:80
     networks:
       - my_network
     restart: always
   app:
-    image: front_end:latest
+    image: henopz/fend:latest
     ports:
-      - 8081:8081
+      - 8080:8081
     depends_on:
       - backend
     networks:
