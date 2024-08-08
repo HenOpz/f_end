@@ -105,7 +105,7 @@ export const PUT_DATA = (url, data, formOrCallback = null, callback = null) => {
         data: data
     })
         .then(res => {
-            if (res.status == 204) {
+            if (res.status == 204 || res.status == 200) {
                 if (typeof formOrCallback === 'function') {
                     if (res.data) formOrCallback(res.data);
                     else formOrCallback();
@@ -131,7 +131,7 @@ export const DELETE_DATA = (url, callback) => {
         }
     })
         .then(res => {
-            if (res.status == 204 || res.status == 201) {
+            if (res.status == 204 || res.status == 201 || res.status == 200) {
                 if (typeof callback === 'function') {
                     callback();
                 }

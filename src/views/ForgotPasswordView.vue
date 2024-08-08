@@ -12,8 +12,8 @@
         <img class="app-logo" :src="appIcon" alt="app icon" />
 
         <div class="app-description">
-          <h2>CPOC IMS</h2>
-          <h1>INSPECTION & MAINTENANCE SYSTEM</h1>
+          <h2>CPOC AIMS</h2>
+          <h1>ASSETS INTEGRITY MANAGEMENT SYSTEM</h1>
           <h3>CARIGALI-PTTEPI Operating Company Sdn. Bhd.</h3>
         </div>
 

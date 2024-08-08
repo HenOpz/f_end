@@ -485,7 +485,7 @@ export default {
         },
     },
     methods: {
-        CREATE_RECORD(e) {
+        CREATE_RECORD() {
             const user = JSON.parse(localStorage.getItem("user"));
             this.failureRecordList.created_by = user.id;
             this.failureRecordList.updated_by = user.id;
@@ -495,7 +495,6 @@ export default {
                 this.failureRecordList.findings_date = moment(
                     this.failureRecordList.findings_date
                 ).format("L");
-            console.log(e.data);
             POST_DATA("/FailureRecord", this.failureRecordList, (data) => {
                 this.SET_CURRENT_VIEW(2, data);
             });

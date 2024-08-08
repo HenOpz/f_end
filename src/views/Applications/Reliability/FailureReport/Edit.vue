@@ -1,43 +1,43 @@
 <template>
     <div>
         <div class="page-container">
-            <div class="action-bar">
-                <button
-                    class="back"
-                    @click="SET_CURRENT_VIEW(0)"
-                >
-                    <i class="fas fa-chevron-left"></i> BACK
-                </button>
-                <div class="wrapper">
-                    <div class="switch" 
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <div>
-                            <v-ons-switch
-                                style="padding: 0 !important; border: 0"
-                                input-id="switch1"
-                                v-model="btn_state"
-                            />
-                        </div>
-                        <span>EDIT MODE</span>
-                    </div>
-                    <button
-                        @click="UPDATE_RECORD"
-                        class="submit"
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <i class="fas fa-save"></i> SAVE
-                    </button>
-                    <button
-                        @click="DELETE_RECORD"
-                        class="delete"
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <i class="fas fa-trash-alt"></i> DELETE
-                    </button>
-                </div>
-            </div>
             <div class="page-section">
+                <div class="action-bar">
+                    <button
+                        class="back"
+                        @click="SET_CURRENT_VIEW(0)"
+                    >
+                        <i class="fas fa-chevron-left"></i> BACK
+                    </button>
+                    <div class="wrapper">
+                        <div class="switch" 
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <div>
+                                <v-ons-switch
+                                    style="padding: 0 !important; border: 0"
+                                    input-id="switch1"
+                                    v-model="btn_state"
+                                />
+                            </div>
+                            <span>EDIT MODE</span>
+                        </div>
+                        <button
+                            @click="UPDATE_RECORD"
+                            class="submit"
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <i class="fas fa-save"></i> SAVE
+                        </button>
+                        <button
+                            @click="DELETE_RECORD"
+                            class="delete"
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <i class="fas fa-trash-alt"></i> DELETE
+                        </button>
+                    </div>
+                </div>
                 <div class="table-wrapper">
                     <div class="input-wrapper">
                         <span>Tag Number</span>
@@ -127,10 +127,10 @@
 
                     <div class="input-wrapper">
                         <span>Findings Date</span>
-                        <div class="input">
+                        <div class="select">
                             <DxDateBox
                                 type="date"
-                                placeholder="Enter Production Loss"
+                                placeholder="Select Findings Date"
                                 :disabled="!btn_state"
                                 v-model="failureRecordList.findings_date"
                                 display-format="dd MMM yyyy"
@@ -958,6 +958,52 @@
             <div class="popup">
                 <h4>Are You Sure?</h4>
                 <p>Your report will be sent once you confirm it. Please note that you will not be able to make any changes after it has been submitted. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
                 <div class="actions">
                     <button
                         class="submit"
@@ -982,6 +1028,52 @@
             <div class="popup">
                 <h4>Are You Sure?</h4>
                 <p>Your report will be approved once you confirm it. Please note that you will not be able to make any changes after it has been approved. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
                 <div class="actions">
                     <button
                         class="submit"
@@ -1157,20 +1249,27 @@ export default {
         if (this.$store.state.status.server == true) {
             this.FETCH_FAILURE_RECORD();
             this.FETCH_LIBRARY();
-            this.FETCH_DROPDOWN_FAILURE_IMPACT();
-            this.FETCH_DROPDOWN_DISCIPLINE();
-            this.FETCH_DROPDOWN_PLATFORM_LIST();
-            this.FETCH_DROPDOWN_ACTION_STATUS();
-            this.FETCH_MAIN_WORK_CTR();
+            GET_DATA(this, "/Md/get-md-failure-impact-list", "formSelect.failureImpact");
+            GET_DATA(this, "/Md/get-md-failure-discipline-list", "formSelect.discipline");
+            GET_DATA(this, "/Md/get-md-platform-list", "formSelect.platform");
+            GET_DATA(this, "/Md/get-md-failure-action-status-list", "formSelect.actionStatus");
+            GET_DATA(this, "/Md/get-md-sap-main-work-ctr-list", "formSelect.mainWorkCtr");
             this.user = JSON.parse(localStorage.getItem("user"));
             GET_DATA(this, `FailureRecordTXN/get-last-failure-record-txn-by-id-failure?id_failure=${this.id_record}`, 'recordLastTXN', (data) => { 
                 this.currentStatusTXN = data.id_status;
                 this.currentUserTXN = data.id_user;
             });
+            GET_DATA(this, `/User/get-user-info-by-id-user?id=${this.user.id}`, (data) => {
+                this.userList = data.map(e => {
+                    return {id: e.id, code: e.name}
+                })
+                if (this.userList.length === 1) this.selectedUser.id_user_info = this.userList[0].id;
+            });
         }
     },
     data() {
         return {
+            userList: [],
             formSelect: {
                 platform: [],
                 failureImpact: [],
@@ -1257,7 +1356,17 @@ export default {
                     },
                 ],
             },
+            selectedUser: {
+                id_user_info: 0,
+                pin: {
+                    box1: null,
+                    box2: null,
+                    box3: null,
+                    box4: null
+                }
+            },
             failureRecordList: {},
+            appData: [],
             shortTermRecordList: {},
             longTermRecordList: {},
             btn_state: false,
@@ -1358,7 +1467,9 @@ export default {
                 this,
                 `/FailureRecord/${this.id_record}`,
                 "failureRecordList",
-                () => {
+                (data) => {
+                    this.failureRecordList = data.data;
+                    this.appData = data.app_data;
                     this.FETCH_SHORT_TERM_RECORD();
                     this.FETCH_LONG_TERM_RECORD();
                 }
@@ -1447,37 +1558,7 @@ export default {
                 "library"
             );
         },
-        FETCH_DROPDOWN_FAILURE_IMPACT() {
-            GET_DATA(
-                this,
-                "/Md/get-md-failure-impact-list",
-                "formSelect.failureImpact"
-            );
-        },
-        FETCH_DROPDOWN_DISCIPLINE() {
-            GET_DATA(
-                this,
-                "/Md/get-md-failure-discipline-list",
-                "formSelect.discipline"
-            );
-        },
-        FETCH_DROPDOWN_PLATFORM_LIST() {
-            GET_DATA(this, "/Md/get-md-platform-list", "formSelect.platform");
-        },
-        FETCH_DROPDOWN_ACTION_STATUS() {
-            GET_DATA(
-                this,
-                "/Md/get-md-failure-action-status-list",
-                "formSelect.actionStatus"
-            );
-        },
-        FETCH_MAIN_WORK_CTR() {
-            GET_DATA(
-                this,
-                "/Md/get-md-sap-main-work-ctr-list",
-                "formSelect.mainWorkCtr"
-            );
-        },
+
         ADD_NEW_FILE(e) {
             // const user = JSON.parse(localStorage.getItem("user"));
             console.log("e", e);
@@ -1553,53 +1634,57 @@ export default {
             else this.$emit("currentView", view);
         },
         SUBMIT_FAILURE_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
+            
             POST_DATA(
-                `/GpiRecordTXN/add-submit-txn?id_user=${this.user.id}&id_gpi=${this.id_record}`,
+                `/FailureRecordTXN/add-submit-txn?id_user=${this.user.id}&id_failure=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
                 {},
                 () => {
                     this.submitFailureRecord = false;
                     this.REFRESH_DATA();
                 }
             );
-            // POST_DATA(
-            //     `/FailureRecordTXN/add-submit-txn?id_user=${this.user.id}&id_failure=${this.data_row.id}`,
-            //     {}
-            // );
         },
         APPROVE_FAILURE_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
             POST_DATA(
-                `/GpiRecordTXN/add-appr-txn?id_user=${this.user.id}&id_gpi=${this.id_record}`,
+                `/FailureRecordTXN/add-appr-txn?id_user=${this.user.id}&id_failure=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
                 {},
                 () => {
                     this.approveFailureRecord = false;
                     this.REFRESH_DATA();
                 }
             );
-            // POST_DATA(
-            //     `/FailureRecordTXN/add-submit-txn?id_user=${this.user.id}&id_failure=${this.data_row.id}`,
-            //     {}
-            // );
         },
         REJECT_FAILURE_RECORD() {
             POST_DATA(
-                `/GpiRecordTXN/add-reject-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&remark=${this.rejectGpiRemark}`,
+                `/FailureRecordTXN/add-reject-txn?id_user=${this.user.id}&id_failure=${this.id_record}&remark=${this.rejectFailureRemark}`,
                 {},
                 () => {
                     this.rejectFailureRecord = false;
                     this.REFRESH_DATA();
                 }
             );
-            // POST_DATA(
-            //     `/FailureRecordTXN/add-reject-txn?id_user=${this.user.id}&id_failure=${this.data_row.id}&remark=${this.rejectFailureRemark}`,
-            //     {}
-            // );
         },
         REFRESH_DATA() {
-            GET_DATA(
-                this,
-                `/FailureRecord/${this.id_record}`,
-                "failureRecordList",
-                () => {
+            GET_DATA(this, `/FailureRecord/${this.id_record}`, "failureRecordList",
+                (data) => {
+                    this.failureRecordList = data.data;
+                    this.appData = data.app_data;
                     this.FETCH_SHORT_TERM_RECORD();
                     this.FETCH_LONG_TERM_RECORD();
                 }
@@ -1650,17 +1735,15 @@ export default {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 51px calc(100vh - 95px);
+    grid-template-rows: 0px calc(100vh - 95px);
     transition: all 0.3s;
-    // overflow-y: hidden;
 }
 
 .page-section {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     overflow-y: auto;
-    height: calc(100% - 270px);
+    height: calc( 100vh - 270px);
     grid-row: span 2;
-    margin-top: 60px;
 }
 
 .risk-matrix {
@@ -1854,5 +1937,31 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: $dexon-primary-blue;
+}
+.popup {
+    .select-wrapper {
+        
+        span {
+            font-size: 14px;
+        }
+        .select {
+            
+        }
+    }
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+        width: 200px;
+        span {
+            font-size: 14px;
+        }
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+    }
 }
 </style>

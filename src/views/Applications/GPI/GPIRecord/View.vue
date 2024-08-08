@@ -30,7 +30,7 @@
                     data-field="id_platform" 
                     caption="Platform" 
                     alignment="center" 
-                    :width="90"
+                    :width="100"
                 >
                     <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
                 </DxColumn>
@@ -70,7 +70,7 @@
                     data-type="date"
                     format="dd MMM yyyy" 
                     alignment="center" 
-                    :width="100"
+                    :width="120"
                 >
                 </DxColumn>
                 <DxColumn 
@@ -122,13 +122,15 @@
                 />
                 <template #masterDetailTemplate="{ data }">
                     <div>
-                    GPI Number: {{ data.data.gpi_number }}<br>
-                    Main Component: {{ data.data.main_component_free_text }}<br>
-                    Repair Description: {{ data.data.repair_type_free_text }}<br>
-                    Damage Mechanism / Findings:
-                    <textarea readonly :value="data.data.dmg_mech_findings" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
-                    Recommendation:
-                    <textarea readonly :value="data.data.recommendation" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
+                        GPI Number: {{ data.data.gpi_number }}<br>
+                        Main Component: {{ data.data.main_component_free_text }}<br>
+                        Repair Description: {{ data.data.repair_type_free_text }}<br>
+                        Damage Mechanism / Findings:
+                        <textarea readonly :value="data.data.dmg_mech_findings" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
+                        Recommendation:
+                        <textarea readonly :value="data.data.recommendation" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
+                        Transaction:
+                        <TxnList :row="data" />
                     </div>
                 </template>
                 <!-- <DxFilterRow :visible="true" /> -->
@@ -165,6 +167,7 @@ import {
     DxHeaderFilter,
     DxMasterDetail,
 } from "devextreme-vue/data-grid";
+import TxnList from "./TxnList.vue";
 
 export default {
     name: "gpi-record",
@@ -181,6 +184,7 @@ export default {
         DxFilterRow,
         DxHeaderFilter,
         DxMasterDetail,
+        TxnList,
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -283,7 +287,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     overflow-y: auto;
     grid-row: span 2;
 }

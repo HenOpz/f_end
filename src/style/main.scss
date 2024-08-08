@@ -17,7 +17,7 @@ $web-theme-color-tertiary: #eb1851;
 $web-theme-color-lightgrey: #F6F6F6;
 
 $dexon-primary-red: #eb1851;
-$dexon-primary-green: #1D9531;
+$dexon-primary-green: #5A7F43;
 $dexon-primary-blue: #140a4b;
 $dexon-primary-gray: #828282;
 $dexon-primary-gray-light: #eee;
@@ -726,13 +726,13 @@ hr {
 #data-grid-list td[role="columnheader"] {
     text-align: center !important;
     vertical-align: middle;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     height: 50px !important;
 }
 
 #data-grid-list td[role="gridcell"] {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 500;
     vertical-align: middle;
     cursor: pointer !important;
@@ -1946,14 +1946,15 @@ td[role="gridcell"] {
 }
 
 .action-bar {
-    position: fixed;
+    position: sticky;
+    top: 0;
     z-index: 50;
     background-color: white;
     display: flex;
     flex-direction: row;
     gap: 20px;
     padding: 10px 20px;
-    width: calc(100% - 240px);
+    // width: 100%;
     justify-content: space-between;
 
     .wrapper {
@@ -2039,6 +2040,12 @@ td[role="gridcell"] {
         gap: 10px
     }
 }
+
+// @media (max-width: 1024px) {
+//     .action-bar {
+//         width: calc(100% - 134px);
+//     }
+// }
 
 .dx-state-disabled.dx-selectbox .dx-texteditor-input {
     background-color: #eee;
@@ -2171,5 +2178,24 @@ td[role="gridcell"] {
             background-color: $dexon-primary-red;
             border-color: $dexon-primary-red;
         }
+    }
+}
+
+.library-btn-download {
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 6px;
+    border: 1px solid gray;
+    padding: 8px;
+    color: #3c3c3c;
+    background: transparent;
+
+    i {
+        font-weight: 900;
+    }
+
+    &:hover {
+        transition: 0.4s;
+        background: #d8d8d8;
     }
 }

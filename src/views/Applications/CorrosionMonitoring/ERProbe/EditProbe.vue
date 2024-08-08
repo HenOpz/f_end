@@ -55,7 +55,7 @@
                         <DxSelectBox
                             :items="probeList"
                             value-expr="id"
-                            display-expr="code"
+                            display-expr="status"
                             placeholder="Select Status"
                             v-model="data.id_probe_status"
                         />
@@ -72,7 +72,7 @@
 </template>
 
 <script>
-import { POST_DATA } from "/axios.js";
+import { GET_DATA, PUT_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from "devextreme-vue/select-box";
@@ -86,7 +86,6 @@ export default {
     name: "edit-probe-record",
     props: {
         id_record: Number,
-        moc_no: String,
     },
     components: {
         DxSelectBox,
@@ -96,43 +95,22 @@ export default {
     },
     created() {
         if (this.$store.state.status.server == true) {
-            this.probeList = [
-                {
-                    id: 1,
-                    code: "Applicable",
-                },
-                {
-                    id: 2,
-                    code: "Not Applicable",
-                },
-            ];
+            GET_DATA(this, '/CMERProbeRecord/' + this.id_record, 'data');
+            GET_DATA(this, '/Md/get-md-cm-probe-status-list', 'probeList');
         }
     },
     data() {
         return {
-            data: {
-                id: 0,
-                id_tag: this.id_tag,
-                record_date: null,
-                probe_type: null,
-                part_no: null,
-                probe_id: null,
-                metal_loss: null,
-                corrosion_rate: null,
-                note: null,
-                id_probe_status: null,
-            },
+            data: {},
             probeList: [],
         };
     },
     computed: {},
     methods: {
         UPDATE_RECORD() {
-            if (this.mocList.start_date !== null)
-                this.mocList.start_date = moment(this.mocList.start_date).format("L");
-            if (this.mocList.expiry_date !== null)
-                this.mocList.expiry_date = moment(this.mocList.expiry_date).format("L");
-            POST_DATA(`/ManagementOfChange/${this.mocList.id}`, this.mocList, () => { this.SET_CURRENT_VIEW(0); });
+            if (this.data.record_date !== null)
+                this.data.record_date = moment(this.data.record_date).format("L");
+            PUT_DATA(`/CMERProbeRecord/${this.data.id}`, this.data, () => { this.$emit('popup'); });
         },
     }
 };

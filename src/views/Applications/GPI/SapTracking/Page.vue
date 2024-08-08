@@ -3,9 +3,9 @@
         <div class="page-section">
             <div class="table-wrapper">
                 <DxDataGrid
-                    id="data-grid-dashboard" 
+                    id="data-grid-list" 
                     key-expr="id" 
-                    :data-source="gpiApprProcessList"
+                    :data-source="sapHeaderList"
                     :hover-state-enabled="true" 
                     :allow-column-reordering="true"
                     :show-borders="true" 
@@ -13,51 +13,75 @@
                     :row-alternation-enabled="false"
                     :word-wrap-enabled="true" 
                     :column-auto-width="true"
-                    @row-inserted="CREATE_RECORD"
-                    @row-updated="UPDATE_RECORD"
-                    @row-removed="DELETE_RECORD"
+                    style="font-size: 12px;"
                 >
                     <DxEditing 
-                        :allow-updating="true"
-                        :allow-deleting="true" 
-                        :allow-adding="true"
+                        :allow-updating="false"
+                        :allow-deleting="false" 
+                        :allow-adding="false"
                         :use-icons="true"
                         mode="row" 
                     />
                     <DxFilterRow :visible="true" />
                     <DxHeaderFilter :visible="true" />
                     <DxColumn 
-                        data-field="seq" 
-                        caption="Seq." 
-                        :width="100" 
+                        data-field="wo_order_no" 
+                        caption="Work Order" 
+                        :width="120" 
                         alignment="center" 
-                        :editor-options="{ placeholder: 'Seq.' }"
                     />
                     <DxColumn 
-                        data-field="id_user" 
-                        caption="Account" 
+                        data-field="description" 
+                        caption="Description" 
                         :min-width="120" 
                         alignment="left"
-                        :editor-options="{ placeholder: 'Select Account' }"
-                    >
-                        <DxLookup :data-source="userList" display-expr="username" value-expr="id" />
-                    </DxColumn>
-                    <DxColumn 
-                        data-field="authorized_name" 
-                        caption="Permission Description" 
-                        :min-width="120" 
-                        alignment="left"
-                        :editor-options="{ placeholder: 'Permission Description' }"
                     />
                     <DxColumn 
-                        data-field="id_discipline" 
-                        caption="Discipline" 
+                        data-field="main_workctr" 
+                        caption="Main WorkCtr" 
+                        :width="100" 
+                        alignment="center"
+                    />
+                    <DxColumn 
+                        data-field="required_start_date" 
+                        caption="Required Start Date" 
+                        :width="120" 
+                        data-type="date"
+                        alignment="center"
+                        format="dd MMM yyyy"
+                    />
+                    <DxColumn 
+                        data-field="required_end_date" 
+                        caption="Required End Date" 
+                        :width="120" 
+                        data-type="date"
+                        alignment="center"
+                        format="dd MMM yyyy"
+                    />
+                    <DxColumn 
+                        data-field="additional_data" 
+                        caption="Additional" 
                         :min-width="120" 
                         alignment="left"
-                        :editor-options="{ placeholder: 'Select Discipline' }"
-                    >
-                        <DxLookup :data-source="discList" display-expr="code" value-expr="id" />
-                    </DxColumn>
+                    />
+                    <DxColumn 
+                        data-field="accessibility" 
+                        caption="Accessibility" 
+                        :width="130" 
+                        alignment="center"
+                    />
+                    <DxColumn 
+                        data-field="scaffolding_requirement" 
+                        caption="Scaffolding Req." 
+                        :width="120" 
+                        alignment="center"
+                    />
+                    <DxColumn 
+                        data-field="system_status" 
+                        caption="System Status" 
+                        :width="120" 
+                        alignment="center"
+                    />
 
                     <!-- Configuration goes here -->
                     <!-- <DxFilterRow :visible="true" /> -->
@@ -74,7 +98,7 @@
 </template>
 
 <script>
-import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
+import { GET_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
@@ -94,11 +118,11 @@ import {
     DxEditing,
     DxFilterRow,
     // DxToolbar
-    DxLookup,
+    // DxLookup,
 } from "devextreme-vue/data-grid";
 
 export default {
-    name: "gpi-user-permission",
+    name: "gpi-sap-tracking",
     components: {
         DxDataGrid,
         DxSearchPanel,
@@ -114,29 +138,20 @@ export default {
         // DxToolbar,
         // DxItem,
         // DxButton
-        DxLookup,
+        // DxLookup,
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "USER PERMISSION",
+            subpageName: "SAP TRACKING",
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            GET_DATA(this, '/User/get-active-user-list', null, 
-                (data) => {
-                    this.userList = data;
-                    GET_DATA(this, '/Md/get-md-gpi-discipline-list', 'discList');
-                    GET_DATA(this, '/GpiRecordAuth/gpi-record-auth-list', 'gpiApprProcessList');
-                }
-            );
+            GET_DATA(this, `/SapHeader/get-sap-header-by-module?id_module=${6}`, 'sapHeaderList');
         }
     },
     data() {
         return {
-            active_tab: 1,
-            gpiApprProcessList: [],
-            userList: [],
-            discList: [],
+            sapHeaderList: [],
         };
     },
     computed: {},
@@ -156,17 +171,6 @@ export default {
                 });
             });
             e.cancel = true;
-        },
-        CREATE_RECORD(e) {
-            e.data.id = 0;
-            e.data.is_active = true;
-            POST_DATA('/GpiRecordAuth/add-gpi-record-auth', e.data, () => { GET_DATA(this, '/GpiRecordAuth/gpi-record-auth-list', 'gpiApprProcessList'); });
-        },
-        UPDATE_RECORD(e) {
-            PUT_DATA(`/GpiRecordAuth/edit-gpi-record-auth?id=${e.data.id}`, e.data, () => { GET_DATA(this, '/GpiRecordAuth/gpi-record-auth-list', 'gpiApprProcessList'); });
-        },
-        DELETE_RECORD(e) {
-            DELETE_DATA(`/GpiRecordAuth/delete-gpi-record-auth?id=${e.key}`, () => { GET_DATA(this, '/GpiRecordAuth/gpi-record-auth-list', 'gpiApprProcessList'); });
         },
     }
 };

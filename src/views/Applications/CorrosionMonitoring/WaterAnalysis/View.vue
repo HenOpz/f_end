@@ -146,7 +146,7 @@
                 <template #addButton>
                     <DxButton
                     icon="las la-plus"
-                    @click="ADD_ROW"
+                    @click="CREATE_ROW"
                     hint="Add"
                     />
                 </template>
@@ -165,6 +165,161 @@
                 />
                 <DxExport :enabled="false" />
                 </DxDataGrid>
+                <br>
+                <div
+                    class="table-header-toolbar left"
+                    style="width: calc(100% - 231px)"
+                >
+                    <label class="hd">Attachment</label>
+                </div>
+                <DxDataGrid 
+                    id="data-grid-list" 
+                    key-expr="id" 
+                    :ref="gridRefNameAttachment" 
+                    :data-source="library"
+                    :hover-state-enabled="true" 
+                    :allow-column-reordering="true" 
+                    :show-borders="true"
+                    :show-row-lines="true" 
+                    :focused-row-enabled="false" 
+                    :row-alternation-enabled="false"
+                    @row-inserted="ADD_NEW_FILE" 
+                    @row-removed="DELETE_DOC" 
+                    @init-new-row="() => {
+                        this.file = [];
+                        this.isEdit = false;
+                    }" 
+                    @editing-start="(e) => {
+                        this.file = [];
+                        this.isEdit = true;
+                        this.dataFileTemp = e;
+                    }" 
+                    @row-removing="() => {
+                        this.isEdit = false;
+                    }" 
+                    @saved="SAVE"
+                >
+                    <DxEditing 
+                        :allow-deleting="true" 
+                        :allow-adding="true" 
+                        :allow-updating="true" 
+                        :use-icons="true"
+                        :show-borders="true" 
+                        mode="popup"
+                    >
+                        <DxPopup
+                            :show-title="true"
+                            :width="650"
+                            :height="300"
+                            title="Attachment"
+                        />
+                        <DxForm label-location="top">
+                            <DxItem :col-count="2" :col-span="2" :row-count="1" item-type="group">
+                                <DxItem item-type="group">
+                                    <DxItem data-field="file" :col-span="1" />
+                                </DxItem>
+                                <DxItem item-type="group">
+                                    <DxItem data-field="note" :col-span="1" />
+                                </DxItem>
+                            </DxItem>
+                        </DxForm>
+                    </DxEditing>
+
+                    <DxColumn 
+                        data-field="file" 
+                        :visible="false" 
+                        edit-cell-template="insertCellTemplate" 
+                    />
+
+                    <DxColumn 
+                        data-field="file_name" 
+                        :allow-adding="true" 
+                        :allow-editing="true" 
+                        caption="File Name"
+                        :editor-options="fileNameInputOptions" 
+                        sort-order="desc" 
+                        :min-width="120" 
+                    />
+
+                    <DxColumn 
+                        data-field="note" 
+                        caption="Note" 
+                        :min-width="120" 
+                        alignment="left" 
+                    />
+
+                    <DxColumn 
+                        data-field="file_type" 
+                        caption="Extension" 
+                        :width="120" 
+                        alignment="center" 
+                    />
+
+                    <DxColumn 
+                        data-field="created_date" 
+                        caption="Uploaded Date" 
+                        :width="120" 
+                        alignment="center"
+                        format="dd MMM yyyy" 
+                        data-type="date" 
+                        header-cell-template="dateHeader"
+                    />
+
+                    <template #dateHeader>
+                        <div>Uploaded<br />Date</div>
+                    </template>
+
+                    <DxColumn
+                        data-field="file_path" 
+                        cell-template="pathCellTemplate" 
+                        caption="Attachment"
+                        :width="120" 
+                        alignment="center" 
+                    />
+
+                    <template #insertCellTemplate>
+                        <div class="widget-container">
+                            <DxFileUploader 
+                                id="file-uploader" 
+                                :multiple="false" 
+                                upload-mode="useForm"
+                                @value-changed="VALUE_CHANGE" 
+                                :visible="true" 
+                            />
+                        </div>
+                    </template>
+
+                    <!-- <template #noteCellTemplate="{ data }">
+                        <div>
+                            <DxTextArea :height="100" :value="data.data.value" placeholder="Enter Note" />
+                        </div>
+                    </template> -->
+
+                    <template #pathCellTemplate="{ data }">
+                        <div>
+                            <button class="library-btn-download" @click="DOWNLOAD(data.value, data.data.file_name)">
+                                <i class="fa-regular fa-circle-down"></i>
+                                DOWNLOAD</button>
+                        </div>
+                    </template>
+
+                    <DxToolbar>
+                        <DxItem location="after" template="addButton" />
+                        <DxItem location="after" name="searchPanel" />
+                    </DxToolbar>
+                    <template #addButton>
+                        <DxButton icon="las la-plus" @click="ADD_ROW" hint="Add" />
+                    </template>
+
+                    <DxHeaderFilter :visible="true" />
+                    <!-- <DxFilterRow :visible="false" /> -->
+                    <DxScrolling mode="standard" />
+                    <DxSearchPanel :visible="true" />
+                    <DxPaging :page-size="10" :page-index="0" />
+                    <DxPager :visible="false" :show-page-size-selector="true" :allowed-page-sizes="[5, 10, 'all']"
+                        :show-navigation-buttons="true" :show-info="true" info-text="Page {0} of {1} ({2} items)" />
+                    <DxExport :enabled="false" />
+                </DxDataGrid>
             </div>
         </div>
         <AddTagRegistration 
@@ -181,7 +336,7 @@
 </template> 
 
 <script>
-import { GET_DATA } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
@@ -191,6 +346,7 @@ import saveAs from "file-saver";
 import { exportDataGrid } from "devextreme/excel_exporter";
 import { DxItem } from "devextreme-vue/form";
 import DxButton from "devextreme-vue/button";
+import { DxFileUploader } from 'devextreme-vue/file-uploader';
 
 import {
     DxDataGrid,
@@ -205,9 +361,10 @@ import {
     DxLookup,
     DxFilterRow,
     DxHeaderFilter,
+    DxForm,
+    DxPopup
     // DxButton,
     // DxFormItem,
-    // DxForm
 } from "devextreme-vue/data-grid";
 
 export default {
@@ -221,13 +378,15 @@ export default {
         DxColumn,
         DxExport,
         DxToolbar,
-        // DxForm,
+        DxForm,
         DxItem,
         DxEditing,
         DxLookup,
         DxFilterRow,
         DxHeaderFilter,
         DxButton,
+        DxPopup,
+        DxFileUploader,
         // DXButton,
         // DxFormItem,
         // penSvg,
@@ -249,6 +408,7 @@ export default {
             GET_DATA(this, '/Md/get-md-cm-water-analysis-status-list/', 'dissolvedStatusList');
             GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
             GET_DATA(this, this.listApiUrl, 'waterAnalysisList');
+            this.FETCH_LIBRARY();
         }
     },
     data() {
@@ -268,6 +428,12 @@ export default {
             isProducedWater: false,
             isSeaWater: false,
             isPipeline: false,
+            library: [],
+            file: [],
+            gridRefNameAttachment: "grid-library",
+            fileNameInputOptions: { placeholder: "File Name" },
+            dataFileTemp: "",
+            isEdit: false,
         };
     },
     computed: {
@@ -322,8 +488,71 @@ export default {
                 e.cellElement.style.backgroundColor = '#fff';
             }
         },
-        ADD_ROW() {
+        CREATE_ROW() {
             this.isShow = 1
+        },
+        FETCH_LIBRARY() {
+            GET_DATA(this, `/CMWaterAnalysisLibrary`, 'library');
+        },
+        ADD_NEW_FILE(e) {
+            var formData = new FormData();
+            formData.append("id_system", this.SYSTEM_ID);
+            formData.append("file", this.file);
+            formData.append("note", e.data.note);
+            if (this.file.length == 0)
+                return this.$ons.notification.alert("Please select file").then(res => {
+                    if (res == 0) {
+                        this.FETCH_LIBRARY();
+                    }
+                });
+            POST_DATA('/CMWaterAnalysisLibrary', formData, true, () => { this.FETCH_LIBRARY(); });
+        },
+        UPDATE_DOC(e) {
+            console.log("e.data", e.data);
+            var formData = new FormData();
+            formData.append("id", e.data.id);
+            formData.append("id_system", this.SYSTEM_ID);
+            formData.append("file", this.file ?? "");
+            formData.append("note", e.data.note);
+            PUT_DATA(`/CMWaterAnalysisLibrary/${e.data.id}`, formData, true, () => { this.FETCH_LIBRARY(); });
+        },
+        VALUE_CHANGE(e) {
+            //console.log("fileReader e data:");
+            console.log(e);
+            console.log(e.value[0].name);
+            let reader = new FileReader();
+            reader.readAsDataURL(e.value[0]);
+            reader.onload = () => {
+                // this function is for showing the image preview on upload
+            };
+            this.file = e.value[0];
+        },
+        SAVE(e) {
+            console.log(e);
+            console.log(this.file);
+            if((e.changes.length > 0 || this.file.size > 0) && this.isEdit) {
+                console.log('save');
+                this.UPDATE_DOC(this.dataFileTemp);
+            }
+        },
+        DOWNLOAD(p,n) {
+            console.log(this.baseURL + p);
+            const url = this.baseURL + p;
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", n);
+            link.setAttribute("target", "_blank");
+            document.body.appendChild(link);
+            link.click();
+        },
+        DELETE_DOC(e) {
+            const id = e.data.id;
+            DELETE_DATA(`/CMWaterAnalysisLibrary/${id}`, () => { this.FETCH_LIBRARY(); });
+        },
+        ADD_ROW() {
+            var grid = this.$refs[this.gridRefNameAttachment].instance;
+            grid.addRow();
+            grid.deselectAll();
         },
     }
 };
@@ -385,7 +614,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     height: calc(100vh - 235px);
     overflow-y: auto;
     grid-row: span 2;
@@ -395,7 +624,13 @@ export default {
     padding-bottom: 20px;
 }
 
-.table-wrapper {
-    margin-bottom: 200px;
+.hd {
+    line-height: 36px;
+    user-select: text;
+    cursor: text;
+    font-size: 16px;
+    font-weight: 600;
+    color: $dexon-primary-blue;
 }
+
 </style>

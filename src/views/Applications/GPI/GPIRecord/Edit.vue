@@ -1,45 +1,45 @@
 <template>
     <div>
         <div class="page-container">
-            <div class="action-bar">
-                <button
-                    class="back"
-                    @click="()=>{this.$router.go(-1)}"
-                >
-                    <i class="fas fa-chevron-left"></i> BACK
-                </button>
-                <div class="wrapper">
-                    <div
-                        class="switch"
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <div>
-                            <v-ons-switch
-                                style="padding: 0 !important; border: 0"
-                                input-id="switch1"
-                                v-model="btn_state"
-                            />
-                        </div>
-                        <span>EDIT MODE</span>
-                    </div>
-
-                    <button
-                        @click="UPDATE_RECORD"
-                        class="submit"
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <i class="fas fa-save"></i> SAVE
-                    </button>
-                    <button
-                        @click="SET_CURRENT_VIEW(0)"
-                        class="delete"
-                        v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
-                    >
-                        <i class="fas fa-trash-alt"></i> DELETE
-                    </button>
-                </div>
-            </div>
             <div class="page-section">
+                <div class="action-bar">
+                    <button
+                        class="back"
+                        @click="()=>{this.$router.go(-1)}"
+                    >
+                        <i class="fas fa-chevron-left"></i> BACK
+                    </button>
+                    <div class="wrapper">
+                        <div
+                            class="switch"
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <div>
+                                <v-ons-switch
+                                    style="padding: 0 !important; border: 0"
+                                    input-id="switch1"
+                                    v-model="btn_state"
+                                />
+                            </div>
+                            <span>EDIT MODE</span>
+                        </div>
+
+                        <button
+                            @click="UPDATE_RECORD"
+                            class="submit"
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <i class="fas fa-save"></i> SAVE
+                        </button>
+                        <button
+                            @click="SET_CURRENT_VIEW(0)"
+                            class="delete"
+                            v-if="this.user.id == this.currentUserTXN && this.currentStatusTXN != 3"
+                        >
+                            <i class="fas fa-trash-alt"></i> DELETE
+                        </button>
+                    </div>
+                </div>
                 <div class="table-wrapper">
                     <div
                         span-2
@@ -547,6 +547,52 @@
             <div class="popup">
                 <h4>Are You Sure?</h4>
                 <p>Your report will be sent once you confirm it. Please note that you will not be able to make any changes after it has been submitted. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
                 <div class="actions">
                     <button
                         class="submit"
@@ -571,6 +617,52 @@
             <div class="popup">
                 <h4>Are You Sure?</h4>
                 <p>Your report will be approved once you confirm it. Please note that you will not be able to make any changes after it has been approved. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
                 <div class="actions">
                     <button
                         class="submit"
@@ -676,8 +768,14 @@ export default {
     created() {
         if (this.$store.state.status.server == true) {
             GET_DATA(this, `/GpiRecord/${this.id_record}`, "gpiRecordList", (data) => {
+                const resultArray = []
+                for (const [key, value] of Object.entries(data)) {
+                    resultArray.push({key: key, value: value});
+                }
+                this.gpiRecordList = resultArray[0].value;
+
                 this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-                    subpageName: "GPI NUMBER: " + data.gpi_number,
+                    subpageName: "GPI NUMBER: " + this.gpiRecordList.gpi_number,
                     subpageInnerName: null,
                 });
             }, (errorMsg) => {
@@ -723,11 +821,18 @@ export default {
                 "library"
             );
             this.user = JSON.parse(localStorage.getItem("user"));
+            GET_DATA(this, `/User/get-user-info-by-id-user?id=${this.user.id}`, (data) => {
+                this.userList = data.map(e => {
+                    return {id: e.id, code: e.name}
+                })
+                if (this.userList.length === 1) this.selectedUser.id_user_info = this.userList[0].id;
+            });
             console.log("user", this.user);
         }
     },
     data() {
         return {
+            userList: [],
             platformList: [],
             assetTypeList: [],
             mainComponentList: [],
@@ -741,6 +846,15 @@ export default {
             gpiRecordList: {},
             statusList: [],
             recordLastTXN: [],
+            selectedUser: {
+                id_user_info: 0,
+                pin: {
+                    box1: null,
+                    box2: null,
+                    box3: null,
+                    box4: null
+                }
+            },
             file: [],
             library: [],
             gridRefName: "grid-library",
@@ -922,8 +1036,16 @@ export default {
                 });
         },
         SUBMIT_GPI_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
             POST_DATA(
-                `/GpiRecordTXN/add-submit-txn?id_user=${this.user.id}&id_gpi=${this.id_record}`,
+                `/GpiRecordTXN/add-submit-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
                 {},
                 () => {
                     this.submitGpiRecord = false;
@@ -932,8 +1054,16 @@ export default {
             );
         },
         APPROVE_GPI_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
             POST_DATA(
-                `/GpiRecordTXN/add-appr-txn?id_user=${this.user.id}&id_gpi=${this.id_record}`,
+                `/GpiRecordTXN/add-appr-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
                 {},
                 () => {
                     this.approveGpiRecord = false;
@@ -953,7 +1083,13 @@ export default {
         },
         REFRESH_DATA() {
             this.approveGpiRecordWithSap = false
-            GET_DATA(this, `/GpiRecord/${this.id_record}`, "gpiRecordList");
+            GET_DATA(this, `/GpiRecord/${this.id_record}`, "gpiRecordList", (data) => {
+                const resultArray = []
+                for (const [key, value] of Object.entries(data)) {
+                    resultArray.push({key: key, value: value});
+                }
+                this.gpiRecordList = resultArray[0].value;
+            });
             GET_DATA(
                 this,
                 `/GpiRecordTXN/get-last-gpi-record-txn-by-id-gpi?id_gpi=${this.id_record}`,
@@ -979,23 +1115,22 @@ export default {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 51px calc(100vh - 95px);
+    grid-template-rows: 0px calc(100vh - 95px);
     transition: all 0.3s;
-    // overflow-y: hidden;
 }
 
 .page-section {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     overflow-y: auto;
-    height: calc(100% - 270px);
+    height: calc(100vh - 270px);
     grid-row: span 2;
-    margin-top: 60px;
 }
 
 .table-wrapper {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
     gap: 15px;
+    margin: 20px;
 
     *[span-2] {
         grid-column: span 2;
@@ -1089,5 +1224,32 @@ export default {
     font-size: 16px;
     font-weight: 600;
     color: $dexon-primary-blue;
+}
+
+.popup {
+    .select-wrapper {
+        
+        span {
+            font-size: 14px;
+        }
+        .select {
+            
+        }
+    }
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+        width: 200px;
+        span {
+            font-size: 14px;
+        }
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+    }
 }
 </style>

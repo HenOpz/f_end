@@ -9,12 +9,12 @@ export default new Vuex.Store({
   state: {
     mode: 'dev', //dev, prod
     modeURL: {
-      dev: 'http://localhost:3000/',
+      dev: 'https://localhost:7129/',
       prod: 'https://dis02.dexon-technology.com:449/',
       //prod: 'https://aims-muda.cpoc.com.my:1444/'
     },
     urlApi: {
-      dev: 'http://localhost:3000/api',
+      dev: 'https://localhost:7129/api',
       prod: 'https://dis02.dexon-technology.com:449/api',
       //prod: 'https://aims-muda.cpoc.com.my:1444/api',
     },

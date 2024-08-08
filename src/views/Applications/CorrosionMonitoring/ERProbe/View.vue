@@ -3,78 +3,89 @@
         <div class="page-container">
             <div class="page-section">
                 <div class="table-wrapper">
-                    <DxDataGrid 
-                        id="data-grid-list" 
-                        key-expr="id_tag" 
-                        :data-source="erProbeList"              
-                        :hover-state-enabled="true" 
-                        :allow-column-reordering="true" 
+                    <DxDataGrid
+                        id="data-grid-list"
+                        key-expr="id_tag"
+                        :data-source="erProbeList"
+                        :hover-state-enabled="true"
+                        :allow-column-reordering="true"
                         :show-borders="true"
-                        :show-row-lines="true" 
-                        :row-alternation-enabled="false" 
+                        :show-row-lines="true"
+                        :row-alternation-enabled="false"
                         :word-wrap-enabled="true"
-                        :column-auto-width="true" 
+                        :column-auto-width="true"
                         @init-new-row="SET_CURRENT_VIEW(1)"
                     >
-                        <DxEditing 
+                        <DxEditing
                             :allow-updating="false"
-                            :allow-deleting="false" 
-                            :allow-adding="false" 
+                            :allow-deleting="false"
+                            :allow-adding="false"
                             :use-icons="true"
-                            mode="popup" 
+                            mode="popup"
                         />
                         <DxFilterRow :visible="true" />
                         <DxHeaderFilter :visible="true" />
-                        
-                        <DxColumn 
+
+                        <DxColumn
                             data-field="id_platform"
-                            caption="Platform" 
-                            alignment="center" 
+                            caption="Platform"
+                            alignment="center"
                             :width="100"
                         >
-                            <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
+                            <DxLookup
+                                :data-source="platformList"
+                                display-expr="code_name"
+                                value-expr="id"
+                            />
                         </DxColumn>
 
-                        <DxColumn 
-                            data-field="tag_no" 
-                            caption="Tag No." 
+                        <DxColumn
+                            data-field="tag_no"
+                            caption="Tag No."
                             alignment="left"
                             :width="120"
                         />
-                        <DxColumn 
-                            data-field="desc" 
-                            caption="Description" 
-                            :min-width="120" 
+                        <DxColumn
+                            data-field="desc"
+                            caption="Description"
+                            :min-width="120"
                             alignment="left"
                         />
-                        <DxColumn 
-                            data-field="record_lastest_date" 
-                            caption="Latest Record Date" 
-                            :width="120" 
+                        <DxColumn
+                            data-field="record_lastest_date"
+                            caption="Latest Record Date"
+                            :width="120"
                             alignment="center"
                             type="date"
                             format="dd MMM yyyy"
                         />
-                        <DxColumn 
-                            data-field="metal_loss" 
-                            caption="Metal Loss (mm)" 
-                            :width="100" 
+                        <DxColumn
+                            data-field="metal_loss"
+                            caption="Metal Loss (mm)"
+                            :width="100"
                             alignment="center"
                             type="number"
                         />
-                        <DxColumn 
-                            data-field="corrosion_rate" 
-                            caption="Corrosion Rate (mm/y)" 
-                            :width="100" 
+                        <DxColumn
+                            data-field="corrosion_rate"
+                            caption="Corrosion Rate (mm/y)"
+                            :width="100"
                             alignment="center"
                             type="number"
                         />
-                        <DxColumn :width="60" alignment="center" cell-template="action-cell-template" />
+                        <DxColumn
+                            :width="60"
+                            alignment="center"
+                            cell-template="action-cell-template"
+                        />
 
                         <template #action-cell-template="{ data }">
                             <div class="action-wrapper">
                                 <div @click="SET_CURRENT_VIEW(2, data.data)">
-                                    <img src="/img/svg/magnifying-glass-svg.svg" class="penSvg" />
+                                    <img
+                                        src="/img/svg/magnifying-glass-svg.svg"
+                                        class="penSvg"
+                                    />
                                 </div>
                                 <!-- <div @click="DELETE_RECORD(data)">
                                     <img src="/img/svg/trash-svg.svg" class="trashSvg" />
@@ -96,28 +107,241 @@
                         <!-- <DxFilterRow :visible="true" /> -->
                         <DxScrolling mode="standard" />
                         <DxSearchPanel :visible="true" />
-                        <DxPaging :page-size="5" :page-index="0" />
-                        <DxPager :show-page-size-selector="true" :allowed-page-sizes="[5, 10, 25]"
-                            :show-navigation-buttons="true" :show-info="false" info-text="Page {0} of {1} ({2} items)" />
+                        <DxPaging
+                            :page-size="5"
+                            :page-index="0"
+                        />
+                        <DxPager
+                            :show-page-size-selector="true"
+                            :allowed-page-sizes="[5, 10, 25]"
+                            :show-navigation-buttons="true"
+                            :show-info="false"
+                            info-text="Page {0} of {1} ({2} items)"
+                        />
+                        <DxExport :enabled="false" />
+                    </DxDataGrid>
+                    <br />
+                    <div
+                        class="table-header-toolbar left"
+                        style="width: calc(100% - 231px)"
+                    >
+                        <label class="hd">Attachment</label>
+                    </div>
+                    <DxDataGrid
+                        id="data-grid-list"
+                        key-expr="id"
+                        :ref="gridRefNameAttachment"
+                        :data-source="library"
+                        :hover-state-enabled="true"
+                        :allow-column-reordering="true"
+                        :show-borders="true"
+                        :show-row-lines="true"
+                        :focused-row-enabled="false"
+                        :row-alternation-enabled="false"
+                        @row-inserted="ADD_NEW_FILE"
+                        @row-removed="DELETE_DOC"
+                        @init-new-row="
+                            () => {
+                                this.file = [];
+                                this.isEdit = false;
+                            }
+                        "
+                        @editing-start="
+                            (e) => {
+                                this.file = [];
+                                this.isEdit = true;
+                                this.dataFileTemp = e;
+                            }
+                        "
+                        @row-removing="
+                            () => {
+                                this.isEdit = false;
+                            }
+                        "
+                        @saved="SAVE"
+                    >
+                        <DxEditing
+                            :allow-deleting="true"
+                            :allow-adding="true"
+                            :allow-updating="true"
+                            :use-icons="true"
+                            :show-borders="true"
+                            mode="popup"
+                        >
+                            <DxPopup
+                                :show-title="true"
+                                :width="650"
+                                :height="300"
+                                title="Attachment"
+                            />
+                            <DxForm label-location="top">
+                                <DxItem
+                                    :col-count="2"
+                                    :col-span="2"
+                                    :row-count="1"
+                                    item-type="group"
+                                >
+                                    <DxItem item-type="group">
+                                        <DxItem
+                                            data-field="file"
+                                            :col-span="1"
+                                        />
+                                    </DxItem>
+                                    <DxItem item-type="group">
+                                        <DxItem
+                                            data-field="note"
+                                            :col-span="1"
+                                        />
+                                    </DxItem>
+                                </DxItem>
+                            </DxForm>
+                        </DxEditing>
+
+                        <DxColumn
+                            data-field="file"
+                            :visible="false"
+                            edit-cell-template="insertCellTemplate"
+                        />
+
+                        <DxColumn
+                            data-field="file_name"
+                            :allow-adding="true"
+                            :allow-editing="true"
+                            caption="File Name"
+                            :editor-options="fileNameInputOptions"
+                            sort-order="desc"
+                            :min-width="120"
+                        />
+
+                        <DxColumn
+                            data-field="note"
+                            caption="Note"
+                            :min-width="120"
+                            alignment="left"
+                        />
+
+                        <DxColumn
+                            data-field="file_type"
+                            caption="Extension"
+                            :width="120"
+                            alignment="center"
+                        />
+
+                        <DxColumn
+                            data-field="created_date"
+                            caption="Uploaded Date"
+                            :width="120"
+                            alignment="center"
+                            format="dd MMM yyyy"
+                            data-type="date"
+                            header-cell-template="dateHeader"
+                        />
+
+                        <template #dateHeader>
+                            <div>Uploaded<br />Date</div>
+                        </template>
+
+                        <DxColumn
+                            data-field="file_path"
+                            cell-template="pathCellTemplate"
+                            caption="Attachment"
+                            :width="120"
+                            alignment="center"
+                        />
+
+                        <template #insertCellTemplate>
+                            <div class="widget-container">
+                                <DxFileUploader
+                                    id="file-uploader"
+                                    :multiple="false"
+                                    upload-mode="useForm"
+                                    @value-changed="VALUE_CHANGE"
+                                    :visible="true"
+                                />
+                            </div>
+                        </template>
+
+                        <!-- <template #noteCellTemplate="{ data }">
+                        <div>
+                            <DxTextArea :height="100" :value="data.data.value" placeholder="Enter Note" />
+                        </div>
+                    </template> -->
+
+                        <template #pathCellTemplate="{ data }">
+                            <div>
+                                <button
+                                    class="library-btn-download"
+                                    @click="
+                                        DOWNLOAD(
+                                            data.value,
+                                            data.data.file_name
+                                        )
+                                    "
+                                >
+                                    <i class="fa-regular fa-circle-down"></i>
+                                    DOWNLOAD
+                                </button>
+                            </div>
+                        </template>
+
+                        <DxToolbar>
+                            <DxItem
+                                location="after"
+                                template="addButton"
+                            />
+                            <DxItem
+                                location="after"
+                                name="searchPanel"
+                            />
+                        </DxToolbar>
+                        <template #addButton>
+                            <DxButton
+                                icon="las la-plus"
+                                @click="ADD_ROW"
+                                hint="Add"
+                            />
+                        </template>
+
+                        <DxHeaderFilter :visible="true" />
+                        <!-- <DxFilterRow :visible="false" /> -->
+                        <DxScrolling mode="standard" />
+                        <DxSearchPanel :visible="true" />
+                        <DxPaging
+                            :page-size="10"
+                            :page-index="0"
+                        />
+                        <DxPager
+                            :visible="false"
+                            :show-page-size-selector="true"
+                            :allowed-page-sizes="[5, 10, 'all']"
+                            :show-navigation-buttons="true"
+                            :show-info="true"
+                            info-text="Page {0} of {1} ({2} items)"
+                        />
                         <DxExport :enabled="false" />
                     </DxDataGrid>
                 </div>
             </div>
         </div>
-        <AddPopup v-if="isShow === 1" @popup="FETCH_MOC_RECORD" :system="system" />
+        <AddPopup
+            v-if="isShow === 1"
+            @popup="FETCH_MOC_RECORD"
+            :system="system"
+        />
         <!-- <EditPopup v-if="isShow === 2" @popup="FETCH_MOC_RECORD" :id_record="selectedId" /> -->
     </div>
 </template>
 
 <script>
-import { GET_DATA } from "/axios.js";
+import { GET_DATA, PUT_DATA, POST_DATA, DELETE_DATA } from "/axios.js";
 // import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
 import { exportDataGrid } from "devextreme/excel_exporter";
 import { DxItem } from "devextreme-vue/form";
-// import DxButton from "devextreme-vue/button";
+import DxButton from "devextreme-vue/button";
+import { DxFileUploader } from "devextreme-vue/file-uploader";
 
 import {
     DxDataGrid,
@@ -134,7 +358,8 @@ import {
     DxHeaderFilter,
     // DxButton,
     // DxFormItem,
-    // DxForm
+    DxForm,
+    DxPopup,
 } from "devextreme-vue/data-grid";
 
 export default {
@@ -148,13 +373,15 @@ export default {
         DxColumn,
         DxExport,
         DxToolbar,
-        // DxForm,
+        DxForm,
         DxItem,
         DxEditing,
         DxLookup,
         DxFilterRow,
         DxHeaderFilter,
-        // DxButton,
+        DxButton,
+        DxPopup,
+        DxFileUploader,
         // DXButton,
         // DxFormItem,
         // penSvg,
@@ -166,13 +393,14 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            this.system = this.$route.fullPath.split('/')[2];
-            this.isCoolingMedium = this.CHECK_SYSTEM('cooling-medium');
-            this.isProducedWater = this.CHECK_SYSTEM('produced-water');
-            this.isSeaWater = this.CHECK_SYSTEM('sea-water');
-            this.isPipeline = this.CHECK_SYSTEM('pipeline');
-            GET_DATA(this, '/Md/get-md-platform-list', 'platformList');
-            GET_DATA(this, this.listApiUrl, 'erProbeList');
+            this.system = this.$route.fullPath.split("/")[2];
+            this.isCoolingMedium = this.CHECK_SYSTEM("cooling-medium");
+            this.isProducedWater = this.CHECK_SYSTEM("produced-water");
+            this.isSeaWater = this.CHECK_SYSTEM("sea-water");
+            this.isPipeline = this.CHECK_SYSTEM("pipeline");
+            GET_DATA(this, "/Md/get-md-platform-list", "platformList");
+            GET_DATA(this, this.listApiUrl, "erProbeList");
+            this.FETCH_LIBRARY();
         }
     },
     data() {
@@ -185,6 +413,12 @@ export default {
             isProducedWater: false,
             isSeaWater: false,
             isPipeline: false,
+            library: [],
+            file: [],
+            gridRefNameAttachment: "grid-library",
+            fileNameInputOptions: { placeholder: "File Name" },
+            dataFileTemp: "",
+            isEdit: false,
         };
     },
     computed: {
@@ -195,18 +429,22 @@ export default {
             else return console.log("develpment mode set up incorrect.");
         },
         SYSTEM_ID() {
-            if(this.system == 'cooling-medium') return 1; 
-            else if(this.system == 'produced-water') return 2; 
-            else if(this.system == 'sea-water') return 3; 
-            else if(this.system == 'pipeline') return 4;
+            if (this.system == "cooling-medium") return 1;
+            else if (this.system == "produced-water") return 2;
+            else if (this.system == "sea-water") return 3;
+            else if (this.system == "pipeline") return 4;
             else return 0;
         },
         listApiUrl() {
-            if(this.system == 'cooling-medium') return '/CMInfo/get-tag-cooling-medium-view-in-corrosion-coupon'; 
-            else if(this.system == 'produced-water') return '/CMInfo/get-tag-produced-water-view-in-corrosion-coupon'; 
-            else if(this.system == 'sea-water') return '/CMInfo/get-tag-sea-water-view-in-corrosion-coupon'; 
-            else if(this.system == 'pipeline') return '/CMInfo/get-tag-pipeline-view-in-corrosion-coupon';
-            else return '';
+            if (this.system == "cooling-medium")
+                return "/CMInfo/get-tag-cooling-medium-view-in-corrosion-coupon";
+            else if (this.system == "produced-water")
+                return "/CMInfo/get-tag-produced-water-view-in-corrosion-coupon";
+            else if (this.system == "sea-water")
+                return "/CMInfo/get-tag-sea-water-view-in-corrosion-coupon";
+            else if (this.system == "pipeline")
+                return "/CMInfo/get-tag-pipeline-view-in-corrosion-coupon";
+            else return "";
         },
     },
     methods: {
@@ -215,11 +453,13 @@ export default {
             const worksheet = workbook.addWorksheet("Projects");
             exportDataGrid({
                 worksheet: worksheet,
-                component: e.component
+                component: e.component,
             }).then(function () {
                 workbook.xlsx.writeBuffer().then(function (buffer) {
                     saveAs(
-                        new Blob([buffer], { type: "application/octet-stream" }),
+                        new Blob([buffer], {
+                            type: "application/octet-stream",
+                        }),
                         "CM-ER-PROBE.xlsx"
                     );
                 });
@@ -232,15 +472,91 @@ export default {
         },
         SET_CURRENT_VIEW(view, data = null, data2 = null) {
             this.$store.commit("SET_SHOW_BACK_BUTTON", false);
-            if (data !== null && data2 === null) this.$emit('currentView', view, data);
-            else if (data !== null && data2 !== null) this.$emit('currentView', view, data, data2);
-            else this.$emit('currentView', view);
-        }
-}
+            if (data !== null && data2 === null)
+                this.$emit("currentView", view, data);
+            else if (data !== null && data2 !== null)
+                this.$emit("currentView", view, data, data2);
+            else this.$emit("currentView", view);
+        },
+        FETCH_LIBRARY() {
+            GET_DATA(this, `/CMERProbeLibrary`, "library");
+        },
+        ADD_NEW_FILE(e) {
+            var formData = new FormData();
+            formData.append("id_system", this.SYSTEM_ID);
+            formData.append("file", this.file);
+            formData.append("note", e.data.note);
+            if (this.file.length == 0)
+                return this.$ons.notification
+                    .alert("Please select file")
+                    .then((res) => {
+                        if (res == 0) {
+                            this.FETCH_LIBRARY();
+                        }
+                    });
+            POST_DATA("/CMERProbeLibrary", formData, true, () => {
+                this.FETCH_LIBRARY();
+            });
+        },
+        UPDATE_DOC(e) {
+            console.log("e.data", e.data);
+            var formData = new FormData();
+            formData.append("id", e.data.id);
+            formData.append("id_system", this.SYSTEM_ID);
+            formData.append("file", this.file ?? "");
+            formData.append("note", e.data.note);
+            PUT_DATA(`/CMERProbeLibrary/${e.data.id}`, formData, true, () => {
+                this.FETCH_LIBRARY();
+            });
+        },
+        VALUE_CHANGE(e) {
+            //console.log("fileReader e data:");
+            console.log(e);
+            console.log(e.value[0].name);
+            let reader = new FileReader();
+            reader.readAsDataURL(e.value[0]);
+            reader.onload = () => {
+                // this function is for showing the image preview on upload
+            };
+            this.file = e.value[0];
+        },
+        SAVE(e) {
+            console.log(e);
+            console.log(this.file);
+            if ((e.changes.length > 0 || this.file.size > 0) && this.isEdit) {
+                console.log("save");
+                this.UPDATE_DOC(this.dataFileTemp);
+            }
+        },
+        DOWNLOAD(p, n) {
+            console.log(this.baseURL + p);
+            const url = this.baseURL + p;
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", n);
+            link.setAttribute("target", "_blank");
+            document.body.appendChild(link);
+            link.click();
+        },
+        DELETE_DOC(e) {
+            const id = e.data.id;
+            DELETE_DATA(`/CMERProbeLibrary/${id}`, () => {
+                this.FETCH_LIBRARY();
+            });
+        },
+        ADD_ROW() {
+            var grid = this.$refs[this.gridRefNameAttachment].instance;
+            grid.addRow();
+            grid.deselectAll();
+        },
+    },
 };
 </script>
 
-<style lang="scss" scoped>
+<style
+    lang="scss"
+    scoped
+>
 @import "@/style/main.scss";
 
 .block {
@@ -296,7 +612,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     height: calc(100vh - 235px);
     overflow-y: auto;
     grid-row: span 2;
@@ -306,7 +622,12 @@ export default {
     padding-bottom: 20px;
 }
 
-.table-wrapper {
-    margin-bottom: 200px;
+.hd {
+    line-height: 36px;
+    user-select: text;
+    cursor: text;
+    font-size: 16px;
+    font-weight: 600;
+    color: $dexon-primary-blue;
 }
 </style>

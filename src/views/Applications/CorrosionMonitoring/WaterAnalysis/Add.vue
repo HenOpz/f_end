@@ -12,7 +12,7 @@
                     <div class="input">
                         <DxSelectBox 
                             :items="tagList" 
-                            value-expr="id" 
+                            value-expr="id_tag" 
                             display-expr="tag_no"
                             placeholder="Select Tag Number" 
                             v-model="data.id_tag" 
@@ -59,6 +59,16 @@
                 </div>
 
                 <div span-2 class="input-wrapper">
+                    <span>CO2 (%)</span>
+                    <div class="input">
+                        <DxNumberBox 
+                            placeholder="Enter CO2" 
+                            v-model="data.co2_val" 
+                        />
+                    </div>
+                </div>
+
+                <div span-2 class="input-wrapper">
                     <span>Dissolved O2 (ppb)</span>
                     <div class="input">
                         <DxNumberBox 
@@ -77,6 +87,9 @@
                         />
                     </div>
                 </div>
+
+                <div/>
+                <div/>
 
 
                 <button class="create" @click="CREATE_RECORD">Create</button>
@@ -105,6 +118,7 @@ export default {
             subpageName: "WATER ANALYSIS",
             subpageInnerName: null,
         });
+        console.log(this.tagList);
     },
     data() {
         return {
@@ -133,6 +147,7 @@ export default {
             const user = JSON.parse(localStorage.getItem("user"));
             this.data.created_by = user.id;
             this.data.updated_by = user.id;
+            console.log(this.data);
             if( this.data.id_tag &&
                 this.data.year && 
                 this.data.period
@@ -140,6 +155,7 @@ export default {
                 POST_DATA('/CMWaterAnalysisPH', this.data);
                 POST_DATA('/CMWaterAnalysisDissolvedO2', this.data);
                 POST_DATA('/CMWaterAnalysisIonCount', this.data);
+                POST_DATA('/CMWaterAnalysisCO2', this.data);
                 this.$emit('popup');
             }
         },

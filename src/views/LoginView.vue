@@ -7,29 +7,37 @@
         <img class="app-logo" :src="appIcon" alt="app icon" />
 
         <div class="app-description">
-          <h2>CPOC IMS</h2>
-          <h1>INSPECTION & MAINTENANCE SYSTEM</h1>
+          <h2>CPOC AIMS</h2>
+          <h1>ASSETS INTEGRITY MANAGEMENT SYSTEM</h1>
           <h3>CARIGALI-PTTEPI Operating Company Sdn. Bhd.</h3>
         </div>
 
-        <!-- <input
+        <input
+            v-if="currentSignIn === 2"
             class="user"
             type="text"
             placeholder="Username"
             v-model="formData.username"
         />
         <input
+            v-if="currentSignIn === 2"
             class="password"
             type="password"
             placeholder="Password"
             v-model="formData.password"
-        />-->
+        />
 
-        <button class="signin" v-on:click="SIGN_IN_GUEST()">Sign In</button>
-        <button @click="SIGN_IN" class="microsoft">
+        <button v-if="currentSignIn === 2" class="signin" v-on:click="SIGN_IN_VENDOR()">Sign In</button>
+        <button v-if="currentSignIn === 1" @click="SIGN_IN" class="microsoft">
           <img src="/img/microsoft.svg" alt="microsoft">
           Login with Microsoft
         </button>
+        <div class="separator">
+          <hr>
+          <span>OR</span>
+          <hr>
+        </div>
+        <span class="signin-method" v-on:click="SIGN_IN_METHOD()">Sign in as {{ currentSignIn === 1 ? 'Vendor' : 'CPOC' }}</span>
 
         <!-- <span @click="$router.push('/forgot-password')" class="forgotPassword">Forgot Password?</span> -->
 
@@ -46,7 +54,7 @@
 
 <script>
 //API
-import { axios } from "/axios.js";
+import { axios, POST_DATA } from "/axios.js";
 import { signIn } from "/authService.js"
 
 //UI
@@ -61,9 +69,10 @@ export default {
       appIcon: this.$store.state.appIcon,
       isLoggedIn: localStorage.getItem("user"),
       isLoading: false,
-      current_tab: 1,
+      currentSignIn: 1,
       formData: {
         username: "",
+        password: "",
         name: "",
         uniqueId: ""
       }
@@ -110,6 +119,17 @@ export default {
             console.log(error);
           })
     },
+    SIGN_IN_VENDOR() {
+      let data = {
+        username: this.formData.username,
+        password: this.formData.password
+      }
+      POST_DATA('/User/loginByVendor', data, (e) => {
+        localStorage.setItem("user", JSON.stringify(e.user));
+        localStorage.setItem("token", JSON.stringify(e.token));
+        this.$router.push("/");
+      });
+    },
     SIGN_IN_GUEST() {
       const name = 'GUEST';
       const username = 'guest@dexon-technology.com';
@@ -150,7 +170,7 @@ export default {
     async SIGN_IN() {
       try {
         const authResult = await signIn();
-        const img = this.FETCH_USER_PHOTO(authResult.uniqueId, authResult.accessToken);
+        // const img = this.FETCH_USER_PHOTO(authResult.uniqueId, authResult.accessToken);
         console.log("authResult", authResult);
         var name = authResult.account.name;
         var username = authResult.account.username;
@@ -161,7 +181,7 @@ export default {
         axios({
           method: "post",
           url: "/User/login",
-          data: { name, username, uniqueId, img }
+          data: { name, username, uniqueId }
         })
           .then(res => {
             if (res.data.user && res.data.token) {
@@ -239,6 +259,10 @@ export default {
       //   this.$ons.notification.alert('"Username" cannot be empty');
       // }
     },
+    SIGN_IN_METHOD() {
+      if (this.currentSignIn === 1) this.currentSignIn = 2;
+      else if (this.currentSignIn === 2) this.currentSignIn = 1;
+    }
   }
 };
 </script>
@@ -299,12 +323,10 @@ export default {
     }
     input {
       width: calc(100% - 60px);
-      padding: 10px 30px;
-      background-color: #F9F9F9;
-      border: none;
-      margin-top: 15px;
-      border-radius: 5px;
-      box-shadow: inset 0 2px 0 #E9E9E9;
+      padding: 15px 30px;
+      // background-color: #F9F9F9;
+      border: solid 1px #adadad;
+      border-radius: 10px;
     }
     input::placeholder {
       color: #BCBCBC;
@@ -320,6 +342,33 @@ export default {
     }
     .signin {
       background-image: linear-gradient(to right, #1A0D7F, #3F2DCA);
+    }
+    .separator {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: 5px;
+      align-items: center;
+
+      hr {
+        flex: 1;
+        background-color: #000000;
+        height: 1px;
+      }
+      span {
+        font-size: 14px;
+      }
+    }
+    .signin-method {
+      color: #000;
+      font-size: 15px;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: rgb(0, 132, 255);
+        text-decoration: underline;
+      }
     }
     .microsoft {
       display: flex;

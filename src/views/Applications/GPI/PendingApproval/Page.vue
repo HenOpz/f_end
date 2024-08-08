@@ -30,7 +30,7 @@
                     data-field="pendingRecord.GpiRecord.id_platform" 
                     caption="Platform" 
                     alignment="center" 
-                    :width="90"
+                    :width="100"
                 >
                     <DxLookup :data-source="platformList" display-expr="code_name" value-expr="id" />
                 </DxColumn>
@@ -70,7 +70,7 @@
                     data-type="date"
                     format="dd MMM yyyy" 
                     alignment="center" 
-                    :width="100"
+                    :width="120"
                 >
                 </DxColumn>
                 <DxColumn 
@@ -126,6 +126,7 @@
                     <textarea readonly :value="data.data.pendingRecord.GpiRecord.dmg_mech_findings" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
                     Recommendation:
                     <textarea readonly :value="data.data.pendingRecord.GpiRecord.recommendation" style="width: 100%; min-height: 100px; border: none; font-size: 10px; padding: 5px; margin-top: 5px;"></textarea>
+                    <TxnList :row="data" />
                     </div>
                 </template>
                 <!-- <DxFilterRow :visible="true" /> -->
@@ -142,7 +143,8 @@
 </template>
 
 <script>
-import { GET_DATA, DELETE_DATA } from "/axios.js";
+import { GET_DATA } from "/axios.js";
+import TxnList from "./TxnList.vue";
 // import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
@@ -178,6 +180,7 @@ export default {
         DxFilterRow,
         DxHeaderFilter,
         DxMasterDetail,
+        TxnList,
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -243,9 +246,6 @@ export default {
                 this.gpiRecordList = resultArray;
             });
         },
-        DELETE_RECORD(e) {
-            DELETE_DATA(`/GpiRecord/delete-gpi-record?id=${e.key}`, () => { this.FETCH_GPI_RECORD(); });
-        },
         onCellPrepared(e) {
             if (e.rowType === "data" && e.column.dataField === "pendingRecord.GpiRecord.id_severity") {
                 e.cellElement.style.backgroundColor = this.GET_STATUS_COLOR(e.data.pendingRecord.GpiRecord.id_severity);
@@ -301,7 +301,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     overflow-y: auto;
     grid-row: span 2;
 }

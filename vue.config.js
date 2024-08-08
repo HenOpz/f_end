@@ -2,7 +2,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   pwa: {
-    name: 'CPOC IMS',
+    name: 'CPOC AIMS',
     themeColor: '#2859A8',
     msTileColor: '#2859A8',
     appleMobileWebAppCapable: 'yes',
@@ -19,5 +19,5 @@ module.exports = defineConfig({
   devServer: {
     port: 8081 // Specify the port you want to use
   },
-  chainWebpack: config => { config.plugin('html').tap(args => { args[0].title = 'CPOC IMS'; return args; }); }
+  chainWebpack: config => { config.plugin('html').tap(args => { args[0].title = 'CPOC AIMS'; return args; }); }
 })

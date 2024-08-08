@@ -37,6 +37,16 @@
                     </div>
                 </div>
 
+                <div class="input-wrapper" v-if="system == 'pipeline'">
+                    <span>Operation Temperature (°C)</span>
+                    <div class="input">
+                        <DxTextBox 
+                            placeholder="Enter Operation Temperature"
+                            v-model="registration.temp_c" 
+                        />
+                    </div>
+                </div>
+
                 <h5 style="grid-column: span 2; margin-bottom: 0; margin-top: 0;">Activities</h5>
 
                 <div class="input-wrapper" v-if="system == 'pipeline'">

@@ -1,30 +1,205 @@
 <template>
     <div>
         <div class="page-container">
-            <div class="action-bar">
-                <button class="back" @click="SET_CURRENT_VIEW(0)">
-                    <i class="fas fa-chevron-left"></i> BACK
-                </button>
-                <div class="wrapper">
-                    <button class="submit" @click="isShow = 1">APPROVE</button>
-                    <button class="delete">REJECT</button>
-                </div>
-            </div>
             <div class="page-section">
+                <div class="action-bar">
+                    <button class="back" @click="SET_CURRENT_VIEW(0)">
+                        <i class="fas fa-chevron-left"></i> BACK
+                    </button>
+                    <div class="wrapper">
+                        <button class="submit" @click="submitGpiRecord = true" v-if="this.currentStatusTXN == 5 && this.user.id == this.currentUserTXN">SUBMIT</button>
+                        <button class="submit" @click="approveGpiRecordWithSap = true" v-if="this.currentStatusTXN == 2 && this.user.id == this.currentUserTXN">APPROVE WITH SAP</button>
+                        <button class="submit" @click="approveGpiRecord = true" v-if="this.currentStatusTXN == 2 && this.user.id == this.currentUserTXN">APPROVE</button>
+                        <button class="delete" @click="rejectGpiRecord = true" v-if="this.currentStatusTXN == 2 && this.user.id == this.currentUserTXN">REJECT</button>
+                    </div>
+                </div>
                 <div class="table-wrapper"> 
                     <div id="pdfPreview"></div>
                 </div>
             </div>
         </div>
-        <Sap :sapData="data_row.id" v-if="isShow == 1" @popup="isShow = 0" />
+        <div
+            v-if="submitGpiRecord"
+            class="confirm-popup-backdrop"
+        >
+            <div class="popup">
+                <h4>Are You Sure?</h4>
+                <p>Your report will be sent once you confirm it. Please note that you will not be able to make any changes after it has been submitted. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button
+                        class="submit"
+                        @click="SUBMIT_GPI_RECORD"
+                    >
+                        SUBMIT
+                    </button>
+                    <button
+                        class="cancel"
+                        @click="submitGpiRecord = false"
+                    >
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-if="approveGpiRecord"
+            class="confirm-popup-backdrop"
+        >
+            <div class="popup">
+                <h4>Are You Sure?</h4>
+                <p>Your report will be approved once you confirm it. Please note that you will not be able to make any changes after it has been approved. Are you sure you want to continue?</p>
+                <div v-if="this.userList.length > 1" class="select-wrapper">
+                    <span>Select User</span>
+                    <div class="select">
+                        <DxSelectBox
+                            :items="userList"
+                            value-expr="id"
+                            display-expr="code"
+                            v-model="selectedUser.id_user_info"
+                            placeholder="Select User"
+                        />
+                    </div>
+                </div>
+                <br>
+                <div v-if="this.userList.length > 1" class="input-wrapper">
+                    <span>Enter Pin for Confirm</span>
+                    <div class="inputs">
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box1"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box2"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box3"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                        <div class="input">
+                            <DxTextBox
+                                v-model="selectedUser.pin.box4"
+                                max-length="1"
+                                :input-attr="{ style: 'text-align: center;' }"
+                            />
+                        </div>
+                    </div>
+                </div>
+                <div class="actions">
+                    <button
+                        class="submit"
+                        @click="APPROVE_GPI_RECORD"
+                    >
+                        APPROVE
+                    </button>
+                    <button
+                        class="cancel"
+                        @click="approveGpiRecord = false"
+                    >
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div
+            v-if="rejectGpiRecord"
+            class="confirm-popup-backdrop"
+        >
+            <div class="popup">
+                <h4>Are You Sure?</h4>
+                <p style="margin-bottom: 10px;">Are you sure you want to reject this report? Please enter the remark of the reject report.</p>
+                <DxTextArea
+                    placeholder="Enter Remark"
+                    v-model="rejectGpiRemark"
+                    style="margin-bottom: 15px;"
+                />
+                <div class="actions">
+                    <button
+                        class="reject"
+                        @click="REJECT_GPI_RECORD"
+                    >
+                        REJECT
+                    </button>
+                    <button
+                        class="cancel"
+                        @click="rejectGpiRecord = false"
+                    >
+                        CANCEL
+                    </button>
+                </div>
+            </div>
+        </div>
+        <Sap :data="gpiRecordList" v-if="approveGpiRecordWithSap == true" @popup="REFRESH_DATA" />
+        <contentLoading text="Loading, please wait..." v-if="isReportLoading == true" color="#fc9b21" />
     </div>
 </template>
 
 <script>
-import { GET_DATA } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import contentLoading from "@/components/app-structures/app-content-loading.vue";
+import DxSelectBox from "devextreme-vue/select-box";
+import DxTextBox from "devextreme-vue/text-box";
+import DxTextArea from "devextreme-vue/text-area";
 
 import Sap from "./Sap.vue"
 
@@ -34,7 +209,11 @@ export default {
         data_row: Object,
     },
     components: {
-        Sap
+        Sap,
+        contentLoading,
+        DxSelectBox,
+        DxTextBox,
+        DxTextArea
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -49,31 +228,63 @@ export default {
             GET_DATA(this, '/Md/get-md-gpi-severity-list', 'severityList');
             GET_DATA(this, '/Md/get-md-gpi-repair-list', 'typeOfRepairList');
             GET_DATA(this, '/Md/get-md-gpi-discipline-list', 'discList');
-            GET_DATA(this, '/User/get-active-user-list', 'userList');
+            GET_DATA(this, '/User/get-active-user-list', 'userListAll');
+            GET_DATA(this, `/GpiFile/get-gpi-file-by-id?id=${this.data_row.id}`, 'pictureLogList');
             GET_DATA(this, `/GpiRecord/${this.id_record}`, null, 
-                (data) => {
-                    this.gpiRecordList = data;
-                    GET_DATA(this, `/GpiFile/get-gpi-file-by-id?id=${this.data_row.id}`, 'pictureLogList');
-                    this.$nextTick(function () {
-                        window.setTimeout(() => {
-                            this.generatePDF();
-                        }, 500);
-                    })
+                async (data) => {
+                    this.gpiRecordList = data.data;
+                    this.appData = data.app_data;
+                    
+                    this.isReportLoading = true;
+                    await this.generatePDF();
+                    this.isReportLoading = false;
+                    // this.$nextTick(function () {
+                    //     window.setTimeout(() => {
+                    //         this.generatePDF();
+                    //     }, 500);
+                    // })
                 }
             )
+            GET_DATA(
+                this,
+                `/GpiRecordTXN/get-last-gpi-record-txn-by-id-gpi?id_gpi=${this.id_record}`,
+                "recordLastTXN",
+                (data) => {
+                    this.currentStatusTXN = data.id_status;
+                    this.currentUserTXN = data.id_user;
+                }
+            );
+            this.user = JSON.parse(localStorage.getItem("user"));
+            GET_DATA(this, `/User/get-user-info-by-id-user?id=${this.user.id}`, (data) => {
+                this.userList = data.map(e => {
+                    return {id: e.id, code: e.name}
+                })
+                if (this.userList.length === 1) this.selectedUser.id_user_info = this.userList[0].id;
+            });
             pdfMake.vfs = pdfFonts.pdfMake.vfs;
         }
     },
     data() {
         return {
             gpiRecordList: {},
+            appData: [],
             pictureLogList: [],
             export_status: {
                 active: false,
                 cur: 0,
                 max: 0,
             },
+            selectedUser: {
+                id_user_info: 0,
+                pin: {
+                    box1: null,
+                    box2: null,
+                    box3: null,
+                    box4: null
+                }
+            },
             userList: [],
+            userListAll: [],
             library: [],
             platformList: [],
             assetTypeList: [],
@@ -84,7 +295,16 @@ export default {
             discList: [],
             id_record: this.data_row.id,
             base64ImageUrl: '',
-            isShow: 0
+            isShow: 0,
+            user: null,
+            isReportLoading: false,
+            submitGpiRecord: false,
+            approveGpiRecord: false,
+            approveGpiRecordWithSap: false,
+            rejectGpiRecord: false,
+            rejectGpiRemark: "",
+            currentStatusTXN: null,
+            currentUserTXN: null,
         };
     },
     computed: {
@@ -96,6 +316,72 @@ export default {
         }
     },
     methods: {
+        SUBMIT_GPI_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
+            POST_DATA(
+                `/GpiRecordTXN/add-submit-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
+                {},
+                () => {
+                    this.submitGpiRecord = false;
+                    this.REFRESH_DATA();
+                }
+            );
+        },
+        APPROVE_GPI_RECORD() {
+            if (this.userList.length > 1) {
+                let pin = String(this.selectedUser.pin.box1) + String(this.selectedUser.pin.box2) + String(this.selectedUser.pin.box3) + String(this.selectedUser.pin.box4)
+                let userPin = this.user.UserInfoes.filter(e => e.id === this.selectedUser.id_user_info)[0].pin
+                if (pin !== userPin) {
+                    this.$ons.notification.alert("Pin is incorrect!");
+                    return;
+                }
+            }
+            POST_DATA(
+                `/GpiRecordTXN/add-appr-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&id_user_info=${this.selectedUser.id_user_info}`,
+                {},
+                () => {
+                    this.approveGpiRecord = false;
+                    this.REFRESH_DATA();
+                }
+            );
+        },
+        REJECT_GPI_RECORD() {
+            POST_DATA(
+                `/GpiRecordTXN/add-reject-txn?id_user=${this.user.id}&id_gpi=${this.id_record}&remark=${this.rejectGpiRemark}`,
+                {},
+                () => {
+                    this.rejectGpiRecord = false;
+                    this.REFRESH_DATA();
+                }
+            );
+        },
+        REFRESH_DATA() {
+            this.approveGpiRecordWithSap = false
+            GET_DATA(this, `/GpiRecord/${this.id_record}`, "gpiRecordList", (data) => {
+                const resultArray = []
+                for (const [key, value] of Object.entries(data)) {
+                    resultArray.push({key: key, value: value});
+                }
+                this.gpiRecordList = resultArray[0].value;
+            });
+            GET_DATA(
+                this,
+                `/GpiRecordTXN/get-last-gpi-record-txn-by-id-gpi?id_gpi=${this.id_record}`,
+                "recordLastTXN",
+                (data) => {
+                    this.currentStatusTXN = data.id_status;
+                    this.currentUserTXN = data.id_user;
+                    this.btn_state = false;
+                }
+            );
+        },
         DATE_FORMAT(d) {
             return moment(d).format("DD MMM yyyy");
         },
@@ -249,9 +535,23 @@ export default {
                     )
                 }
 
-                console.warn(grid);
+                console.warn(grid, this.pictureLogList.length);
 
                 return grid;
+            }
+
+            const signatureImage = async () => {
+                let pictureRow = []
+                for (let index = 0; index < 2; index++) {
+                    const element = this.appData[index];
+                    if (element) {
+                        await this.convert(this.baseURL + element.signature);
+                        pictureRow.push([{ image: this.base64ImageUrl, width: 100, height: 30, alignment: 'center', border: [false, false, false, false] }])
+                        this.base64ImageUrl = '';
+                    }
+                    else pictureRow.push([{ text: '-', border: [true, false, true, false] }])
+                }
+                return pictureRow;
             }
 
             const docDefinition = {
@@ -322,6 +622,35 @@ export default {
                         table: {
                             widths: ['*', '*'],
                             body: await pictureLogData()
+                        }
+                    },
+                    {
+                        table: {
+                            widths: ['*', '*'],
+                            body: [
+                                [
+                                    { text: 'ACKNOWLEDGMENT', style: 'cellTitle', border: [true, false, true, true], colSpan: 2 },
+                                    '',
+                                ],
+                                [
+                                    { text: 'Originator', border: [true, false, true, true], bold: true, alignment: 'center' },
+                                    { text: 'Leader', border: [true, false, true, true], bold: true, alignment: 'center' },
+                                ],
+                                await signatureImage(),
+                                [
+                                    { text: `${this.appData[0] ? this.appData[0].name : ''}`, border: [true, false, true, true], alignment: 'center' },
+                                    { text: `${this.appData[1] ? this.appData[1].name : ''}`, border: [true, false, true, true], alignment: 'center' },
+                                ],
+                                [
+                                    { text: `${this.appData[0] ? moment(this.appData[0].txn_datetime).format("DD MMM yyyy") : ''}`, border: [true, false, true, true], alignment: 'center' },
+                                    { text: `${this.appData[1] ? moment(this.appData[1].txn_datetime).format("DD MMM yyyy") : ''}`, border: [true, false, true, true], alignment: 'center' },
+                                ],
+                            ]
+                        },
+                        layout: {
+                            hLineWidth: function (i) {
+                                return (i === 3 || i === 4 ) ? 0 : 1;
+                            },
                         }
                     },
                 ],
@@ -442,7 +771,7 @@ export default {
             return disc[0]?.code ? disc[0].code : '-';
         },
         GET_USER(id) {
-            const user = this.userList.filter(d => d.id == id);
+            const user = this.userListAll.filter(d => d.id == id);
             return user[0]?.name ? user[0].name : '-';
         },
     }
@@ -456,24 +785,21 @@ export default {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 51px calc(100vh - 95px);
-    transition: all 0.3s;
-    // overflow-y: hidden;
+    grid-template-rows: 0px calc(100vh - 95px);
 }
 
 .page-section {
-    padding: 20px;
+    padding: 0px 20px 20px 20px;
     overflow-y: auto;
-    height: calc(100% - 270px);
+    height: calc(100vh - 270px);
     grid-row: span 2;
-    margin-top: 60px;
 }
 
 .table-wrapper {
     display: grid;
     grid-template-columns: 100%;
     gap: 15px;
-    margin-bottom: 20px !important;
+    margin: 20px;
 
     *[fill] {
         grid-column: span 2;
@@ -506,6 +832,31 @@ export default {
     }
 }
 
-
+.popup {
+    .select-wrapper {
+        
+        span {
+            font-size: 14px;
+        }
+        .select {
+            
+        }
+    }
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+        width: 200px;
+        span {
+            font-size: 14px;
+        }
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+    }
+}
 
 </style>

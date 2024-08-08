@@ -1,92 +1,146 @@
 <template>
-    <div class="page-wrapper">
-        <div class="page-toolbar">
-            <toolbar pageSubName="User Account" @refreshInfo="FETCH_LIST()" :isNewBtn="true" newBtnLabel="New Account"
-                @newBtnFn="TOGGLE_POPUP('add')" :isBack="true" />
-        </div>
-        <div class="page-content">
-            <DxDataGrid 
-                id="data-grid-list"
-                key-expr="id"
-                :data-source="accountList" 
-                :selection="{ mode: 'single' }"
-                :hover-state-enabled="true" 
-                :allow-column-reordering="false" 
-                :show-borders="true"
-                :show-row-lines="false" 
-                :row-alternation-enabled="true" 
-                @exporting="EXPORT_DATA"
+    <div class="page-container">
+        <br />
+        <DxDataGrid
+            id="data-grid-dashboard"
+            key-expr="id"
+            :data-source="userList"
+            :selection="{ mode: 'single' }"
+            :hover-state-enabled="true"
+            :allow-column-reordering="false"
+            :show-borders="true"
+            :show-row-lines="false"
+            :row-alternation-enabled="true"
+            @row-inserted="CREATE_ROW"
+            @row-updated="UPDATE_ROW"
+        >
+            <DxEditing
+                :allow-updating="true"
+                :allow-deleting="true"
+                :allow-adding="true"
+                :use-icons="true"
+                mode="popup"
             >
-                <DxColumn 
-                    data-field="username" 
-                    caption="Username" 
+                <DxPopup
+                    :show-title="true"
+                    :width="500"
+                    :height="438"
+                    title="User Info"
                 />
-                <DxColumn 
-                    data-field="name" 
-                    caption="Full Name" 
+                <DxForm
+                    label-location="top"
+                    :col-count="2"
+                >
+                    <DxItem
+                        data-field="name"
+                        :col-span="2"
+                    />
+                    <DxItem
+                        data-field="email"
+                        :col-span="2"
+                    />
+                    <DxItem
+                        data-field="id_company"
+                        :col-span="1"
+                    />
+                    <DxItem
+                        data-field="position"
+                        :col-span="1"
+                    />
+                    <DxItem
+                        data-field="pin"
+                        :col-span="1"
+                    />
+                </DxForm>
+            </DxEditing>
+            <DxColumn
+                data-field="name"
+                caption="Full Name"
+                :editor-options="{ placeholder: 'Full Name' }"
+            />
+            <DxColumn
+                data-field="id_company"
+                caption="Company"
+                :editor-options="{ placeholder: 'Select Company' }"
+            >
+                <DxLookup
+                    :data-source="companyList"
+                    display-expr="company_name"
+                    value-expr="id"
                 />
-                <DxColumn 
-                    data-field="login_last_date" 
-                    caption="Last Login" 
-                    data-type="date" 
-                    format="dd MMM yyyy | HH:mm" 
-                    alignment="center" 
-                />
-                <!-- <DxColumn 
-                    caption="Password" 
-                    :width="150" 
-                    cell-template="option-btn-password" 
-                /> -->
-                <DxColumn 
-                    :width="90" 
-                    caption="" 
-                    cell-template="option-btn-set" 
-                />
-                <template #option-btn-password="{ data }">
-                    <div class="table-btn-group" v-if="data.data.id_role != 5">
-                        <div class="table-btn table-btn-none" v-on:click="RESET_PASSWORD(data)">
-                            <i class="las la-undo-alt red"></i>
-                            <span class="red">reset password</span>
-                        </div>
-                    </div>
-                </template>
-                <template #option-btn-set="{ data }">
-                    <div class="table-btn-group" v-if="data.data.id_role != 5">
-                        <!-- <div class="table-btn" v-on:click="VIEW_INFO(data)">
-                            <i class="las la-search blue"></i>
-                        </div> -->
-                        <!-- <div class="table-btn" v-on:click="TOGGLE_POPUP('edit', data)">
-                            <i class="las la-pen green"></i>
-                        </div> -->
-                        <div class="table-btn" v-on:click="DELETE_ACCOUNT(data)">
-                            <i class="las la-trash red"></i>
-                        </div>
-                    </div>
-                </template>
-                <!-- Configuration goes here -->
-                <!-- <DxFilterRow :visible="true" /> -->
-                <DxScrolling mode="standard" />
-                <DxSearchPanel :visible="true" />
-                <DxPaging :page-size="10" :page-index="0" />
-                <DxPager :show-page-size-selector="true" :allowed-page-sizes="[5, 10, 20]"
-                    :show-navigation-buttons="true" :show-info="true" info-text="Page {0} of {1} ({2} items)" />
-                <DxExport :enabled="true" />
-            </DxDataGrid>
-        </div>
+            </DxColumn>
+            <DxColumn
+                data-field="position"
+                caption="Position"
+                :editor-options="{ placeholder: 'Position' }"
+            />
+            <DxColumn
+                data-field="email"
+                caption="Email"
+                :editor-options="{ placeholder: 'Email' }"
+            />
+            <DxColumn
+                data-field="pin"
+                caption="Pin"
+                :editor-options="{ placeholder: 'Pin (4 digits)' }"
+            />
+            <DxMasterDetail
+                :enabled="true"
+                template="masterDetailTemplate"
+            />
+            <template #masterDetailTemplate="{ data }">
+                <div
+                    style="
+                        display: grid;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 15px;
+                    "
+                >
+                    <displayImage
+                        :id_user="id_user"
+                        :id_record="data.key"
+                        :image_path="data.data.profile_img"
+                        :type="1"
+                    />
+                    <displayImage
+                        :id_user="id_user"
+                        :id_record="data.key"
+                        :image_path="data.data.signature"
+                        :type="2"
+                    />
+                </div>
+            </template>
 
-        <popupAdd v-if="isAdd == true" @btn-cancel-add="TOGGLE_POPUP('add')" @refreshList="FETCH_LIST()" />
-        <popupEdit v-if="isEdit == true" @btn-cancel-edit="TOGGLE_POPUP('edit')" @refreshList="FETCH_LIST()"
-            v-bind:editInfo="editInfo" />
-        <contentLoading text="Loading, please wait..." v-if="isLoading == true" color="#fc9b21" />
+            <DxFilterRow :visible="true" />
+            <DxHeaderFilter :visible="true" />
+            <DxScrolling mode="standard" />
+            <DxSearchPanel :visible="true" />
+            <DxPaging
+                :page-size="10"
+                :page-index="0"
+            />
+            <DxPager
+                :show-page-size-selector="true"
+                :allowed-page-sizes="[5, 10, 20]"
+                :show-navigation-buttons="true"
+                :show-info="true"
+                info-text="Page {0} of {1} ({2} items)"
+            />
+        </DxDataGrid>
+        <PageLoading
+            v-if="isLoading == true"
+            text="Loading"
+        />
     </div>
 </template>
 
 <script>
-//DataGrid
+// import { sha256 } from "js-sha256";
+// import moment from "moment";
+import displayImage from "@/components/image-component.vue";
+
+import { GET_DATA, PUT_DATA, POST_DATA } from "/axios.js";
 import "devextreme/dist/css/dx.light.css";
-import { Workbook } from "exceljs";
-import saveAs from "file-saver";
-import { exportDataGrid } from "devextreme/excel_exporter";
 import {
     DxDataGrid,
     DxSearchPanel,
@@ -94,126 +148,141 @@ import {
     DxPager,
     DxScrolling,
     DxColumn,
-    DxExport,
+    DxEditing,
+    DxLookup,
+    DxFilterRow,
+    DxHeaderFilter,
+    DxMasterDetail,
+    DxPopup,
+    DxForm,
 } from "devextreme-vue/data-grid";
+import { DxItem } from "devextreme-vue/form";
 
-//API
-import { GET_DATA, PUT_DATA, DELETE_DATA } from "/axios.js";
-
-//Pages & Structures
-import toolbar from "@/components/app-structures/app-navbar-toolbar.vue";
-import popupAdd from "@/views/Applications/UserAccountManager/account-add.vue";
-import popupEdit from "@/views/Applications/UserAccountManager/account-edit.vue";
-import contentLoading from "@/components/app-structures/app-content-loading.vue";
-
-//JS
-import clone from "just-clone";
-import { sha256 } from "js-sha256";
+import ViewLayout from "@/layouts/non-sidebar-layout.vue";
+// import DxDateBox from "devextreme-vue/date-box";
+// import DxSelectBox from "devextreme-vue/select-box";
+import PageLoading from "@/components/app-structures/app-loading.vue";
 
 export default {
-    name: "User-Account-List",
+    name: "AccountView",
+    props: {
+        id_user: Number,
+    },
     components: {
-        toolbar,
+        PageLoading,
         DxDataGrid,
         DxSearchPanel,
         DxPaging,
         DxPager,
         DxScrolling,
         DxColumn,
-        DxExport,
-        contentLoading,
-        popupAdd,
-        popupEdit,
+        DxEditing,
+        DxLookup,
+        DxFilterRow,
+        DxHeaderFilter,
+        DxMasterDetail,
+        displayImage,
+        DxPopup,
+        DxForm,
+        DxItem,
     },
     created() {
+        this.$emit(`update:layout`, ViewLayout);
         this.$store.commit("CLEAR_CURRENT_CLIENT");
         this.$store.commit("UPDATE_CURRENT_INAPP", {
-            name: "User Account Manager",
-            icon: "/img/icon_menu/account/account.png",
+            name: "My Account",
+            icon: "",
         });
-        if (this.$store.state.status.server == true) this.FETCH_LIST();
+        if (this.$store.state.status.server == true) {
+            GET_DATA(this, "/Md/get-md-user-company-list", "companyList");
+            GET_DATA(
+                this,
+                `/User/get-user-info-by-id-user?id=${this.id_user}`,
+                "userList"
+            );
+        }
     },
     data() {
         return {
-            accountList: [],
-            isAdd: false,
-            isEdit: false,
+            userList: [],
+            companyList: [],
+            file_pic_upload: "",
+            previewImg: "",
             isLoading: false,
-            errorMessage: "",
-            editInfo: "",
-            dataGridAttributes: {
-                class: "data-grid-style",
-            },
         };
     },
-    computed: {},
+    computed: {
+        baseURL() {
+            var mode = this.$store.state.mode;
+            if (mode == "dev") return this.$store.state.modeURL.dev;
+            else if (mode == "prod") return this.$store.state.modeURL.prod;
+            else return console.log("develpment mode set up incorrect.");
+        },
+    },
     methods: {
-        EXPORT_DATA(e) {
-            const workbook = new Workbook();
-            const worksheet = workbook.addWorksheet("Clients");
-            exportDataGrid({
-                worksheet: worksheet,
-                component: e.component,
-            }).then(function () {
-                workbook.xlsx.writeBuffer().then(function (buffer) {
-                    saveAs(
-                        new Blob([buffer], { type: "application/octet-stream" }),
-                        "Clients.xlsx"
-                    );
-                });
-            });
-            e.cancel = true;
+        CREATE_ROW(e) {
+            e.data.id = 0;
+            e.data.id_user = this.id_user;
+            POST_DATA("/User/add-user-info", e.data, () => {});
         },
-        TOGGLE_POPUP(m, data) {
-            if (m == "add") {
-                if (this.isAdd == true) this.isAdd = false;
-                else this.isAdd = true;
-            } else if (m == "edit") {
-                if (this.isEdit == true) this.isEdit = false;
-                else {
-                    this.editInfo = clone(data.data);
-                    this.isEdit = true;
-                }
-            }
+        UPDATE_ROW(e) {
+            PUT_DATA(`/User/edit-user-info?id=${e.key}`, e.data, () => {});
         },
-        FETCH_LIST() {
-            GET_DATA(this, '/User/get-active-user-list', 'accountList');
-        },
-        DELETE_ACCOUNT(e) {
-            const user = JSON.parse(localStorage.getItem("user"));
-            this.$ons.notification.confirm("Confirm Delete Account?").then((res) => {
-                if (res == 1) {
-                    DELETE_DATA(`/User/inactive-user?id=${e.data.id_account}&updated_by=${user.id}`, () => {
-                        this.$ons.notification.alert("Account delete successful");
-                        this.FETCH_LIST();
-                    });
-                }
-            });
-        },
-        RESET_PASSWORD(row_data) {
-            // console.log(row_data);
-            // console.log("Reset account id: " + row_data.data.id_account);
-            this.$ons.notification.confirm("Confirm password reset?").then((res) => {
-                if (res == 1) {
-                    let data = {
-                        id_account: row_data.data.id_account,
-                        password: sha256("dex0n7845"),
-                    };
-                    PUT_DATA('/UserAccount/edit-user-password', data, () => { 
-                        this.$ons.notification.alert("Password reset successful");
-                        this.FETCH_LIST();
-                    });
-                }
-            });
+        DELETE_ROW(e) {
+            PUT_DATA(`/User/edit-user-info?id=${e.key}`, e.data, () => {});
         },
     },
 };
 </script>
 
-<style lang="scss" scoped>
+<style
+    lang="scss"
+    scoped
+>
 @import "@/style/main.scss";
 
-.data-grid-style {
-    margin-bottom: 100px;
+report-sheet {
+    max-width: 100%;
+    width: 100%;
+    font-family: $web-default-font;
+    box-shadow: none;
+    padding: 0 !important;
+    margin-top: 0;
+    margin-bottom: 0;
+
+    .report-container {
+        .header {
+            .title {
+                grid-column: span 4;
+            }
+        }
+
+        .sheet-body {
+            grid-template-columns: 100%;
+            overflow: hidden;
+
+            .form-item {
+                display: grid;
+                grid-template-columns: 230px calc(100% - 230px);
+                grid-template-rows: 35px;
+
+                .form-item-label {
+                    label {
+                        line-height: 14px;
+                    }
+                }
+
+                .form-item-value {
+                    grid-column: span 1;
+
+                    label {
+                        margin: 0 auto;
+                        font-weight: 600;
+                        line-height: 14px;
+                    }
+                }
+            }
+        }
+    }
 }
 </style>

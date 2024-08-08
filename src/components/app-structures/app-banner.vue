@@ -56,7 +56,7 @@ export default {
 
         .left-col {
             position: absolute;
-            left: 2%;
+            left: 40px;
             color: white;
             text-shadow: 3px 6px 9px rgba(0, 0, 0, 0.4);
             font-size: 26px;
@@ -97,7 +97,8 @@ export default {
         height: 100%;
         top: 0;
         left: 0;
-        background: linear-gradient(90deg, $web-theme-color-secondary 20%, rgba(39, 89, 168, 0) 80%);
+        border-left: 1px solid rgb(173, 173, 173);
+        background: linear-gradient(90deg, #291F85 0%, rgba(90,127,67, 0.7) 80%); 
     }
 }
 </style>

@@ -135,12 +135,8 @@
           </div>
         </div>
 
-        <div>
-          picture
-        </div>
-        <div>
-          picture
-        </div>
+        <CPicture :type="1" />
+        <CPicture :type="2" />
 
         <button class="create" @click="CREATE_RECORD">Create</button>
         <button @click="SET_CURRENT_VIEW(0)">Cancel</button>
@@ -158,6 +154,7 @@ import moment from "moment";
 
 //Components
 //import VueTabsChrome from "vue-tabs-chrome";
+import CPicture from "./Picture.vue"
 
 //DataGrid
 import "devextreme/dist/css/dx.light.css";
@@ -227,7 +224,8 @@ export default {
     DxHtmlEditor,
     DxToolbar,
     DxMediaResizing,
-    DxItem
+    DxItem,
+    CPicture
   },
   created() {
     this.$store.commit("UPDATE_CURRENT_PAGENAME", {

@@ -59,6 +59,14 @@
                                 :width="100" 
                                 alignment="center"
                             />
+                            <DxPaging :page-size="10" :page-index="0" />
+                            <DxPager 
+                                :show-page-size-selector="true" 
+                                :allowed-page-sizes="[5, 10, 20]" 
+                                :show-navigation-buttons="true"
+                                :show-info="true" 
+                                info-text="Page {0} of {1} ({2} items)" 
+                            />
                         </DxDataGrid>
                     </div>
                     <div class="chart-container">
@@ -105,8 +113,8 @@ offlineExporting(Highcharts);
 import {
     DxDataGrid,
     // DxSearchPanel,
-    // DxPaging,
-    // DxPager,
+    DxPaging,
+    DxPager,
     // DxScrolling,
     DxColumn,
     // DxExport,
@@ -133,8 +141,8 @@ export default {
     components: {
         DxDataGrid,
         // DxSearchPanel,
-        // DxPaging,
-        // DxPager,
+        DxPaging,
+        DxPager,
         // DxScrolling,
         DxColumn,
         // DxExport,
@@ -185,18 +193,7 @@ export default {
                 }]
             }
             
-            GET_DATA(this, `/CMRCIRecord/get-cm-rci-record-by-id-info?id=${this.id_record}`, 'atpList', () => {
-                if (this.atpList.length > 0) {
-                    let chartCategories = [];
-                    let chartSeries = [];
-                    this.atpList.forEach(item => {
-                        chartCategories.push(item.year)
-                        chartSeries.push(item.rci_val)
-                    });
-                    this.chartOptions.xAxis.categories = chartCategories;
-                    this.chartOptions.series[0].data = chartSeries;
-                }
-            });
+            this.GET_ATP();
             GET_DATA(this, '/Md/get-md-month-list', 'monthList');
             const years = []
             for (let index = 0; index < 11; index++) {
@@ -224,52 +221,33 @@ export default {
     },
     computed: {},
     methods: {
+        GET_ATP() {
+            GET_DATA(this, `/CMRCIRecord/get-cm-rci-record-by-id-info?id=${this.id_record}`, 'atpList', () => {
+                if (this.atpList.length > 0) {
+                    let chartCategories = [];
+                    let chartSeries = [];
+                    this.atpList.forEach(item => {
+                        chartCategories.push(item.id_month + ' - ' + item.year)
+                        chartSeries.push(item.rci_val)
+                    });
+                    this.chartOptions.xAxis.categories = chartCategories;
+                    this.chartOptions.series[0].data = chartSeries;
+                }
+            });
+        },
         CREATE_RECORD(e) {
             e.data.id = 0;
             e.data.id_tag = this.id_record;
-            POST_DATA('/CMRCIRecord', e.data, () => { GET_DATA(this, `/CMRCIRecord/get-cm-rci-record-by-id-info?id=${this.id_record}`, 'atpList', () => {
-                if (this.atpList.length > 0) {
-                    let chartCategories = [];
-                    let chartSeries = [];
-                    this.atpList.forEach(item => {
-                        chartCategories.push(item.year)
-                        chartSeries.push(item.rci_val)
-                    });
-                    this.chartOptions.xAxis.categories = chartCategories;
-                    this.chartOptions.series[0].data = chartSeries;
-                }
-            }); });
+            POST_DATA('/CMRCIRecord', e.data, () => { this.GET_ATP(); });
         },
         UPDATE_RECORD(e) {
-            PUT_DATA(`/CMRCIRecord/${e.key}`, e.data, () => { GET_DATA(this, `/CMRCIRecord/get-cm-rci-record-by-id-info?id=${this.id_record}`, 'atpList', () => {
-                if (this.atpList.length > 0) {
-                    let chartCategories = [];
-                    let chartSeries = [];
-                    this.atpList.forEach(item => {
-                        chartCategories.push(item.year)
-                        chartSeries.push(item.rci_val)
-                    });
-                    this.chartOptions.xAxis.categories = chartCategories;
-                    this.chartOptions.series[0].data = chartSeries;
-                }
-            }); });
+            PUT_DATA(`/CMRCIRecord/${e.key}`, e.data, () => { this.GET_ATP(); });
         },
         DELETE_RECORD(e) {
-            DELETE_DATA(`/CMRCIRecord/delete-cm-rci-record?id=${e.key}`, () => { GET_DATA(this, `/CMRCIRecord/get-cm-rci-record-by-id-info?id=${this.id_record}`, 'atpList', () => {
-                if (this.atpList.length > 0) {
-                    let chartCategories = [];
-                    let chartSeries = [];
-                    this.atpList.forEach(item => {
-                        chartCategories.push(item.year)
-                        chartSeries.push(item.rci_val)
-                    });
-                    this.chartOptions.xAxis.categories = chartCategories;
-                    this.chartOptions.series[0].data = chartSeries;
-                }
-            }); });
+            DELETE_DATA(`/CMRCIRecord/delete-cm-rci-record?id=${e.key}`, () => { this.GET_ATP(); });
         },
         GET_STATUS_CELL_COLOR(value) {
-            if (value.rowType === "data" && value.column.dataField === "rci") {
+            if (value.rowType === "data" && value.column.dataField === "rci_val") {
                 if (value.data.rci && value.data.temp) {
                     let rci = Number(value.data.rci);
                     let temp = Number(value.data.temp);
@@ -281,7 +259,7 @@ export default {
             }
         },
         onCellPrepared(e) {
-            if(e.rowType === "data" && e.column.dataField === "rci") {
+            if(e.rowType === "data" && e.column.dataField === "rci_val") {
                 e.cellElement.style.backgroundColor = this.GET_STATUS_CELL_COLOR(e);
                 e.cellElement.style.textTransform = "uppercase";
             }

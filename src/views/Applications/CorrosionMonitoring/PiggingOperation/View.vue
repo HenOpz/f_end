@@ -30,7 +30,7 @@
                     data-field="id_platform" 
                     caption="Wellhead" 
                     alignment="center" 
-                    :width="95"
+                    :width="120"
                 >
                     <DxLookup :data-source="formSelect.platform" display-expr="code_name" value-expr="id" />
                 </DxColumn>
@@ -38,7 +38,7 @@
                     data-field="pipeline" 
                     caption="Pipeline" 
                     alignment="center" 
-                    :width="110"
+                    :width="120"
                 />
                 <DxColumn 
                     data-field="lastest_date" 
@@ -52,7 +52,7 @@
                     data-field="gas_rate" 
                     caption="Gas Rate (mmscfd)" 
                     alignment="center"
-                    :width="95"
+                    :width="120"
                 />
                 <DxColumn 
                     data-field="sand" 
@@ -320,7 +320,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     height: calc(100vh - 235px);
     overflow-y: auto;
     grid-row: span 2;

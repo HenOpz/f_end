@@ -24,7 +24,7 @@
                             {{ month.month_code }}
                         </span>
                     </div>
-                    <div v-for="(tag, index) in tagList" :key="'tag-' + index" style="display: grid; grid-template-columns: 10% repeat(13, 1fr); gap: 5px; margin-bottom: 5px; border-bottom: 2px solid #777; font-weight: 600; padding-bottom: 5px;">
+                    <div v-for="(tag, index) in dashboardList" :key="'tag-' + index" style="display: grid; grid-template-columns: 10% repeat(13, 1fr); gap: 5px; margin-bottom: 5px; border-bottom: 2px solid #777; font-weight: 600; padding-bottom: 5px;">
                         <span style="grid-row: span 1; display: flex; align-items: center; justify-content: flex-start; background-color: #ddd; padding-left: 5px; ">
                             {{ tag.tag_no }}
                         </span>
@@ -37,9 +37,9 @@
                         <span style="grid-column-start: 2; display: flex; align-items: center; justify-content: center; background-color: #eee; padding-top: 5px; padding-bottom: 5px;" >
                             500
                         </span>
-                        <span v-for="(val, valIndex) in tag.value" :key="'actual-' + valIndex" style="display: flex; align-items: center; justify-content: center; background-color: #eee;" 
-                        v-bind:style="val.Percentage >= 95 || !val.Percentage ? 'backgroundColor: #eee;' : 'backgroundColor: #ff0000a8;'">
-                            {{ TO_FIXED(val.Percentage, 2) }}
+                        <span v-for="(val, valIndex) in tag.values" :key="'actual-' + valIndex" style="display: flex; align-items: center; justify-content: center; background-color: #eee;" 
+                        v-bind:style="val.rci_val >= 30 || !val.rci_val ? 'backgroundColor: #eee;' : 'backgroundColor: #ff0000a8;'">
+                            {{ TO_FIXED(val.rci_val, 2) }}
                         </span>
                     </div>
                 </div>
@@ -169,21 +169,10 @@
 </template> 
 
 <script>
-//API
 import { GET_DATA, DELETE_DATA } from "/axios.js";
-// import moment from "moment";
 import AddTagRegistration from "./Add.vue"
 import EditTagRegistration from "./Edit.vue"
 import InjectionRate from "./InjectionRate.vue"
-
-//Components
-//import VueTabsChrome from "vue-tabs-chrome";
-// import downloadFileSvg from "@/components/svg/download-file-svg.vue"
-// import magnifyingGlassSvg from "@/components/svg/magnifying-glass-svg.vue"
-// import penSvg from "@/components/svg/pen-svg.vue"
-// import trashSvg from "@/components/svg/trash-svg.vue"
-
-//DataGrid
 import "devextreme/dist/css/dx.light.css";
 import { Workbook } from "exceljs";
 import saveAs from "file-saver";
@@ -202,16 +191,10 @@ import {
   DxExport,
   DxToolbar,
   DxEditing,
-//   DxLookup,
   DxRequiredRule,
   DxFilterRow,
   DxHeaderFilter,
-  // DxButton,
-  // DxFormItem,
-  // DxForm
 } from "devextreme-vue/data-grid";
-
-//Structures
 
 export default {
     name: "inspection-record",
@@ -247,19 +230,9 @@ export default {
             subpageInnerName: null,
         });
         if (this.$store.state.status.server == true) {
-            // this.FETCH_DROPDOWN_NOC();
-            // this.FETCH_DROPDOWN_RRL();
-            // this.FETCH_DROPDOWN_STATUS();
-            // this.FETCH_MOC_RECORD();
             GET_DATA(this, '/Md/get-md-month-list', 'monthList');
             GET_DATA(this, '/CMRCIRecord/get-latest-cm-rci-records', 'tagList');
-            // GET_DATA(this, '/CMInfo/get-tag-pipeline-view-in-chem-injection-percentage?year=2024', 'tagList', (data) => {
-            //     const resultArray = [];
-            //     for (const [key, value] of Object.entries(data)) {
-            //         resultArray.push({key: key, value: value});
-            //     }
-            //     this.tagList = resultArray;
-            // });
+            GET_DATA(this, `/CMRCIRecord/get-cm-rci-records-for-dashboard?year_no=${2024}`, 'dashboardList');
             const years = []
             for (let index = 0; index < 11; index++) {
                 years.push({ id: index, year: 2020 + index })
@@ -269,6 +242,7 @@ export default {
     },
     data() {
         return {
+            dashboardList: [],
             tagList: [],
             isShow: 0,
             selectedId: null,
@@ -336,7 +310,7 @@ export default {
         },
         TO_FIXED(value, digits) {
             if(value) {
-                return value.toFixed(digits) + '%';
+                return value.toFixed(digits);
             } else {
                 return "";
             }
@@ -430,7 +404,7 @@ button {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     height: calc(100vh - 235px);
     overflow-y: auto;
     grid-row: span 2;
@@ -440,7 +414,4 @@ button {
     padding-bottom: 20px;
 }
 
-.table-wrapper {
-    margin-bottom: 200px;
-}
 </style>

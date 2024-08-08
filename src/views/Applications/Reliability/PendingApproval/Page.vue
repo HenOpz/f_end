@@ -69,7 +69,7 @@ export default {
 }
 
 .page-section {
-  padding: 20px;
+  padding: 20px 40px;
   overflow-y: auto;
   grid-row: span 2;
 }

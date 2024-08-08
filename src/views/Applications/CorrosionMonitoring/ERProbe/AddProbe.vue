@@ -55,7 +55,7 @@
                         <DxSelectBox
                             :items="probeList"
                             value-expr="id"
-                            display-expr="code"
+                            display-expr="status"
                             placeholder="Select Status"
                             v-model="data.id_probe_status"
                         />
@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { POST_DATA } from "/axios.js";
+import { GET_DATA, POST_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from "devextreme-vue/select-box";
@@ -93,17 +93,11 @@ export default {
         DxDateBox,
         DxNumberBox,
     },
+    props: {
+        id_tag: Number,
+    },
     created() {
-        this.probeList = [
-            {
-                id: 1,
-                code: "Applicable",
-            },
-            {
-                id: 2,
-                code: "Not Applicable",
-            },
-        ];
+        GET_DATA(this, '/Md/get-md-cm-probe-status-list', 'probeList');
     },
     data() {
         return {

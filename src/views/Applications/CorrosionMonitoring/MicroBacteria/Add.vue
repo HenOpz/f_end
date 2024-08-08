@@ -12,7 +12,7 @@
                     <div class="input">
                         <DxSelectBox 
                             :items="tagList" 
-                            value-expr="id" 
+                            value-expr="id_tag" 
                             display-expr="tag_no"
                             placeholder="Select Tag Number" 
                             v-model="data.id_tag" 

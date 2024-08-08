@@ -7,8 +7,8 @@
                 </div>
 
                 <div class="app-topbar-text">
-                    <label>CPOC IMS</label>
-                    <label>INSPECTION & MAINTENANCE SYSTEM</label>
+                    <label>CPOC AIMS</label>
+                    <label>ASSETS INTEGRITY MANAGEMENT SYSTEM</label>
                 </div>
 
                 <label class="dev-mode-badge" v-if="this.$store.state.mode == 'dev'">

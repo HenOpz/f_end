@@ -34,11 +34,11 @@ export default {
   },
   created() {
     this.$store.commit("UPDATE_CURRENT_INAPP", {
-      name: "CPOC IMS",
+      name: "CPOC AIMS",
       //icon: "/img/icon_menu/equipment/piping.png"
     });
     this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-      subpageName: "CPOC IMS",
+      subpageName: "CPOC AIMS",
       subpageInnerName: null
     });
     if (this.$store.state.status.server == true) {

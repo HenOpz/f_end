@@ -102,11 +102,13 @@
                                 alignment="center"
                             />
                             <DxColumn 
-                                data-field="probe_status" 
+                                data-field="id_probe_status" 
                                 caption="Probe Status" 
                                 :width="120" 
                                 alignment="center"
-                            />
+                            >
+                                <DxLookup :data-source="probeList" display-expr="status" value-expr="id" />
+                            </DxColumn>
                             <!-- <DxColumn caption="MOC" :width="80" alignment="center" cell-template="moc-cell-template" />
                             <DxColumn caption="RA" :width="80" alignment="center" cell-template="ra-cell-template" /> -->
                             <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
@@ -214,6 +216,32 @@
                                                 :visible="false" 
                                                 edit-cell-template="insertCellTemplate" 
                                             />
+
+                                            <DxColumn
+                                                data-field="file_path"
+                                                caption="Picture"
+                                                cell-template="picture-template"
+                                            />
+
+                                            <template #picture-template="{ data }">
+                                                <div
+                                                    style="
+                                                        display: flex;
+                                                        justify-content: center;
+                                                    "
+                                                >
+                                                    <!-- <a :href="baseURL + data.value" download="dwg" target="_blank" v-if="data.value != ''">
+                                    <img :src="baseURL + data.value" width="300" height="200" />
+                                    <br />
+                                    </a> -->
+
+                                                    <img
+                                                        :src="baseURL + data.data.file_path"
+                                                        width="200"
+                                                        height="200"
+                                                    />
+                                                </div>
+                                            </template>
 
                                             <DxColumn 
                                                 data-field="file_name" 
@@ -404,7 +432,7 @@ import {
     DxEditing,
     DxFilterRow,
     // DxButton,
-    // DxLookup,
+    DxLookup,
     // DxRequiredRule,
     // DxFormItem,
     DxForm,
@@ -436,7 +464,7 @@ export default {
         DxFilterRow,
         DxButton,
         // DxAddRowButton,
-        // DxLookup,
+        DxLookup,
         // DxRequiredRule,
         // DxFormItem,
         // DxSelectBox,
@@ -459,6 +487,7 @@ export default {
         });
         if (this.$store.state.status.server == true) {
             GET_DATA(this, '/CMCorrosionCouponMonitorRecord/ByTag/' + this.id_tag, 'recordList');
+            GET_DATA(this, '/Md/get-md-cm-probe-status-list', 'probeList');
             this.FETCH_LIBRARY();
             this.chartOptions = {
                 title: {
@@ -604,6 +633,7 @@ export default {
             id_record: 0,
             selectedCouponData: null,
             id_tag: this.info.id_tag,
+            probeList: [],
             library: [],
             file: [],
             gridRefName: "grid-library",
@@ -612,7 +642,14 @@ export default {
             isEdit: false
         };
     },
-    computed: {},
+    computed: {
+        baseURL() {
+            var mode = this.$store.state.mode;
+            if (mode == "dev") return this.$store.state.modeURL.dev;
+            else if (mode == "prod") return this.$store.state.modeURL.prod;
+            else return console.log("develpment mode set up incorrect.");
+        },
+    },
     methods: {
         DELETE_RECORD(id) {
             this.$ons.notification.confirm("Confirm Delete This Row?").then((res) => {

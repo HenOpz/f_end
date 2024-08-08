@@ -1,18 +1,12 @@
 <template>
     <div class="page-container">
-        <div class="action-bar">
-            <div></div>
-            <div class="wrapper">
-                <button class="submit">APPROVE</button>
-                <button class="delete">REJECT</button>
-            </div>
-        </div>
         <div class="page-section">
             <div class="table-wrapper"> 
                 <div id="pdfPreview"></div>
                 <RiskMatrix pdf style="position: absolute; left: -9999px; top: -9999px;" />
             </div>
         </div>
+        <contentLoading text="Loading, please wait..." v-if="isReportLoading == true" color="#fc9b21" />
     </div>
 </template>
 
@@ -23,6 +17,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import html2canvas from 'html2canvas';
 import RiskMatrix from "./RiskMatrix.vue"
+import contentLoading from "@/components/app-structures/app-content-loading.vue";
 
 export default {
     name: "failure-report",
@@ -30,7 +25,9 @@ export default {
         data_row: Object,
     },
     components: {
-        RiskMatrix
+        RiskMatrix,
+        contentLoading,
+
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -41,18 +38,21 @@ export default {
             this.FETCH_DISC();
             this.FETCH_IMPACT();
             this.FETCH_PLATFORM();
+            this.FETCH_LIBRARY(); 
             this.FETCH_FAILURE_RECORD();
-            this.FETCH_LIBRARY();
             pdfMake.vfs = pdfFonts.pdfMake.vfs;
+            this.user = JSON.parse(localStorage.getItem("user"));
         }
     },
     data() {
         return {
             failureRecordList: {},
+            appData: [],
             shortTermRecordList: [],
             longTermRecordList: [],
             shortTermLength: 2,
             longTermLength: 2,
+            userList: [],
             export_status: {
                 active: false,
                 cur: 0,
@@ -64,6 +64,8 @@ export default {
             impact: [],
             id_record: this.data_row.id,
             base64ImageUrl: '',
+            isReportLoading: false,
+            user: null,
         };
     },
     computed: {
@@ -75,16 +77,20 @@ export default {
         }
     },
     methods: {
-        FETCH_FAILURE_RECORD() {
-            GET_DATA(this, `/FailureRecord/${this.id_record}`, (data) => {
-                this.failureRecordList = data;
+        async FETCH_FAILURE_RECORD() {
+            GET_DATA(this, `/FailureRecord/${this.id_record}`, async (data) => {
+                this.failureRecordList = data.data;
+                this.appData = data.app_data;
                 this.FETCH_SHORT_TERM_RECORD();
                 this.FETCH_LONG_TERM_RECORD();
-                this.$nextTick(function () {
-                    window.setTimeout(() => {
-                        this.generatePDF();
-                    },1500);
-                })
+                this.isReportLoading = true;
+                await this.generatePDF();
+                this.isReportLoading = false;
+                // this.$nextTick(function () {
+                //     window.setTimeout(async () => {
+                //         this.generatePDF();
+                //     },1500);
+                // })
             });
         },
         FETCH_SHORT_TERM_RECORD() {
@@ -100,7 +106,7 @@ export default {
                     if (res.status == 200 && res.data) {
                         this.shortTermRecordList = res.data;
                         this.shortTermLength = this.shortTermRecordList.length + 1;
-                        console.log("shortTermRecordList", this.shortTermRecordList);
+                        // console.log("shortTermRecordList", this.shortTermRecordList);
                     }
                 })
                 .catch(error => {
@@ -110,11 +116,10 @@ export default {
                     }
                 })
                 .finally(() => {
-                    this.isLoading = false;
+                    // this.isLoading = false;
                 });
         },
         FETCH_LONG_TERM_RECORD() {
-            this.isLoading = true;
             axios({
                 method: "get",
                 url:
@@ -127,7 +132,7 @@ export default {
                     if (res.status == 200 && res.data) {
                         this.longTermRecordList = res.data;
                         this.longTermLength = this.longTermRecordList.length + 1;
-                        console.log("longTermRecordList", this.longTermRecordList);
+                        // console.log("longTermRecordList", this.longTermRecordList);
                     }
                 })
                 .catch(error => {
@@ -137,11 +142,11 @@ export default {
                     }
                 })
                 .finally(() => {
-                    this.isLoading = false;
+                    // this.isLoading = false;
                 });
         },
         FETCH_LIBRARY() {
-            GET_DATA(this, `/RCFAFile/get-rcfa-file-by-id?id=${this.id_record}`, 'library');
+            GET_DATA(this, `/FailureFile/get-failure-file-by-id?id=${this.id_record}`, 'library');
         },
         FETCH_PLATFORM() {
             GET_DATA(this, '/Md/get-md-platform-list', 'platform');
@@ -193,7 +198,7 @@ export default {
         },
         headerTable() {
             return {
-                widths: [85.5, '*', 37.5, 48],
+                widths: [85.5, '*', 37.5, 80],
                 body: [
                     [
                         { rowSpan: 4, image: 'logo', width: 60, height: 50, alignment: 'center', margin: [0, 0, 0, 0] },
@@ -217,7 +222,7 @@ export default {
                         '',
                         '',
                         { text: 'Originator:', style: 'cellLeft' }, 
-                        { text: this.failureRecordList ? this.failureRecordList.created_by : '-', style: 'headerCellRight' } 
+                        { text: this.failureRecordList ? this.GET_ORIGINATOR(this.failureRecordList.created_by) : '-', style: 'headerCellRight' } 
                     ],
 
                 ]
@@ -361,6 +366,20 @@ export default {
                 return data;
             }
 
+            const signatureImage = async () => {
+                let pictureRow = []
+                for (let index = 0; index < 3; index++) {
+                    const element = this.appData[index];
+                    if (element && element.signature) {
+                        await this.convert(this.baseURL + element.signature);
+                        pictureRow.push([{ image: this.base64ImageUrl, width: 100, height: 30, alignment: 'center', border: [false, false, false, false] }])
+                        this.base64ImageUrl = '';
+                    }
+                    else pictureRow.push([{ text: '', border: [true, false, true, false] }])
+                }
+                return pictureRow;
+            }
+
             const riskMatrix = document.getElementById('risk-matrix');
             const canvas = await html2canvas(riskMatrix);
             const imgData = canvas.toDataURL('image/png');
@@ -368,7 +387,7 @@ export default {
 
             const docDefinition = {
                 info: {
-                    title: 'test'
+                    title: this.failureRecordList.fl_number || ''
                 },
                 content: [
                     {
@@ -533,24 +552,21 @@ export default {
                                     ''
                                 ],
                                 [
-                                    { text: 'Team Leader', border: [true, false, true, true], bold: true, alignment: 'center' },
-                                    { text: 'Maintenance/Operation Supervisor', border: [true, false, true, true], bold: true, alignment: 'center' },
-                                    { text: 'OIM', border: [true, false, true, true], bold: true, alignment: 'center' }
+                                    { text: this.failureRecordList.id_work_group === 1 ? 'Engineer' : 'Team Leader', border: [true, false, true, true], bold: true, alignment: 'center' },
+                                    { text: this.failureRecordList.id_work_group === 1 ? 'Section Leader' : 'Maintenance/Operation Supervisor', border: [true, false, true, true], bold: true, alignment: 'center' },
+                                    { text: this.failureRecordList.id_work_group === 1 ? 'DPO' : 'OIM', border: [true, false, true, true], bold: true, alignment: 'center' }
                                 ],
+                                await signatureImage(),
                                 [
-                                    { text: '-', border: [true, false, true, false] },
-                                    { text: '-', border: [true, false, true, false] },
-                                    { text: '-', border: [true, false, true, false] }
+                                    { text: this.appData[0] ? this.appData[0].name : '', border: [true, false, true, false], alignment: 'center' },
+                                    { text: this.appData[1] ? this.appData[1].name : '', border: [true, false, true, false], alignment: 'center' },
+                                    { text: this.appData[2] ? this.appData[2].name : '', border: [true, false, true, false], alignment: 'center' }
                                 ],
+                                
                                 [
-                                    { text: 'Name:', border: [true, false, true, true] },
-                                    { text: 'Name:', border: [true, false, true, true] },
-                                    { text: 'Name:', border: [true, false, true, true] }
-                                ],
-                                [
-                                    { text: 'Date:', border: [true, false, true, true] },
-                                    { text: 'Date:', border: [true, false, true, true] },
-                                    { text: 'Date:', border: [true, false, true, true] }
+                                    { text: this.appData[0] ? moment(this.appData[0].txn_datetime).format("DD MMM yyyy") : '', border: [true, false, true, true], alignment: 'center' },
+                                    { text: this.appData[1] ? moment(this.appData[1].txn_datetime).format("DD MMM yyyy") : '', border: [true, false, true, true], alignment: 'center' },
+                                    { text: this.appData[2] ? moment(this.appData[2].txn_datetime).format("DD MMM yyyy") : '', border: [true, false, true, true], alignment: 'center' }
                                 ],
                                 [
                                     { text: 'CMMS Input by:', style: 'cellLeft', border: [true, false, true, true] },
@@ -559,6 +575,11 @@ export default {
                                 ]
                             ]
                         },
+                        layout: {
+                            hLineWidth: function (i) {
+                                return (i === 3 || i === 4 ) ? 0 : 1;
+                            },
+                        }
                     },
                     await this.generatePictures(),
                 ],
@@ -629,17 +650,22 @@ export default {
                 const mimeType = metadata.split(':')[1].split(';')[0];
                 const b = new Blob([byteArray], { type: mimeType });
                 const c = URL.createObjectURL(b)
-                console.log(c);
+                // console.log(c);
 
                 const embed = document.createElement('embed');
                 embed.src = c;
                 embed.type = 'application/pdf';
                 embed.width = '100%';
-                embed.height = '400px';
+                embed.height = '600px';
 
                 // Append the embedded object to the preview container
                 document.getElementById('pdfPreview').appendChild(embed);
             });
+        },
+        GET_ORIGINATOR(id) {
+            const user = this.userList.filter(p => p.id == id);
+            if (user.length > 0) return user[0].name;
+            else return ''
         },
         GET_PLATFORM(id) {
             const platform = this.platform.filter(p => p.id == id);
@@ -653,6 +679,7 @@ export default {
             const disc = this.disc.filter(d => d.id == id);
             return disc[0]?.discipline ? disc[0].discipline : '-';
         },
+        
     }
 };
 </script>
@@ -664,32 +691,22 @@ export default {
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-rows: 51px calc(100vh - 95px);
+    grid-template-rows: 0px calc(100vh - 95px);
     transition: all 0.3s;
-    // overflow-y: hidden;
-}
-
-.action-bar {
-    width: calc(100% - 260px) !important;
-    padding: 5px 0 !important;
-    margin: 0 !important;
-    top: 275px;
 }
 
 .page-section {
-    padding: 20px;
+    padding: 0px;
+    overflow-y: auto;
     height: calc(100vh - 270px);
-    margin-top: 60px;
+    grid-row: span 2;
 }
 
 .table-wrapper {
     display: grid;
     grid-template-columns: 100%;
     gap: 15px;
-    margin-bottom: 20px !important;
-    // width: calc(100% - 260px) !important;
-    // height: 600px;
-    // overflow-y: auto;
+    margin: 0px;
 
     *[fill] {
         grid-column: span 2;
@@ -706,12 +723,12 @@ export default {
     }
 
     button {
-        color: white;
-        border-radius: 5px;
-        padding: 10px;
+        padding: 20px 0;
+        background-color: white;
         border: solid 1px gray;
-        font-weight: 600;
-        font-size: 12px;
+        border-radius: 10px;
+        font-weight: 800;
+        font-size: 16px;
         transition: 1s;
         cursor: pointer;
     }
@@ -721,7 +738,32 @@ export default {
         background-color: $web-theme-color-secondary;
     }
 }
-
+.popup {
+    .select-wrapper {
+        
+        span {
+            font-size: 14px;
+        }
+        .select {
+            
+        }
+    }
+    .input-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+        width: 200px;
+        span {
+            font-size: 14px;
+        }
+        .inputs {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+        }
+    }
+}
 
 
 </style>

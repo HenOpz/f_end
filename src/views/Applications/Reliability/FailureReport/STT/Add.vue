@@ -395,14 +395,10 @@ export default {
     created() {
         console.log("id_record:" + this.id_record);
         console.log("id_platform:" + this.id_platform);
-        this.$store.commit("UPDATE_CURRENT_PAGENAME", {
-            subpageName: "FAILURE REPORT",
-            subpageInnerName: null,
-        });
         this.FETCH_FAILURE_ACTION_STATUS();
         this.FETCH_DISCIPLINE();
         this.FETCH_STATUS();
-        this.FETCH_FUNC_LOCATION();
+        // this.FETCH_FUNC_LOCATION();
         this.FETCH_PLANNER_GRP();
         this.FETCH_PLANNER_GRP_PLANNING_PLANT();
         this.FETCH_MAIN_WORK_CTR();
@@ -463,6 +459,7 @@ export default {
                 abc_indicator: "1",
                 user_status: "SCRN",
             },
+            platform: null,
         };
     },
     computed: {},
@@ -645,8 +642,9 @@ export default {
         FETCH_PLATFORM() {
             GET_DATA(this, "/Md/get-md-platform-list", (data) => {
                 const platform = data.filter((p) => p.id == this.id_platform);
-                this.sapHeader.planner_grp_planning_plant =
-                    platform[0].planning_plant;
+                this.sapHeader.planner_grp_planning_plant = platform[0].planning_plant;
+                this.platform = platform[0].code_name;
+                GET_DATA(this, `/Md/get-md-sap-functional-location-by-platform?platform=${this.platform}`, "formSelect.functionalLocation");
             });
         },
         SET_CURRENT_VIEW(view, data = null) {

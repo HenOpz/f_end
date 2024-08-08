@@ -484,7 +484,7 @@ export default {
         height: 100%;
         top: 0;
         left: 0;
-        background: linear-gradient(90deg, $web-theme-color-secondary 20%, rgba(39, 89, 168, 0) 80%);
+        background: linear-gradient(90deg, $web-theme-color-secondary 20%, rgba(90,127,67, 0.7) 80%);
     }
 }
 

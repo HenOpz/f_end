@@ -29,7 +29,7 @@
                         <DxDataGrid 
                             id="data-grid-list" 
                             key-expr="id" 
-                            :data-source="monitoringRecord" 
+                            :data-source="erProbeRecord" 
                             :selection="{ mode: 'single' }"
                             :hover-state-enabled="true" 
                             :allow-column-reordering="true" 
@@ -46,9 +46,6 @@
                                 :use-icons="true"
                                 mode="popup" 
                             />
-                            <DxFilterRow :visible="true" />
-                            <DxHeaderFilter :visible="true" />
-                            <DxSelection mode="single" />
                             <DxColumn 
                                 data-field="record_date" 
                                 caption="Record Date" 
@@ -80,7 +77,9 @@
                                 caption="Probe Status" 
                                 :width="120" 
                                 alignment="center"
-                            />
+                            >
+                                <DxLookup :data-source="probeList" display-expr="status" value-expr="id" />
+                            </DxColumn>
                             <DxColumn :width="80" alignment="center" cell-template="action-cell-template" />
 
                             <DxToolbar>
@@ -111,15 +110,6 @@
                                     </div>
                                 </div>
                             </template>
-
-                            <!-- Configuration goes here -->
-                            <!-- <DxFilterRow :visible="true" /> -->
-                            <DxScrolling mode="standard" />
-                            <DxSearchPanel :visible="true" />
-                            <DxPaging :page-size="5" :page-index="0" />
-                            <DxPager :show-page-size-selector="true" :allowed-page-sizes="[5, 10, 25]"
-                                :show-navigation-buttons="true" :show-info="false" info-text="Page {0} of {1} ({2} items)" />
-                            <DxExport :enabled="false" />
                         </DxDataGrid>
                     </div>
                     <div fill v-if="active_tab === tabs[2]" class="table-chart">
@@ -173,8 +163,8 @@
                 </div>
             </div>
         </div>
-        <AddProbe v-if="isShow === 1" @popup="isShow = 0" />
-        <EditProbe v-if="isShow === 2" @popup="isShow = 0" />
+        <AddProbe v-if="isShow === 1" :id_tag="id_tag" @popup="CLOSE_POPUP" />
+        <EditProbe v-if="isShow === 2" :id_record="selectedId" @popup="CLOSE_POPUP" />
     </div>
 </template>
 
@@ -216,7 +206,7 @@ import {
     DxEditing,
     // DxFilterRow,
     // DxButton,
-    // DxLookup,
+    DxLookup,
     // DxRequiredRule,
     // DxFormItem,
     // DxForm
@@ -247,7 +237,7 @@ export default {
         // DxFilterRow,
         DxButton,
         // DxAddRowButton,
-        // DxLookup,
+        DxLookup,
         // DxRequiredRule,
         // DxFormItem,
         DxSelectBox,
@@ -268,6 +258,8 @@ export default {
             // GET_DATA(this, '/Md/get-md-moc-rrl-list', 'formSelect.rrl');
             // GET_DATA(this, '/Md/get-md-moc-status-list', 'formSelect.status');
             // GET_DATA(this, `/ManagementOfChange/${this.id_record}`, 'mocList');
+            GET_DATA(this, '/CMERProbeRecord/ByTag/' + this.id_tag, 'erProbeRecord');
+            GET_DATA(this, '/Md/get-md-cm-probe-status-list', 'probeList');
             this.chartOptions = {
                 credits: {
                 enabled: false
@@ -296,29 +288,7 @@ export default {
     },
     data() {
         return {
-            monitoringRecord: [
-                {
-                    id: 1,
-                    record_date: '2 May 2022',
-                    metal_loss: '0.0064',
-                    corrosion_rate: '0.0002',
-                    comments: 'Low corrosion rate'
-                },
-                {
-                    id: 2,
-                    record_date: '25 Apr 2021',
-                    metal_loss: '0.0054',
-                    corrosion_rate: '0.0001',
-                    comments: 'Low corrosion rate'
-                },
-                {
-                    id: 3,
-                    record_date: '25 Mar 2020',
-                    metal_loss: '0.0068',
-                    corrosion_rate: '0.0003',
-                    comments: 'Low corrosion rate'
-                },
-            ],
+            erProbeRecord: [],
             libraryList: [
                 {
                     id: 1,
@@ -339,10 +309,12 @@ export default {
                     library: 'N/A'
                 }
             ],
+            selectedId: null,
             chartOptions: {},
             tabs: ['Probe Record', 'Summary Dashboard'],
             active_tab: 'Probe Record',
             isShow: 0,
+            probeList: [],
             dataGridAttributes: {
                 class: "data-grid"
             },
@@ -368,7 +340,11 @@ export default {
             this.$store.commit("SET_SHOW_BACK_BUTTON", true);
             if (data !== null) this.$emit('currentView', view, data);
             else this.$emit('currentView', view);
-        }
+        },
+        CLOSE_POPUP() {
+            this.isShow = 0;
+            GET_DATA(this, '/CMERProbeRecord/ByTag/' + this.id_tag, 'erProbeRecord');
+        },
     }
 };
 </script>

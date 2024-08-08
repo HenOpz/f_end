@@ -508,7 +508,7 @@ button {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     height: calc(100vh - 235px);
     overflow-y: auto;
     grid-row: span 2;
@@ -518,7 +518,4 @@ button {
     padding-bottom: 20px;
 }
 
-.table-wrapper {
-    margin-bottom: 200px;
-}
 </style>

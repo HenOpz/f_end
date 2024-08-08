@@ -162,6 +162,11 @@ const routes = [
         component: () => import("../views/Applications/GPI/PendingApproval/Page.vue"),
       },
       {
+        path: "sap-tracking",
+        alias: "Sap Tracking",
+        component: () => import("../views/Applications/GPI/SapTracking/Page.vue"),
+      },
+      {
         path: "gpi-approval-process",
         alias: "GPI Approval Process",
         component: () => import("../views/Applications/GPI/GPIApprovalProcess/Page.vue"),
@@ -801,7 +806,7 @@ const routes = [
     path: "/user-account-manager",
     name: "User Account Manager",
     component: () =>
-      import("../views/Applications/UserAccountManager/UserList.vue"),
+      import("../views/Applications/UserAccountManager/AccountList.vue"),
     // beforeEnter: (to, from, next) => {
     //   if (store.state.user.role == 'manager' || store.state.user.role == 'admin') next()
     //   else next('/')

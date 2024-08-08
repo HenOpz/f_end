@@ -127,7 +127,7 @@ export default {
 .app-sidebar {
     width: 200px;
     height: calc(100% - 120px);
-    background-color: $web-theme-color-secondary;
+    background: linear-gradient(180deg, $web-theme-color-secondary 0%, rgba(90,127,67, 1) 120%);
     border: 1px solid #e6e6e6;
     border-width: 0 1px 0 0;
     position: relative;
@@ -243,7 +243,7 @@ export default {
     }
 
     .fixed-panel {
-        background-color: $web-theme-color-secondary;
+        // background-color: $web-theme-color-secondary;
     }
 }
 

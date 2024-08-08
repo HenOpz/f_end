@@ -136,30 +136,16 @@
                   :accepted-values="headerValues"
                   :options="headerOptions"
                 />
-                <DxItem
-                  name="size"
-                  :accepted-values="sizeValues"
-                  :options="fontSizeOptions"
-                />
                 <DxItem name="bold" />
                 <DxItem name="italic" />
                 <DxItem name="underline" />
                 <DxItem name="strike" />
                 <DxItem name="bulletList" />
                 <DxItem name="orderedList" />
-                <DxItem name="image" />
                 <DxItem name="alignLeft" />
                 <DxItem name="alignCenter" />
                 <DxItem name="alignRight" />
                 <DxItem name="alignJustify" />
-                <DxItem name="insertTable" />
-                <DxItem name="deleteTable" />
-                <DxItem name="insertRowAbove" />
-                <DxItem name="insertRowBelow" />
-                <DxItem name="deleteRow" />
-                <DxItem name="insertColumnLeft" />
-                <DxItem name="insertColumnRight" />
-                <DxItem name="deleteColumn" />
               </DxToolbar>
             </DxHtmlEditor>
           </div>

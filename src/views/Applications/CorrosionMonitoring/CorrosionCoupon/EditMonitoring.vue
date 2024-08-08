@@ -32,7 +32,7 @@
                         <DxSelectBox 
                             :items="probeList" 
                             value-expr="id" 
-                            display-expr="code"
+                            display-expr="status"
                             placeholder="Select Status" 
                             v-model="data.id_probe_status" 
                         />
@@ -48,7 +48,7 @@
 </template>
 
 <script>
-import { PUT_DATA } from "/axios.js";
+import { GET_DATA, PUT_DATA } from "/axios.js";
 import moment from "moment";
 import "devextreme/dist/css/dx.light.css";
 import DxSelectBox from 'devextreme-vue/select-box';
@@ -64,25 +64,12 @@ export default {
     },
     created() {
         console.log(this.selectedData);
-        this.probeList = [
-            {
-                id: 1,
-                code: 'Applicable'
-            },
-            {
-                id: 2,
-                code: 'Not Applicable'
-            },
-        ]
+        GET_DATA(this, '/CMCorrosionCouponMonitorRecord/' + this.selectedData.id, 'data');
+        GET_DATA(this, '/Md/get-md-cm-probe-status-list', 'probeList');
     },
     data() {
         return {
-            data: {
-                id: this.selectedData.id,
-                id_tag: this.selectedData.id_tag,
-                install_date: this.selectedData.install_date,
-                remove_date: this.selectedData.remove_date,
-            },
+            data: {},
             probeList: [],
         };
     },

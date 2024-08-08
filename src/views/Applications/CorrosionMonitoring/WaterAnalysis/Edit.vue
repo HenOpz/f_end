@@ -147,7 +147,7 @@
                             </DxColumn>
                             <DxColumn 
                                 data-field="co2_val" 
-                                caption="CO2 (ppb)" 
+                                caption="CO2 (%)" 
                                 :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :editor-options="{ placeholder: 'CO2' }"
@@ -308,9 +308,9 @@
                 </div>
 
                 <div fill v-if="active_tab === tabs[4]" class="table-chart">
-                    <div>
+                    <div fill>
                         <DxDataGrid 
-                            id="data-grid-dashboard" 
+                            id="data-grid-list" 
                             key-expr="id" 
                             :element-attr="dataGridAttributesHydro"
                             :data-source="hydroList"
@@ -329,7 +329,7 @@
                             <DxEditing 
                                 :allow-updating="true" 
                                 :allow-deleting="true" 
-                                :allow-adding="false" 
+                                :allow-adding="true" 
                                 :use-icons="true"
                                 mode="row" 
                             />
@@ -344,16 +344,17 @@
                                 info-text="Page {0} of {1} ({2} items)" 
                             />
                             <DxColumn 
-                                data-field="date" 
+                                data-field="record_date" 
                                 caption="Date" 
                                 :width="dxColumnWidth[0]" 
                                 alignment="center"
-                                :editor-options="{ placeholder: 'Select' }"
                                 sort-order="desc"
+                                dataType="date"
+                                format="dd MMM yyyy"
                             >
                             </DxColumn>
                             <DxColumn 
-                                data-field="hydro_dynamic_cr_90_value" 
+                                data-field="cr_90_per_mm_yr" 
                                 caption="CR 90% (mm/yr)" 
                                 :width="dxColumnWidth[2]" 
                                 alignment="center"
@@ -361,21 +362,21 @@
                                 :format="formatDecimal2"
                             />
                             <DxColumn 
-                                data-field="hydro_dynamic_cr_95_value" 
+                                data-field="cr_95_per_mm_yr" 
                                 caption="CR 95% (mm/yr)" 
                                 :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :format="formatDecimal2"
                             />
                             <DxColumn 
-                                data-field="hydro_dynamic_cr_99_value" 
+                                data-field="cr_99_per_mm_yr" 
                                 caption="CR 99% (mm/yr)" 
                                 :width="dxColumnWidth[2]" 
                                 alignment="center"
                                 :format="formatDecimal2"
                             />
                             <DxColumn 
-                                data-field="hydro_dynamic_not_injected_value" 
+                                data-field="cr_not_injected_mm_yr" 
                                 caption="CR Not Injected (mm/yr)" 
                                 :width="dxColumnWidth[2]" 
                                 alignment="center"
@@ -383,7 +384,7 @@
                             />
                         </DxDataGrid>
                     </div>
-                    <div class="chart-container">
+                    <div class="chart-container" fill>
                         <highcharts :options="chartHydroOptions" :key="'chart-hydro-' + chartHydroOptions.id"  />
                     </div>
                 </div>
@@ -401,6 +402,7 @@ import exportingInit from "highcharts/modules/exporting";
 import offlineExporting from "highcharts/modules/offline-exporting";
 import { Chart } from "highcharts-vue";
 import Highcharts from "highcharts";
+import moment from "moment";
 exportingInit(Highcharts);
 offlineExporting(Highcharts);
 
@@ -442,9 +444,9 @@ export default {
             console.log('dataInfo', this.dataInfo);
             GET_DATA(this, '/Md/get-md-cm-water-analysis-status-list/', 'dissolvedStatusList');
             this.FETCH_PH();
+            this.FETCH_CO2();
             this.FETCH_DISSOLVED_O2();
             this.FETCH_ION();
-            this.FETCH_CO2();
             this.FETCH_HYDRO();
         }
     },
@@ -528,6 +530,44 @@ export default {
                 }
             });
         },
+        FETCH_CO2() {
+            GET_DATA(this, '/CMWaterAnalysisCO2/ByTag/' + this.dataInfo.id_tag, 'co2List', () => {
+                let categories = [];
+                let value = [];
+
+                this.co2List.forEach(item => {
+                    categories.push(item.year + ' ' + item.period);
+                    value.push({
+                        y: item.co2_val,
+                    })
+                })
+
+                this.chartCO2Options = {
+                    id: this.active_tab,
+                    title: {
+                        text: 'CO2 Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'CO2 (%)'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: 'CO2',
+                        data: value,
+                        lineColor: '#ccc',
+                        color: '#777'
+                    }]
+                }
+            });
+        },
         FETCH_DISSOLVED_O2() {
             GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id_tag, 'dissolvedList', () => {
                 let categories = [];
@@ -582,7 +622,7 @@ export default {
                 this.chartIonOptions = {
                     id: this.active_tab,
                     title: {
-                        text: 'FE Count Trending Results',
+                        text: 'Fe Count Trending Results',
                         align: 'center'
                     },
                     xAxis: {
@@ -605,63 +645,67 @@ export default {
                 }
             });
         },
-        FETCH_CO2() {
-            let categories = [];
-            let value = [];
-
-            this.chartCO2Options = {
-                id: this.active_tab,
-                title: {
-                    text: 'CO2 Trending Results',
-                    align: 'center'
-                },
-                xAxis: {
-                    categories: categories,
-                },
-                yAxis: {
-                    title: {
-                        text: 'CO2'
-                    }
-                },
-                credits: {
-                    enabled: false
-                },
-                series: [{
-                    name: 'CO2',
-                    data: value,
-                    lineColor: '#ccc',
-                    color: '#777'
-                }]
-            }
-        },
         FETCH_HYDRO() {
-            let categories = [];
-            let value = [];
+            GET_DATA(this, '/CMWaterAnalysisHydroDynamic', 'hydroList', () => {
+                let categories = [];
+                let value1 = [];
+                let value2 = [];
+                let value3 = [];
+                let value4 = [];
 
-            this.chartHydroOptions = {
-                id: this.active_tab,
-                title: {
-                    text: 'Hydro Dynamic Trending Results',
-                    align: 'center'
-                },
-                xAxis: {
-                    categories: categories,
-                },
-                yAxis: {
+                this.hydroList.forEach(item => {
+                    categories.push(moment(item.record_date).format("DD MMM YYYY"));
+                    value1.push({ y: item.cr_90_per_mm_yr })
+                    value2.push({ y: item.cr_95_per_mm_yr })
+                    value3.push({ y: item.cr_99_per_mm_yr })
+                    value4.push({ y: item.cr_not_injected_mm_yr })
+                })
+
+                this.chartHydroOptions = {
+                    id: this.active_tab,
                     title: {
-                        text: 'Hydro Dynamic'
-                    }
-                },
-                credits: {
-                    enabled: false
-                },
-                series: [{
-                    name: 'Hydro Dynamic',
-                    data: value,
-                    lineColor: '#ccc',
-                    color: '#777'
-                }]
-            }
+                        text: 'Hydro Dynamic Trending Results',
+                        align: 'center'
+                    },
+                    xAxis: {
+                        categories: categories,
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Hydro Dynamic'
+                        }
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    series: [
+                        {
+                            name: 'CR 90%',
+                            data: value1,
+                            lineColor: '#03fcba',
+                            color: '#03fcba'
+                        },
+                        {
+                            name: 'CR 95%',
+                            data: value2,
+                            lineColor: '#03c2fc',
+                            color: '#03c2fc'
+                        },
+                        {
+                            name: 'CR 99%',
+                            data: value3,
+                            lineColor: '#b603fc',
+                            color: '#b603fc'
+                        },
+                        {
+                            name: 'CR Not Injected',
+                            data: value4,
+                            lineColor: '#fc0390',
+                            color: '#fc0390'
+                        }
+                    ]
+                }
+            });
         },
         GET_COLOR_STATUS(id) {
             if(id) {
@@ -678,31 +722,37 @@ export default {
             e.data.created_by = user.id;
             e.data.updated_by = user.id;
             if(e.component._customClass == 'data-grid-list-ph'){
-                POST_DATA('/CMWaterAnalysisPH', e.data, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                POST_DATA('/CMWaterAnalysisPH', e.data, () => {this.FETCH_PH();});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                POST_DATA('/CMWaterAnalysisDissolvedO2', e.data, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                POST_DATA('/CMWaterAnalysisDissolvedO2', e.data, () => {this.FETCH_DISSOLVED_O2();});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                POST_DATA('/CMWaterAnalysisIonCount', e.data, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                POST_DATA('/CMWaterAnalysisIonCount', e.data, () => {this.FETCH_CO2();});
+            } else if (e.component._customClass == 'data-grid-list-hydro') {
+                POST_DATA('/CMWaterAnalysisHydroDynamic', e.data, () => {this.FETCH_HYDRO();});
             }
         },
         UPDATE_RECORD(e) {
             const user = JSON.parse(localStorage.getItem("user"));
             e.data.updated_by = user.id;
             if(e.component._customClass == 'data-grid-list-ph'){
-                PUT_DATA('/CMWaterAnalysisPH/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                PUT_DATA('/CMWaterAnalysisPH/' + e.data.id, e.data, () => {this.FETCH_PH();});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                PUT_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                PUT_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, e.data, () => {this.FETCH_DISSOLVED_O2();});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                PUT_DATA('/CMWaterAnalysisIonCount/' + e.data.id, e.data, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                PUT_DATA('/CMWaterAnalysisIonCount/' + e.data.id, e.data, () => {this.FETCH_CO2();});
+            } else if (e.component._customClass == 'data-grid-list-hydro') {
+                PUT_DATA('/CMWaterAnalysisHydroDynamic/' + e.data.id, e.data, () => {this.FETCH_HYDRO();});
             }
         },
         DELETE_RECORD(e) {
             if(e.component._customClass == 'data-grid-list-ph'){
-                DELETE_DATA('/CMWaterAnalysisPH/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisPH/ByTag/' + this.dataInfo.id, 'pHList')});
+                DELETE_DATA('/CMWaterAnalysisPH/' + e.data.id, () => {this.FETCH_PH();});
             } else if (e.component._customClass == 'data-grid-list-dissolved') {
-                DELETE_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisDissolvedO2/ByTag/' + this.dataInfo.id, 'dissolvedList')});
+                DELETE_DATA('/CMWaterAnalysisDissolvedO2/' + e.data.id, () => {this.FETCH_DISSOLVED_O2();});
             } else if (e.component._customClass == 'data-grid-list-ion') {
-                DELETE_DATA('/CMWaterAnalysisIonCount/' + e.data.id, () => {GET_DATA(this, '/CMWaterAnalysisIonCount/ByTag/' + this.dataInfo.id, 'ionCountList')});
+                DELETE_DATA('/CMWaterAnalysisIonCount/' + e.data.id, () => {this.FETCH_CO2();});
+            } else if (e.component._customClass == 'data-grid-list-hydro') {
+                DELETE_DATA('/CMWaterAnalysisHydroDynamic/' + e.data.id, () => {this.FETCH_HYDRO();});
             }
         },
         onCellPrepared() {
@@ -784,6 +834,8 @@ export default {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 5px;
+        height: 500px;
+        overflow-y: scroll;
     }
 
     .input-wrapper {

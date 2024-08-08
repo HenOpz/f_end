@@ -73,7 +73,7 @@
                     <DxColumn
                         data-field="id_discipline"
                         caption="Discipline"
-                        :width="100"
+                        :width="120"
                         alignment="center"
                     >
                         <DxLookup
@@ -83,7 +83,7 @@
                         />
                     </DxColumn>
                     <!-- <DxColumn data-field="rca_status" caption="RCA Status" :width="80" alignment="center" />
-          <DxColumn data-field="rca_action_status" caption="RCA Action Status" :width="80" alignment="center" /> -->
+                    <DxColumn data-field="rca_action_status" caption="RCA Action Status" :width="80" alignment="center" /> -->
                     <DxColumn
                         :width="user.failure_seq === 1 ? 120 : 80"
                         alignment="center"
@@ -135,6 +135,8 @@
                                     margin-top: 5px;
                                 "
                             ></textarea>
+                            Transaction:
+                            <TxnList :row="data" />
                         </div>
                     </template>
 
@@ -189,6 +191,7 @@
 <script>
 //API
 import { GET_DATA, DELETE_DATA } from "/axios.js";
+import TxnList from "./TxnList.vue";
 // import moment from "moment";
 
 //Components
@@ -251,6 +254,7 @@ export default {
         // penSvg,
         // trashSvg,
         DxMasterDetail,
+        TxnList,
     },
     created() {
         this.$store.commit("UPDATE_CURRENT_PAGENAME", {
@@ -344,7 +348,7 @@ export default {
 }
 
 .page-section {
-    padding: 20px;
+    padding: 20px 40px;
     overflow-y: auto;
     grid-row: span 2;
 }
